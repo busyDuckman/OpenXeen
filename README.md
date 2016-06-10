@@ -3,6 +3,8 @@
 OpenXeen is a mod for Might and Magic IV & V - World of Xeen (WOX), programmed by duuckman (Dr Warren Creemers).
 It is a game engine rewrite in java designed to make MaM gaming more available.
 
+
+
 Unfortunately, MaM is not abandonware - you (still) need to purchase a copy to play the full version of WOX legally.
 This mod aims to bundle the shareware version, but I recommend finding a full CD (talkie) version on ebay.
 
@@ -30,3 +32,4 @@ Acknowledgments:
 
 And a shout-out to the Xeen community on faceook, [https://www.facebook.com/groups/AdventurersOfXeen/].
 It was great sharing a love of MaM games with you guys.
+
