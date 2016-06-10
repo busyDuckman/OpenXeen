@@ -31,10 +31,10 @@ Status:
   NB: First run will take some time, proxy files are being created.
 
 Acknowledgments:
-    xeen.wikia.org -    So so much work on the MaM file formats
-    Ben            -    Sharing a passion for reverse engineering xeen
-    Elliot Kroo    -    GifSequenceWriter.java
-    Hyllian        -    xBR algorithm
+  - xeen.wikia.org -    So so much work on the MaM file formats
+  - Ben            -    Sharing a passion for reverse engineering xeen
+  - Elliot Kroo    -    GifSequenceWriter.java
+  - Hyllian        -    xBR algorithm
 
 And a shout-out to the Xeen community on faceook, [https://www.facebook.com/groups/AdventurersOfXeen/].
 It was great sharing a love of MaM games with you guys.
