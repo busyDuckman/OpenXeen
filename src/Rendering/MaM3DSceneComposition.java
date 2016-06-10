@@ -57,7 +57,11 @@ public class MaM3DSceneComposition implements ISceneComposition {
 
     public synchronized void setSky(MaMSprite sky)
     {
-        addRenderable(MaM3dScenePos.TopHalfOfsky.getRenderablePosition(), sky);
+        IRenderableGameObject skyTop = IRenderableGameObject.fromImage(sky.getRenderedFrames()[0]);
+        IRenderableGameObject skyBottom = IRenderableGameObject.fromImage(sky.getRenderedFrames()[1]);
+
+        addRenderable(MaM3dScenePos.TopHalfOfsky.getRenderablePosition(), skyTop);
+        addRenderable(MaM3dScenePos.BottomHalfOfsky.getRenderablePosition(), skyBottom);
     }
 
     public synchronized void addSurface(Point relativePos, MaMSurface surface)
@@ -67,7 +71,7 @@ public class MaM3DSceneComposition implements ISceneComposition {
 
     public synchronized void addMonster(Point relativePos, MaMMonster monster)
     {
-        addRenderable(MaM3dScenePos.Monsters2StepsForward.getRenderablePosition(), monster.getAttackAnimation());
+        addRenderable(MaM3dScenePos.MonsterCurrentMiddle.getRenderablePosition(), monster.getAttackAnimation());
     }
 
 

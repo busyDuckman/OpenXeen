@@ -134,8 +134,19 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
             {
                 case "MON":
                 case "ATT":
+                case "EG2":
+                case "END":
+                case "INT":
+                case "TWN":
+                case "SWL":
+                case "PIC":
+                case "OBJ":
+                case "ICN":
+                case "FWL":
+                case "FAC":
                     return getSprite(id);
                 case "GND":
+                case "SKY":
                     return getSprite(id);
                 case "PAL":
                     return getPallet(id);

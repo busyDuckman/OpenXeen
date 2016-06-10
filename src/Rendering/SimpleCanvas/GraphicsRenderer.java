@@ -43,6 +43,12 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             renderView(g, timeMS, hudView);
         }
 
+        MaM2DMapComposition mapView = this.game.renderMap(0,0,16,16);
+        if(mapView != null)
+        {
+            renderView(g, timeMS, mapView);
+        }
+
     }
 
     private void renderView(Graphics g, long timeMS, ISceneComposition view) {

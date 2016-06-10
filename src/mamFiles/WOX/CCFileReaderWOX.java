@@ -260,6 +260,7 @@ public class CCFileReaderWOX extends CCFileReader
 
     @Override
     public MaMPallet getPalletForFile(int id) throws CCFileFormatException {
+        //ignoring id for now, so far this pallet works for all sprites
         try
         {
             return getPallet(variant.getDefaultPallate());
@@ -268,8 +269,6 @@ public class CCFileReaderWOX extends CCFileReader
         {
             return getPallet("MM4.PAL");
         }
-        //ignoring id for now, so far this pallet works for all sprites
-        //return getPallet("MM4.PAL");
     }
 
     public WoXCCVariant getVariant() {

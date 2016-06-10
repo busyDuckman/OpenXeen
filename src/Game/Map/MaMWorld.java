@@ -63,6 +63,8 @@ public abstract class MaMWorld implements AutoCloseable
         return worldName;
     }
 
+    public abstract void loadMaps() throws CCFileFormatException;
+
     public Map<Integer, MaMMazeFile> getMazeFiles() {
         return MazeFiles;
     }
@@ -102,5 +104,10 @@ public abstract class MaMWorld implements AutoCloseable
     public void close() throws Exception {
         this.ccFile.close();
         this.ccFileAnimations.close();
+    }
+
+    public void setCurrentMap(int mapID)
+    {
+        this.currentMaze = getMazeFiles().get(mapID);
     }
 }

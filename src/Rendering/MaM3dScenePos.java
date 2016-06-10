@@ -5,8 +5,8 @@ package Rendering;
  */
 public enum MaM3dScenePos
 {
-    TopHalfOfsky (0x0000, 0, 8, 8, 0, 0x0000),
-    BottomHalfOfsky (0x0000, 1, 8, 25, 0, 0x0000),
+    TopHalfOfsky (0x0000, 0, 8, 8, 0, 0x0000, 0),
+    BottomHalfOfsky (0x0000, 1, 8, 25, 0, 0x0000, 0),
     Ground (0x0000, 0, 8, 67, 0, 0x0000, 1),
     SurfaceTile4StepsForward3Left (0x0000, 0, 8, 67, 0, 0x0000),
     SurfaceTile4StepsForward2Left (0x0000, 0, 38, 67, 0, 0x0000),
@@ -132,7 +132,10 @@ public enum MaM3dScenePos
 0xFFFF, 0, 110, 73, 0, 0x0000),
 0xFFFF, 0, 110, 73, 0, 0x0000),*/
     
-    ProjecTileWeaponSprite1StepsForward (0xFFFF, 0, 72, 43, 0, 0x8000);
+    ProjecTileWeaponSprite1StepsForward (0xFFFF, 0, 72, 43, 0, 0x8000),
+    MonsterCurrentMiddle(0x0000, 1, 32, 24, 0, 0x0000);
+
+
 //    ProjecTileWeaponSprite1StepsForward (0xFFFF, 0, 72, 43, 0, 0x0000),
 //    ProjecTileWeaponSprite1StepsForward (0xFFFF, 0, 93, 48, 0, 0x0000),
 //    ProjecTileWeaponSprite1StepsForward (0xFFFF, 0, 51, 48, 0, 0x8000),
@@ -151,7 +154,8 @@ public enum MaM3dScenePos
     int flags;
     int renderDepth;
 
-    MaM3dScenePos(int defaultSprite, int frame, int xPos, int yPos, double scale, int flags, int renderDepth) {
+    MaM3dScenePos(int defaultSprite, int frame, int xPos, int yPos,
+                  double scale, int flags, int renderDepth) {
         this.defaultSprite = defaultSprite;
         this.frame = frame;
         this.xPos = xPos;
@@ -161,7 +165,8 @@ public enum MaM3dScenePos
         this.renderDepth = renderDepth;
     }
 
-    MaM3dScenePos(int defaultSprite, int frame, int xPos, int yPos, double scale, int flags)
+    MaM3dScenePos(int defaultSprite, int frame, int xPos, int yPos,
+                  double scale, int flags)
     {
         //this(defaultSprite, frame, xPos, yPos, 1.0/scale, flags, 5);
         this(defaultSprite, frame, xPos, yPos, 1.0, flags, 5);

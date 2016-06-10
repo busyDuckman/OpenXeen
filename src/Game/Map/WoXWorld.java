@@ -74,7 +74,8 @@ public class WoXWorld extends MaMWorld
         return scene;
     }
 
-    void loadMaps() throws CCFileFormatException
+    @Override
+    public void loadMaps() throws CCFileFormatException
     //ref Dictionary<int, string> mapNameLut, ref Dictionary<string, int> mapIDLut)
     {
         int missCount=0;
