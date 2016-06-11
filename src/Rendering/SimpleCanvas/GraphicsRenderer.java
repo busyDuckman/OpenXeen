@@ -10,13 +10,43 @@ import java.awt.image.BufferedImage;
 
 /**
  * Created by duckman on 20/05/2016.
+ *
+ * This class implements IMaMRenderer, This is the requirement to render the openXeen game.
+ * Any SFX or graphical enhancements, are done here.
+ *
+ * IMaMRenderer uses the IMaMGame object to perform render to sprite collection tasts:
+ *  - game.render(...)
+ *  - game.renderHUDForWorld(...)
+ *  - game.renderMap(...)
+ *
+ *  It then takes the sprite collections (composed scenes) and renders them to the display.
+ *
+ *  This class in the vein of a reference implementation of IMaMRenderer.
+ *  Fancy rendering should be done in a custom class implementing IMaMRenderer. This class
+ *  is for testing and reference purposes and should not be polluted.
  */
 public class GraphicsRenderer implements IMaMRenderer<Graphics>
 {
+    //------------------------------------------------------------------------------------------------------------------
+    // Instance data
+    //------------------------------------------------------------------------------------------------------------------
     IMaMGame game;
+    protected double scale = 1;
 
-    double scale = 4;
+    //------------------------------------------------------------------------------------------------------------------
+    // Constructors
+    //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * @param scale The scale to which the scene will be drawn. Will be clamped to 0.1 - 100.
+     */
+    public GraphicsRenderer(double scale) {
+        setScale(scale);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Getters and Setters
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public void setGame(IMaMGame game) {
         this.game = game;
@@ -27,10 +57,24 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
         return game;
     }
 
+    public double getScale() {
+        return scale;
+    }
+
+    /**
+     * @param scale The scale to which the scene will be drawn. Will be clamped to 0.1 - 100.
+     */
+    public void setScale(double scale) {
+        this.scale = Math.max(0.1, Math.min(scale, 100));
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Rendering
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public void refresh(Graphics g, long timeMS)
     {
-        MaM3DSceneComposition view = this.getCurrentView();
+        MaM3DSceneComposition view = this.game.render();
 
         if(view != null)
         {
@@ -51,7 +95,57 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
 
     }
 
-    private void renderView(Graphics g, long timeMS, ISceneComposition view) {
+    //------------------------------------------------------------------------------------------------------------------
+    // Helper methods
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * So...
+     * If a sprite is rendered so its edge in world space is (X + W)
+     * Then its edge in view space is (X*scale + W*scale).
+     * BUT: Consider the Sprite adjacent o it (X2 + W2), such that X2 = (X + W)+1;
+     *
+     * Problem: X2*scale != (X*scale + W*scale)+1.
+     *   This causes occasional tears when scaling sprites in a non integral fashion.
+     *
+     * I'm 90% sure scaling rectangles by outer dimensions fixes this, if not
+     * the other code here can be used instead.
+     */
+    private static Rectangle scaleRectangleNoTearing(Rectangle r, double scale) {
+
+        int x = (int)Math.round(r.x * scale);
+        int y = (int)Math.round(r.y * scale);
+        int right = (int)Math.round((r.x+r.width) * scale);
+        int bottom = (int)Math.round((r.y+r.height) * scale);
+        return new Rectangle(x, y, right-x, bottom-y);
+
+//        if(scale > 1.0) //magnification must respect tearing
+//        {
+//            int x = (int)Math.round(r.x * scale);
+//            int y = (int)Math.round(r.y * scale);
+//
+//            //scale to edge of next sprite (note the +1)
+//            int right = (int)Math.round((r.x+r.width+1) * scale);
+//            int bottom = (int)Math.round((r.y+r.height+1) * scale);
+//
+//            //rectangle to pixel before next bound
+//            return new Rectangle(x, y, right-x-1, bottom-y-1);
+//        }
+//        else if(scale < 1.0) //minification should be fine
+//        {
+//            int x = (int)Math.round(r.x * scale);
+//            int y = (int)Math.round(r.y * scale);
+//            int right = (int)Math.round((r.x+r.width) * scale);
+//            int bottom = (int)Math.round((r.y+r.height) * scale);
+//            return new Rectangle(x, y, right-x, bottom-y);
+//        }
+//        else
+//        {
+//            //no scale
+//            return r;
+//        }
+    }
+
+    protected void renderView(Graphics g, long timeMS, ISceneComposition view) {
         view.depthSort();
         for (Pair<RenderablePos, IRenderableGameObject> renderable : view.getRenderables())
         {
@@ -74,15 +168,9 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             }
 
             Rectangle bounds = renderable.getKey().getImageBounds(frame.getWidth(), frame.getHeight());
-            //Rectangle bounds =
+            bounds = scaleRectangleNoTearing(bounds, scale);
 
-            g.drawImage(
-                    frame,
-                    (int)Math.round(bounds.x*scale),
-                    (int)Math.round(bounds.y*scale),
-                    (int)Math.round(bounds.width*scale),
-                    (int)Math.round(bounds.height*scale),
-                    null);
+            g.drawImage(frame,bounds.x, bounds.y, bounds.width, bounds.height, null);
         }
     }
 
@@ -112,15 +200,9 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             }
 
             Rectangle bounds = renderable.getKey().getImageBounds(frame.getWidth(), frame.getHeight());
-            //Rectangle bounds =
+            bounds = scaleRectangleNoTearing(bounds, scale);
 
-            g.drawImage(
-                    frame,
-                    (int)Math.round(bounds.x*scale),
-                    (int)Math.round(bounds.y*scale),
-                    (int)Math.round(bounds.width*scale),
-                    (int)Math.round(bounds.height*scale),
-                    null);
+            g.drawImage(frame,bounds.x, bounds.y, bounds.width, bounds.height, null);
         }
     }
 }

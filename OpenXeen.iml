@@ -21,5 +21,6 @@
     </orderEntry>
     <orderEntry type="library" name="joda-time:joda-time:2.9.3" level="project" />
     <orderEntry type="library" name="com.miglayout:miglayout-core:5.0" level="project" />
+    <orderEntry type="library" name="com.miglayout:miglayout-swing:5.0" level="project" />
   </component>
 </module>

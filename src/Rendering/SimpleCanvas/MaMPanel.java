@@ -2,55 +2,60 @@ package Rendering.SimpleCanvas;
 
 import Game.IMaMGame;
 import Game.MaMActions;
-import Game.Monsters.MaMMonster;
-import Rendering.IMaMSprite;
+import net.miginfocom.swing.MigLayout;
 import org.joda.time.DateTime;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 
 /**
  * Created by duckman on 16/05/2016.
  */
 
 
-public class MaMWindow extends JPanel implements  KeyListener //implements WindowListener // implements MouseListener
+public class MaMPanel extends JPanel implements  KeyListener, ComponentListener//implements WindowListener // implements MouseListener
 {
     //------------------------------------------------------------------------------------------------------------------
     // Instance Data
     //------------------------------------------------------------------------------------------------------------------
     protected String title;
 
-    IMaMGame game;
+    protected IMaMGame game;
 
-    protected double scaleX = 1.0;
-    protected double scaleY = 1.0;
-    Font messageFont = new Font("TimesRoman", Font.PLAIN, 20);
+    protected double scale = 1.0;
+    protected Dimension mamNativeSize = new Dimension(320, 200);
+    protected Font messageFont = new Font("TimesRoman", Font.PLAIN, 20);
 
-    Timer timer;
-    GraphicsRenderer renderer = null;
+    protected Timer timer;
+    protected GraphicsRenderer renderer = null;
 
 
 
     //------------------------------------------------------------------------------------------------------------------
     // Constructors
     //------------------------------------------------------------------------------------------------------------------
-    public MaMWindow(IMaMGame game)
+    public MaMPanel(IMaMGame game)
     {
         this(null, game);
     }
 
-    public MaMWindow(String title, IMaMGame game)
+    public MaMPanel(String title, IMaMGame game)
     {
         // frame in GLOBAL.ICN
         super();
+
         this.title = title;
+        this.setLayout(new MigLayout("","",""));
+
         //this.addMouseMotionListener(this);
         //this.addMouseListener(this);
         this.setFocusable(true);
         this.addKeyListener(this);
+        Dimension size = new Dimension((int)(mamNativeSize.width*scale), (int)(mamNativeSize.height*scale));
+        this.setPreferredSize(size);
+        this.addComponentListener(this);
+
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
             @Override
@@ -67,7 +72,7 @@ public class MaMWindow extends JPanel implements  KeyListener //implements Windo
 
         this.game = game;
 
-        renderer = new GraphicsRenderer();
+        renderer = new GraphicsRenderer(scale);
         renderer.setGame(game);
 
         timer = new Timer(20, new ActionListener() {
@@ -100,13 +105,6 @@ public class MaMWindow extends JPanel implements  KeyListener //implements Windo
         long ms = DateTime.now().getMillis();
         renderer.refresh(g, ms);
 
-//        try {
-//            //g.drawImage(game.getCcFile().loadMonsters(game)[0].getImage(0), 40, 40, null);
-//            g.drawImage(game.getWorld().getMonsters()[0].getImage(0), 40, 40, null);
-//        } catch (CCFileFormatException e) {
-//            e.printStackTrace();
-//        }
-
         //draw title
         if(this.title != null)
         {
@@ -135,6 +133,37 @@ public class MaMWindow extends JPanel implements  KeyListener //implements Windo
 
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // ComponentListener
+    //------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        scale = Math.min((this.getWidth() / (double)mamNativeSize.width),
+                         (this.getHeight() / (double)mamNativeSize.height));
+
+        renderer.setScale(scale);
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
+    }
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    // KeyListener
+    //------------------------------------------------------------------------------------------------------------------
 
     @Override
     public void keyTyped(KeyEvent e) {
