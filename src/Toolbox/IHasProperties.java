@@ -8,15 +8,15 @@ import java.util.*;
  */
 public interface IHasProperties
 {
-    boolean getProperties(Properties p);
-    boolean setProperties(Properties p);
+    boolean getProperties(HProperties p);
+    boolean setProperties(HProperties p);
 
     default boolean saveProperties(String path, String comment)
     {
         try(OutputStream os = new FileOutputStream(path))
         {
             //yes its cool that I can do this in java, but its not cool that I have to.
-            Properties p = new Properties(){
+            HProperties p = new HProperties(){
                 @Override
                 public synchronized Enumeration<Object> keys() {
                     TreeSet<Object> ts = new TreeSet<>(new NaturalOrderComparator());
@@ -41,7 +41,7 @@ public interface IHasProperties
 
     default boolean loadProperties(String path)
     {
-        Properties prop = new Properties();
+        HProperties prop = new HProperties();
         try(InputStream is = new FileInputStream(path))
         {
             prop.load(is);

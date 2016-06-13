@@ -1,10 +1,7 @@
 package mamFiles;
 
-import Game.MaMGame;
 import Game.Map.MaMWorld;
 import Game.Monsters.MaMMonster;
-import Rendering.IMaMSprite;
-import Toolbox.ArrayHelpers;
 import Toolbox.FileHelpers;
 import Toolbox.IValidatable;
 import mamFiles.WOX.SpriteFileWOX;
@@ -85,14 +82,14 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
 
     protected Map<Integer, String> knownFileNames;
     String filePath;
-    protected int fileSize;
+    //protected int fileSize;
 
     //-------------------------------------------------------------------------------------------------
     // Constructor
     //-------------------------------------------------------------------------------------------------
-    protected CCFileReader(String fileName, int size)
+    protected CCFileReader(String fileName)
     {
-        super(FileHelpers.getFileNameNoExtension(fileName));
+        super(FileHelpers.getFileNameNoExtension(fileName), "root@" + fileName);
         filePath = fileName;
     }
 
@@ -105,17 +102,81 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     //-------------------------------------------------------------------------------------------------
     // Actual file loading
     //-------------------------------------------------------------------------------------------------
-    public abstract MaMSprite getSprite(int id, MaMPallet pal) throws CCFileFormatException;
-    public abstract MaMPallet getPallet(int id) throws CCFileFormatException;
-    public abstract MaMSurface getSurface(int id, MaMPallet pal) throws CCFileFormatException;
-    public MaMRawImage getRawImage(int id, MaMPallet pal) throws CCFileFormatException
+    // A) THESE ARE THE ONLY FUNCTIONS TO EXTRACT FROM CC FILES.
+    // B) THEY ARE ONLY CALLED FROM A CACHE MISS
+
+    protected abstract MaMSprite __getSprite(int id, MaMPallet pal) throws CCFileFormatException;
+    protected abstract MaMPallet __getPallet(int id) throws CCFileFormatException;
+    protected abstract MaMSurface __getSurface(int id, MaMPallet pal) throws CCFileFormatException;
+    protected MaMRawImage __getRawImage(int id, MaMPallet pal) throws CCFileFormatException
     {
-        return new MaMRawImage(getFileNameForID(id), getFileRaw(id), pal);
+        return new MaMRawImage(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
+    }
+    protected abstract MaMMazeFile __getMapFile(int id, MaMWorld world) throws CCFileFormatException;
+
+    protected MaMTextFile __getText(int id) throws CCFileFormatException
+    { return new MaMTextFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id)); }
+
+    protected MAMVocFile __getVoc(int id) throws CCFileFormatException
+    {
+        return new MAMVocFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
     }
 
+    protected MaMBinaryFile __getMaMBinaryFile(int id) throws CCFileFormatException
+    {
+        return new MaMBinaryFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
+    }
+
+
+    //-------------------------------------------------------------------------------------------------
+    // Pallet helpers
+    //-------------------------------------------------------------------------------------------------
     public abstract MaMPallet getPalletForFile(int id) throws CCFileFormatException;
 
-    public abstract MaMMazeFile getMapFile(int id, MaMWorld world) throws CCFileFormatException;
+    //-------------------------------------------------------------------------------------------------
+    // Cached file objects
+    //-------------------------------------------------------------------------------------------------
+
+
+    public MaMSprite getSprite(int id, MaMPallet pal) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getSprite);
+    }
+
+    public MaMPallet getPallet(int id) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getPallet);
+    }
+
+    public MaMSurface getSurface(int id, MaMPallet pal) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getSurface);
+    }
+
+    public MaMRawImage getRawImage(int id, MaMPallet pal) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getRawImage);
+    }
+
+    public MaMMazeFile getMapFile(int id, MaMWorld world) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, (I) -> this.__getMapFile(I, world));
+    }
+
+    public MaMTextFile getText(int id) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getText);
+    }
+
+    public MAMVocFile getVoc(int id) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getVoc);
+    }
+
+    public MaMBinaryFile getMaMBinaryFile(int id) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getMaMBinaryFile);
+    }
 
 
 
@@ -124,7 +185,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     //-------------------------------------------------------------------------------------------------
     public MAMFile getFile(int id) throws CCFileFormatException
     {
-        String fileName = getFileNameForID(id);
+        String fileName = getNameForID(id);
         String fileExt = FileHelpers.getFileExtension(fileName).toUpperCase();
         String fileNameNoExt = FileHelpers.getFileNameNoExtension(fileName).toUpperCase();
 
@@ -159,7 +220,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
                 case "RAW":
                     return getRawImage(id);
                 default:
-                    return new MaMBinaryFile(fileName, getFileRaw(id));
+                    return getMaMBinaryFile(id);
             }
         }
         catch (Exception ex)
@@ -233,16 +294,9 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     public MaMTextFile getText(String fileName) throws CCFileFormatException
     { return getText(hashFileName(fileName)); }
 
-    public MaMTextFile getText(int id) throws CCFileFormatException
-    { return new MaMTextFile(getFileNameForID(id), getFileRaw(id)); }
 
     public MAMVocFile getVoc(String fileName) throws CCFileFormatException
     { return getVoc(hashFileName(fileName)); }
-
-    public MAMVocFile getVoc(int id) throws CCFileFormatException
-    {
-        return new MAMVocFile(getFileNameForID(id), getFileRaw(id));
-    }
 
     public MaMMazeFile getMapFile(String fileName, MaMWorld world) throws CCFileFormatException {
         return getMapFile(hashFileName(fileName), world);
@@ -334,7 +388,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     //-------------------------------------------------------------------------------------------------
     // Misc
     //-------------------------------------------------------------------------------------------------
-    public String getFileNameForID(int id)
+    public String getNameForID(int id)
     {
         if(knownFileNames == null)
         {
@@ -426,7 +480,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         for (CCFileTocEntry tocEntry : tocEntries)
         {
             int id = tocEntry.ID;
-            String fileName = getFileNameForID(id);
+            String fileName = getNameForID(id);
 
             MAMFile mamFile = null;
             try {
@@ -484,7 +538,10 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
             //sprite
             try
             {
-                MaMSprite sprite = new SpriteFileWOX("SPRITE_FOR_"+fileName,getFileRaw(id), getPalletForFile(id));
+                MaMSprite sprite = new SpriteFileWOX("SPRITE_FOR_"+fileName,
+                                                    MAMFile.generateKeyFromCCFile(id, this),
+                                                    getFileRaw(id),
+                                                    getPalletForFile(id));
                 //if we are here, we parsed a sprite
                 System.out.println(describeFile(fileName) + " was a computer sprite alright.");
                 return sprite;
@@ -496,7 +553,10 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
             //raw image
             try
             {
-                MaMRawImage img = new MaMRawImage("IMAGE_FOR_"+fileName,getFileRaw(id), getPalletForFile(id));
+                MaMRawImage img = new MaMRawImage("IMAGE_FOR_"+fileName,
+                                                MAMFile.generateKeyFromCCFile(id, this),
+                                                getFileRaw(id),
+                                                getPalletForFile(id));
                 //if we are here, we parsed a sprite
                 System.out.println(describeFile(fileName) + " was a raw image.");
                 return img;
@@ -511,7 +571,9 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
             {
                 if(looksLikeText(((MaMBinaryFile) mamFile).data))
                 {
-                    MaMTextFile txt = new MaMTextFile("TEXT_FOR_"+fileName, getFileRaw(id));
+                    MaMTextFile txt = new MaMTextFile("TEXT_FOR_"+fileName,
+                                                        MAMFile.generateKeyFromCCFile(id, this),
+                                                        getFileRaw(id));
                     System.out.println(describeFile(fileName) + " was a text file.");
                     return txt;
                 }

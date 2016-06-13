@@ -7,8 +7,8 @@ import mamFiles.MaMPallet;
  */
 public class PalletWOX extends MaMPallet
 {
-    public PalletWOX(String name, byte[] data)
+    public PalletWOX(String name, String key, byte[] data)
     {
-        super(name, data, 256, 2);
+        super(name, key, data, 256, 2);
     }
 }

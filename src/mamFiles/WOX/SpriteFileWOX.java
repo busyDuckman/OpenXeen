@@ -201,8 +201,8 @@ public class SpriteFileWOX extends MaMSprite
 
 
 
-    public SpriteFileWOX(String name, byte[] data, MaMPallet pal) throws CCFileFormatException {
-        super(name, pal);
+    public SpriteFileWOX(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
+        super(name, key, pal);
         BinaryHelpers.DebugDumpBinary(data, "sprite.last");
 
         //0002h	n * 4	The cells that are used to generate a frame where n is the number of frames in the sprite.

@@ -10,6 +10,7 @@ import Toolbox.Direction;
 import Toolbox.Grid;
 import mamFiles.CCFileFormatException;
 import mamFiles.CCFileReader;
+import mamFiles.MAMFile;
 import mamFiles.MaMMazeFile;
 
 import java.awt.*;
@@ -34,8 +35,8 @@ public class WOXMazeFile extends MaMMazeFile
     private int tavernTips;
     private Point runPos;
 
-    public WOXMazeFile(int mazeID, MaMWorld world) throws CCFileFormatException {
-        super("MAZE_"+mazeID);
+    public WOXMazeFile(int mazeID, String key, MaMWorld world) throws CCFileFormatException {
+        super("MAZE_"+mazeID, key);
 
         int mapWidth = 16;
         int mapHeight = 16;

@@ -9,9 +9,9 @@ public class MaMBinaryFile extends MAMFile
 {
     byte[] data;
 
-    public MaMBinaryFile(String name, byte[] data)
+    public MaMBinaryFile(String name, String key, byte[] data)
     {
-        super(name);
+        super(name, key);
         this.data = data;
     }
 
@@ -32,6 +32,8 @@ public class MaMBinaryFile extends MAMFile
     public MaMBinaryFile fromBinFile(String path)
     {
         byte[] data = FileHelpers.readAllBytes(path);
-        return new MaMBinaryFile(FileHelpers.getFileNameTillFirstDot(path), data);
+        return new MaMBinaryFile(FileHelpers.getFileNameTillFirstDot(path),
+                                MAMFile.generateKeyFromPath(path),
+                                data);
     }
 }

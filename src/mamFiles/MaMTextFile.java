@@ -11,15 +11,15 @@ public class MaMTextFile extends MAMFile
 {
     String text;
 
-    public MaMTextFile(String name, byte[] data)
+    public MaMTextFile(String name, String key, byte[] data)
     {
-        super(name);
+        super(name, key);
         text = new String(data);
     }
 
-    public MaMTextFile(String name, String data)
+    public MaMTextFile(String name, String key, String data)
     {
-        super(name);
+        super(name, key);
         text = new String(data.toCharArray());
     }
 
@@ -39,6 +39,8 @@ public class MaMTextFile extends MAMFile
 
     public static MaMTextFile fromTextFile(String path)
     {
-        return new MaMTextFile(FileHelpers.getFileNameTillFirstDot(path), FileHelpers.readAllText(path));
+        return new MaMTextFile(FileHelpers.getFileNameTillFirstDot(path),
+                                MAMFile.generateKeyFromPath(path),
+                                FileHelpers.readAllText(path));
     }
 }

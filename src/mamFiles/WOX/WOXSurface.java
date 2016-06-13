@@ -1,6 +1,7 @@
 package mamFiles.WOX;
 
 import mamFiles.CCFileFormatException;
+import mamFiles.MAMFile;
 import mamFiles.MaMPallet;
 import mamFiles.MaMSurface;
 
@@ -9,7 +10,8 @@ import mamFiles.MaMSurface;
  */
 public class WOXSurface extends MaMSurface
 {
-    public WOXSurface(String name, byte[] data, MaMPallet pal) throws CCFileFormatException {
-        super(new SpriteFileWOX(name, data, pal));
+    public WOXSurface(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
+        //super(new SpriteFileWOX(name, key, data, pal), MAMFile.generateKeyFromJoin();
+        super(new SpriteFileWOX(name, MAMFile.generateUniqueKey(key), data, pal), key);
     }
 }

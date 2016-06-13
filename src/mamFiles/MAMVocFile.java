@@ -17,9 +17,9 @@ public class MAMVocFile extends MAMFile
     //TODO: put this in config file.
     static String pathtoFFMpeg = "x:\\utils\\";
 
-    public MAMVocFile(String name, byte[] data)
+    public MAMVocFile(String name, String key, byte[] data)
     {
-        super(name);
+        super(name, key);
         vocFileData = data;
     }
 
@@ -85,6 +85,8 @@ public class MAMVocFile extends MAMFile
 
     public MAMVocFile fromVocFile(String path)
     {
-        return new MAMVocFile(FileHelpers.getFileNameTillFirstDot(path), FileHelpers.readAllBytes(path));
+        return new MAMVocFile(FileHelpers.getFileNameTillFirstDot(path),
+                                MAMFile.generateKeyFromPath(path),
+                                FileHelpers.readAllBytes(path));
     }
 }

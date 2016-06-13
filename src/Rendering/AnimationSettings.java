@@ -1,8 +1,7 @@
 package Rendering;
 
+import Toolbox.HProperties;
 import Toolbox.IHasProperties;
-
-import java.util.Properties;
 
 public class AnimationSettings implements IHasProperties
 {
@@ -51,7 +50,7 @@ public class AnimationSettings implements IHasProperties
     // IHasProperties
     //------------------------------------------------------------------------------------------------------------------
     @Override
-    public boolean getProperties(Properties p)
+    public boolean getProperties(HProperties p)
     {
         this.numberOfFrames = Integer.parseInt(p.getProperty("AnimationSettings.numberOfFrames"));
         this.milliSecondsPerFrame = Integer.parseInt(p.getProperty("AnimationSettings.milliSecondsPerFrame"));
@@ -61,7 +60,7 @@ public class AnimationSettings implements IHasProperties
     }
 
     @Override
-    public boolean setProperties(Properties p) {
+    public boolean setProperties(HProperties p) {
         p.setProperty("AnimationSettings.numberOfFrames", String.valueOf(this.numberOfFrames));
         p.setProperty("AnimationSettings.milliSecondsPerFrame", String.valueOf(this.milliSecondsPerFrame));
         p.setProperty("AnimationSettings.pingPongAnimation", String.valueOf(this.pingPongAnimation));

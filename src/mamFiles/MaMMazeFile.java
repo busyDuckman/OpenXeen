@@ -24,8 +24,8 @@ public abstract class MaMMazeFile extends MAMFile
     protected boolean isOutdoors;
     private MaMSprite tilesSprite;
 
-    public MaMMazeFile(String name) throws CCFileFormatException {
-        super(name);
+    public MaMMazeFile(String name, String key) throws CCFileFormatException {
+        super(name, key);
     }
 
     @Override

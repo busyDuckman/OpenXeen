@@ -27,9 +27,9 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
     //------------------------------------------------------------------------------------------------------------------
     // Constructors
     //------------------------------------------------------------------------------------------------------------------
-    public MaMRawImage(String name, byte[] data, MaMPallet pal) throws CCFileFormatException
+    public MaMRawImage(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException
     {
-        super(name);
+        super(name, key);
         Dimension size = Arrays.stream(knownSizes)
                             .filter(S -> (S.width * S.height) == data.length)
                             .findFirst()
@@ -46,8 +46,8 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
         }
     }
 
-    public MaMRawImage(String name, BufferedImage image) {
-        super(name);
+    public MaMRawImage(String name, String key, BufferedImage image) {
+        super(name, key);
         this.image = image;
     }
 
@@ -127,7 +127,9 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
                 BufferedImage image = ImageIO.read(new File(path));
 
                 //done
-                return new MaMRawImage(FileHelpers.getFileNameTillFirstDot(path), image);
+                return new MaMRawImage(FileHelpers.getFileNameTillFirstDot(path),
+                                        MAMFile.generateKeyFromPath(path),
+                                        image);
             }
         } catch (Exception e) {
             e.printStackTrace();

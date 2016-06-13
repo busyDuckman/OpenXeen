@@ -1,7 +1,8 @@
 package mamFiles;
 
 import Rendering.AnimationSettings;
-import Rendering.IMaMSprite;
+import Toolbox.HProperties;
+import mamFiles.WOX.SpriteFileWOX;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,14 +13,19 @@ import java.awt.image.BufferedImage;
  * More info [http://xeen.wikia.com/wiki/SRF_File_Format]
  * Bigger picture [http://xeen.wikia.com/wiki/MAZExxxx.DAT_File_Format]
  */
-public class MaMSurface extends MaMSprite implements Rendering.IRelativeToLocationSprite
+public class MaMSurface extends MAMFile implements Rendering.IRelativeToLocationSprite
 {
     protected final static int[] viewWidthLut = {3,5,7,7};
     protected final static int[] ySumLut = {0,3,8,15};
 
-    public MaMSurface(MaMSprite aSprite)
+    MaMSprite sprite;
+
+    /**
+     * @param aSprite A sprite, with a key not equal to the key parameter
+     */
+    public MaMSurface(MaMSprite aSprite, String key)
     {
-        super(aSprite.name, aSprite.getPallet());
+        super(aSprite.name, key);
     }
 
     @Override
@@ -33,7 +39,7 @@ public class MaMSurface extends MaMSprite implements Rendering.IRelativeToLocati
             if((x >= -divergence)&&(x <= divergence))
             {
                 int relativeFrame = ySumLut[y]+x+divergence;
-                return this.getRenderedFrames()[relativeFrame];
+                return this.sprite.getRenderedFrames()[relativeFrame];
             }
         }
 
@@ -44,5 +50,39 @@ public class MaMSurface extends MaMSprite implements Rendering.IRelativeToLocati
     @Override
     public AnimationSettings getAnimationSettings() {
         return null;
+    }
+
+
+    @Override
+    public String suggestProxyFileName() {
+        return name + ".png";
+    }
+
+    @Override
+    public boolean saveProxy(String path) throws CCFileFormatException {
+        return sprite.saveProxy(path);
+    }
+
+    public MaMSurface fromPng(String path) throws CCFileFormatException {
+        MaMSprite sprite = SpriteFileWOX.fromPNGFile(path);
+        return new MaMSurface(sprite, MAMFile.generateKeyFromPath(path));
+    }
+
+
+    @Override
+    public boolean setProperties(HProperties p) {
+        //TODO: sprite key and this key are saved to the same property
+        p = p.push("Sprite");
+        sprite.setProperties(p);
+        p = p.pop();
+        return super.setProperties(p);
+    }
+
+    @Override
+    public boolean getProperties(HProperties p) {
+        p = p.push("Sprite");
+        sprite.getProperties(p);
+        p = p.pop();
+        return super.getProperties(p);
     }
 }

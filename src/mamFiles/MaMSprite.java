@@ -1,18 +1,15 @@
 package mamFiles;
 
-import Game.MaMGame;
 import Rendering.AnimationSettings;
 import Toolbox.FileHelpers;
+import Toolbox.HProperties;
 import Toolbox.IHasProperties;
 import Toolbox.ImageHelpers;
-import Toolbox.xBR.ResizeXBR;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Arrays;
-import java.util.Properties;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.sun.org.apache.xalan.internal.lib.ExsltStrings.split;
@@ -98,16 +95,16 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
 
     protected AnimationSettings animationSettings = null;
 
-    protected MaMSprite(String name, MaMPallet pal)
+    protected MaMSprite(String name, String key, MaMPallet pal)
     {
-        super(name);
+        super(name, MAMFile.generateKeyFromJoin(key, pal));
         pallet = pal;
         transparentIndex = 0;
     }
 
-    protected MaMSprite(String name, BufferedImage[] frames)
+    protected MaMSprite(String name, String key, BufferedImage[] frames)
     {
-        super(name);
+        super(name, key);
         pallet = null;
         renderedFrames = frames;
         transparentIndex = 0;
@@ -212,7 +209,8 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     {
         try {
             return new MaMSprite(FileHelpers.getFileNameTillFirstDot(path),
-                    ImageHelpers.getGifFrames(path));
+                                MAMFile.generateKeyFromPath(path),
+                                ImageHelpers.getGifFrames(path));
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -227,7 +225,9 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     {
         try {
             BufferedImage img = ImageIO.read(new File(path));
-            MaMSprite sprite = new MaMSprite("", (MaMPallet)null);
+            MaMSprite sprite = new MaMSprite(FileHelpers.getFileNameTillFirstDot(path),
+                                            MAMFile.generateKeyFromPath(path),
+                                            (MaMPallet)null);
             if(sprite.loadProperties(FileHelpers.changeExtesion(path, "cfg")))
             {
                 //this works because getProperties fills out a dummy array of the correct size.
@@ -239,7 +239,9 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
             else
             {
                 //just give up and create a non-animated sprite, in the images resolution.
-                return new MaMSprite(FileHelpers.getFileNameTillFirstDot(path), new BufferedImage[] {img});
+                return new MaMSprite(FileHelpers.getFileNameTillFirstDot(path),
+                        MAMFile.generateKeyFromPath(path),
+                        new BufferedImage[] {img});
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -252,17 +254,19 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     // IHasProperties
     //------------------------------------------------------------------------------------------------------------------
     @Override
-    public boolean setProperties(Properties p) {
+    public boolean setProperties(HProperties p) {
         super.setProperties(p);
         p.setProperty("MaMSprite.originalWidth", String.valueOf(this.width));
         p.setProperty("MaMSprite.originalHeight", String.valueOf(this.height));
         p.setProperty("MaMSprite.frameCount", String.valueOf(this.getRenderedFrames().length));
 
-        AnimationSettings s = this.getAnimationSettings();
-        p.setProperty("MaMSprite.hasAnimation", String.valueOf(s != null));
-        if(s != null)
+        AnimationSettings anim = this.getAnimationSettings();
+        p.setProperty("MaMSprite.hasAnimation", String.valueOf(anim != null));
+        if(anim != null)
         {
-            s.setProperties(p);
+            p = p.push("Animation");
+            anim.setProperties(p);
+            p = p.pop();
         }
         for(int i=0; i<frames.length; i++)
         {
@@ -273,7 +277,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     }
 
     @Override
-    public boolean getProperties(Properties p) {
+    public boolean getProperties(HProperties p) {
         super.getProperties(p);
         this.width = Integer.parseInt(p.getProperty("MaMSprite.originalWidth"));
         this.height = Integer.parseInt(p.getProperty("MaMSprite.originalHeight"));

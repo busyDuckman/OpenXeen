@@ -4,7 +4,6 @@ import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
 import Toolbox.BinaryHelpers;
 import Toolbox.FileHelpers;
-import com.google.common.collect.ImmutableMap;
 import mamFiles.*;
 
 import java.io.FileNotFoundException;
@@ -62,7 +61,7 @@ public class CCFileReaderWOX extends CCFileReader
     WoXCCVariant variant;
 
     protected CCFileReaderWOX(String name, WoXCCVariant variant) {
-        super(name, 0);
+        super(name);
         this.variant = variant;
     }
 
@@ -83,7 +82,7 @@ public class CCFileReaderWOX extends CCFileReader
             //Open the file stream
             ccFile.fileStream = new RandomAccessFile(filePath, "r");
             RandomAccessFile fs = ccFile.fileStream;
-            ccFile.fileSize = (int)fs.getChannel().size();
+            int fileSize = (int)fs.getChannel().size();
 
             //read and validate number of files
             ccFile.numberOfFiles = fs.read() | (fs.read() << 8);
@@ -101,7 +100,7 @@ public class CCFileReaderWOX extends CCFileReader
                 throw CCFileFormatException.fromBadReadLength(ccFile, readLen, tocLen);
             }
             ccFile.seekDataBegin = tocLen + 2;
-            ccFile.createTocFromEncryptedHeader(rawToc, ccFile.numberOfFiles);
+            ccFile.createTocFromEncryptedHeader(rawToc, ccFile.numberOfFiles, fileSize);
 
             //parse known files
             ccFile.loadKnownFiles(filePath);
@@ -153,7 +152,7 @@ public class CCFileReaderWOX extends CCFileReader
         return var;
     }
 
-    protected void createTocFromEncryptedHeader(byte[] rawToc, int numberOfFiles) throws CCFileFormatException
+    protected void createTocFromEncryptedHeader(byte[] rawToc, int numberOfFiles, int fileSize) throws CCFileFormatException
     {
         tocEntries = new CCFileTocEntry[numberOfFiles];
 
@@ -188,7 +187,7 @@ public class CCFileReaderWOX extends CCFileReader
             {
                 throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " is invalid (" + toc.toString() + ")");
             }
-            if(toc.offset > this.fileSize)
+            if(toc.offset > fileSize)
             {
                 throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " points to position beyond end of cc file.");
             }
@@ -237,27 +236,30 @@ public class CCFileReaderWOX extends CCFileReader
     }
 
     @Override
-    public MaMSprite getSprite(int id, MaMPallet pal) throws CCFileFormatException
+    protected MaMSprite __getSprite(int id, MaMPallet pal) throws CCFileFormatException
     {
-        return new SpriteFileWOX(getFileNameForID(id), getFileRaw(id), pal);
+        return new SpriteFileWOX(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
     }
 
     @Override
-    public MaMPallet getPallet(int id) throws CCFileFormatException
+    protected MaMPallet __getPallet(int id) throws CCFileFormatException
     {
-        return new PalletWOX(getFileNameForID(id), getFileRaw(id));
+        return new PalletWOX(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
     }
 
     @Override
-    public MaMSurface getSurface(int id, MaMPallet pal) throws CCFileFormatException {
-        return new WOXSurface(getFileNameForID(id), getFileRaw(id), pal);
+    protected MaMSurface __getSurface(int id, MaMPallet pal) throws CCFileFormatException {
+        return new WOXSurface(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
     }
 
     @Override
-    public MaMMazeFile getMapFile(int id, MaMWorld world) throws CCFileFormatException {
-        return new WOXMazeFile(id, world);
+    protected MaMMazeFile __getMapFile(int id, MaMWorld world) throws CCFileFormatException {
+        return new WOXMazeFile(id, MAMFile.generateKeyFromCCFile(id, this), world);
     }
 
+    //-------------------------------------------------------------------------------------------------
+    // Pallet helpers
+    //-------------------------------------------------------------------------------------------------
     @Override
     public MaMPallet getPalletForFile(int id) throws CCFileFormatException {
         //ignoring id for now, so far this pallet works for all sprites

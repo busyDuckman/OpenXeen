@@ -20,9 +20,9 @@ public class MaMPallet extends MAMFile
 
     //public MaMPallet() { colors = new Color[256]; }
 
-    public MaMPallet(String name, byte[] data, int numColors, int leftShift)
+    public MaMPallet(String name, String key, byte[] data, int numColors, int leftShift)
     {
-        super(name);
+        super(name, key);
         colors = new Color[numColors];
         for (int i = 0; i < Math.min(numColors,data.length/3); i ++)
         {
@@ -34,9 +34,9 @@ public class MaMPallet extends MAMFile
         }
     }
 
-    public MaMPallet(String name, Color[] data)
+    public MaMPallet(String name, String key, Color[] data)
     {
-        super(name);
+        super(name, key);
         colors = new Color[data.length];
         for (int i = 0; i < data.length; i++) {
             colors[i] = new Color(data[i].getRed(), data[i].getGreen(), data[i].getBlue(), data[i].getAlpha());
@@ -56,7 +56,7 @@ public class MaMPallet extends MAMFile
         }
 
         //done.
-        return new MaMPallet(name+"_trans@"+index, newColors);
+        return new MaMPallet(name+"_trans@"+index, MAMFile.generateUniqueKey(key), newColors);
     }
 
     public Color getColor(int index) { return colors[index% colors.length]; }
@@ -96,7 +96,9 @@ public class MaMPallet extends MAMFile
                     }
 
                     //done
-                    return new MaMPallet(FileHelpers.getFileNameTillFirstDot(path), ArrayHelpers.toColorArray(cols));
+                    return new MaMPallet(FileHelpers.getFileNameTillFirstDot(path),
+                                        MAMFile.generateKeyFromPath(path),
+                                        ArrayHelpers.toColorArray(cols));
                 }
             }
         } catch (Exception e) {
