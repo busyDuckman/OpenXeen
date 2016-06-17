@@ -4,7 +4,10 @@ import Game.Map.MaMTile;
 import Toolbox.Grid;
 import mamFiles.CCFileFormatException;
 import mamFiles.MAMFile;
+import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,10 +25,27 @@ public abstract class MaMMazeFile extends MAMFile
     protected boolean[] miscFlags;
     protected boolean isDark;
     protected boolean isOutdoors;
-    private MaMSprite tilesSprite;
+    //private MaMSprite tilesSprite;
+    protected int floorType;
+    protected int wallNoPass;
+    protected int surfNoPass;
+    protected int unlockDoor;
+    protected int unlockBox;
+    protected int bashDoor;
+    protected int bashGrate;
+    protected int bashWall;
+    protected int chanceToRun;
+    protected int trapDamage;
+    protected int wallKind;
+    protected int tavernTips;
+    protected Point runPos;
+
+    protected IMaMEnvironmentSet environmentSet;
 
     public MaMMazeFile(String name, String key) throws CCFileFormatException {
         super(name, key);
+
+        cantCastList = new ArrayList<>();
     }
 
     @Override
@@ -74,12 +94,12 @@ public abstract class MaMMazeFile extends MAMFile
         return isOutdoors;
     }
 
+    public IMaMEnvironmentSet getEnvironmentSet() {
+        return environmentSet;
+    }
+
     @Override
     public String getName() {
         return name;
-    }
-
-    public MaMSprite getTilesSprite() {
-        return tilesSprite;
     }
 }

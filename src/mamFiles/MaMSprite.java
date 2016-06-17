@@ -1,16 +1,18 @@
 package mamFiles;
 
 import Rendering.AnimationSettings;
-import Toolbox.FileHelpers;
-import Toolbox.HProperties;
-import Toolbox.IHasProperties;
-import Toolbox.ImageHelpers;
+import Toolbox.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.sun.org.apache.xalan.internal.lib.ExsltStrings.split;
 
@@ -109,6 +111,39 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         renderedFrames = frames;
         transparentIndex = 0;
     }
+
+    public MaMSprite appendSprite(String newName, MaMSprite another)
+    {
+        BufferedImage[] images = Stream.concat(Arrays.stream(this.getRenderedFrames()),
+                                               Arrays.stream(another.getRenderedFrames()))
+                                       .toArray(BufferedImage[]::new);
+
+        return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
+    }
+
+    public MaMSprite subSetOfFrames(String newName, int start, int length)
+    {
+        BufferedImage[] images = Arrays.stream(this.getRenderedFrames())
+                                        .skip(start)
+                                        .limit(length)
+                                        .toArray(BufferedImage[]::new);
+
+        return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
+    }
+
+    public MaMSprite whereFrames(String newName, IntPredicate indexOk)
+    {
+        List<BufferedImage> okImages = new ArrayList<>();
+        for (int i = 0; i < getRenderedFrames().length; i++) {
+            if(indexOk.test(i)) {
+                okImages.add(getRenderedFrames()[i]);
+            }
+        }
+        BufferedImage[] images = ArrayHelpers.toBufferedImageArray(okImages);
+
+        return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
+    }
+
 
 
     @Override

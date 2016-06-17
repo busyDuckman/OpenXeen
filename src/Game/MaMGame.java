@@ -169,10 +169,8 @@ public class MaMGame implements IMaMGame
             MaMMonster mon = world.getMonsters()[testMonsterID%world.getMonsters().length];
             view.addMonster(new Point(100,0), mon);
 
-            //TODO: file caching is non existant...
             view.setGround(world.getCcFile().getSprite("CAVE.GND"));
             view.setSky(world.getCcFile().getSprite("SKY.SKY"));
-
 
         } catch (CCFileFormatException e) {
             e.printStackTrace();

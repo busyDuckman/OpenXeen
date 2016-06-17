@@ -67,4 +67,22 @@ public class CCFileFormatException extends Exception
             throw new CCFileFormatException("Test failed");
         }
     }
+
+    public static CCFileFormatException fromMissingFile(String file, CCFileReader reader) {
+        return new CCFileFormatException("Missing file \"" + file + "\" in \"" + reader.getFilePath() + "\"");
+    }
+
+    public static void throwFeatureNotReady() throws CCFileFormatException
+    {
+        throwFeatureNotReady(null);
+    }
+    public static void throwFeatureNotReady(String message) throws CCFileFormatException
+    {
+        throw new CCFileFormatException("MaM Feature not developed yet: " + ((message != null) ? message : "(N/A)"));
+    }
+
+    public static void notSupposedToBeHere() throws CCFileFormatException
+    {
+        throw new CCFileFormatException("Code execution reached somewhere it was not supposed to.");
+    }
 }

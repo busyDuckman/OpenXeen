@@ -112,7 +112,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     {
         return new MaMRawImage(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
     }
-    protected abstract MaMMazeFile __getMapFile(int id, MaMWorld world) throws CCFileFormatException;
+    protected abstract MaMMazeFile __getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException;
 
     protected MaMTextFile __getText(int id) throws CCFileFormatException
     { return new MaMTextFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id)); }
@@ -158,9 +158,9 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getRawImage);
     }
 
-    public MaMMazeFile getMapFile(int id, MaMWorld world) throws CCFileFormatException
+    public MaMMazeFile getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, (I) -> this.__getMapFile(I, world));
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, (I) -> this.__getMapFile(I, world, mazeID));
     }
 
     public MaMTextFile getText(int id) throws CCFileFormatException
@@ -298,8 +298,8 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     public MAMVocFile getVoc(String fileName) throws CCFileFormatException
     { return getVoc(hashFileName(fileName)); }
 
-    public MaMMazeFile getMapFile(String fileName, MaMWorld world) throws CCFileFormatException {
-        return getMapFile(hashFileName(fileName), world);
+    public MaMMazeFile getMapFile(String fileName, MaMWorld world, int mazeID) throws CCFileFormatException {
+        return getMapFile(hashFileName(fileName), world, mazeID);
     }
 
     public int getNumberOfFiles() {
@@ -423,7 +423,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     public void loadKnownFiles(String filePath)
     {
         //find a matcching csv and pars out the file names
-        Path path = Paths.get((filePath.toLowerCase() + "FFSJAVA").replace(".ccFFSJAVA", ".csv"));
+        Path path = Paths.get(filePath + ".csv");
         if(FileHelpers.fileExists(path))
         {
             String[] lines = FileHelpers.readAllLines(path);

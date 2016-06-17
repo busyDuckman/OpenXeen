@@ -124,7 +124,7 @@ public class BinaryHelpers
     {
         for(int i=0; i<n; i++)
         {
-            bits[n] = (value & 1) != 0;
+            bits[i] = (value & 1) != 0;
             value >>>= 1;
         }
     }

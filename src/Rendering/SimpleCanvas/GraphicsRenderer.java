@@ -90,7 +90,7 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
         MaM2DMapComposition mapView = this.game.renderMap(0,0,16,16);
         if(mapView != null)
         {
-            //renderView(g, timeMS, mapView);
+            renderView(g, timeMS, mapView);
         }
 
     }

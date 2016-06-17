@@ -31,7 +31,7 @@ public class CCFileReaderWOX extends CCFileReader
         DARK_CUR (null, WoXWorld.WoxVariant.DARK_SIDE),
         DARK_SAV (null, WoXWorld.WoxVariant.DARK_SIDE),
         DARK_INTRO("DARK.PAL", WoXWorld.WoxVariant.DARK_SIDE),
-        CLOUDS_CC (null, WoXWorld.WoxVariant.CLOUDS),
+        CLOUDS_CC ("MM4.PAL", WoXWorld.WoxVariant.CLOUDS),
         CLOUDS_DAT (null, WoXWorld.WoxVariant.CLOUDS),
         CLOUDS_SAV (null, WoXWorld.WoxVariant.CLOUDS),
         UNKNOWN (null, WoXWorld.WoxVariant.UNKNOWN);
@@ -253,8 +253,8 @@ public class CCFileReaderWOX extends CCFileReader
     }
 
     @Override
-    protected MaMMazeFile __getMapFile(int id, MaMWorld world) throws CCFileFormatException {
-        return new WOXMazeFile(id, MAMFile.generateKeyFromCCFile(id, this), world);
+    protected MaMMazeFile __getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException {
+        return new WOXMazeFile(mazeID, MAMFile.generateKeyFromCCFile(id, this), world);
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -269,7 +269,8 @@ public class CCFileReaderWOX extends CCFileReader
         }
         catch (Exception ex)
         {
-            return getPallet("MM4.PAL");
+            System.out.println("Problem getting pallate, using standard.");
+            return MaMPallet.getDefaultMaMPallate();
         }
     }
 

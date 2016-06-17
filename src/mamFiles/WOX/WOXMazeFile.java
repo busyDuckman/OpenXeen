@@ -12,6 +12,7 @@ import mamFiles.CCFileFormatException;
 import mamFiles.CCFileReader;
 import mamFiles.MAMFile;
 import mamFiles.MaMMazeFile;
+import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
@@ -21,19 +22,7 @@ import java.io.ByteArrayInputStream;
  */
 public class WOXMazeFile extends MaMMazeFile
 {
-    private int floorType;
-    private int wallNoPass;
-    private int surfNoPass;
-    private int unlockDoor;
-    private int unlockBox;
-    private int bashDoor;
-    private int bashGrate;
-    private int bashWall;
-    private int chanceToRun;
-    private int trapDamage;
-    private int wallKind;
-    private int tavernTips;
-    private Point runPos;
+
 
     public WOXMazeFile(int mazeID, String key, MaMWorld world) throws CCFileFormatException {
         super("MAZE_"+mazeID, key);
@@ -44,12 +33,23 @@ public class WOXMazeFile extends MaMMazeFile
         //there are several different files to get.
 
         //DAT file, eg maze0001.DAT holds the terrain
-        byte[] mapData = world.getCcFile().getFileRaw(world.getMapNameFile(mazeID));
-        loadMaze(mapData, mapWidth, mapHeight);
+        String mapDataFile = world.getMazeName(mazeID);
+        CCFileReader reader = ((WoXWorld)world).getCCFileCur();
+
+        if(reader.fileExists(mapDataFile))
+        {
+            byte[] mapData = reader.getFileRaw(mapDataFile);
+            CCFileFormatException.throwIf(mapData == null);
+
+            loadMaze(mapData, mapWidth, mapHeight);
+        }
+        else
+        {
+            throw CCFileFormatException.fromMissingFile(mapDataFile, reader);
+        }
     }
 
-    protected void loadMaze(byte[] data, int mapWidth, int mapHeight)
-    {
+    protected void loadMaze(byte[] data, int mapWidth, int mapHeight) throws CCFileFormatException {
         //create a binary reader to save sanity.
         ByteArrayInputStream bisMapData = new ByteArrayInputStream(data);
         int mapSize = mapWidth * mapHeight;
@@ -202,7 +202,7 @@ public class WOXMazeFile extends MaMMazeFile
         int[] visitedTiles = BinaryHelpers.readBYTEs(bisMapData, mapSize/8);
 
 
-        //loop over ever tile and create the map
+        //loop over every tile and create the map
         for (int y = 0; y < mapHeight; y++)
         {
             for (int x = 0; x < mapWidth; x++)
@@ -226,6 +226,16 @@ public class WOXMazeFile extends MaMMazeFile
             }
         }
 
+        //graphics
+        if(this.isOutdoors)
+        {
+            //TODO: use brain on this
+            //environmentSet = new WoXOutdoorEnvironmentSet();
+        }
+        else
+        {
+
+        }
     }
 
     private MaMTile createTile(int data, int flags) {

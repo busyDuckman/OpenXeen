@@ -3,14 +3,11 @@ package Game.Map;
 import Game.MaMGame;
 import Game.Monsters.MaMMonster;
 import Rendering.ISceneComposition;
-import Rendering.MaM2DInsertionOrderComposition;
-import Rendering.MaM2DMapComposition;
 import com.sun.istack.internal.NotNull;
 import mamFiles.*;
+import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,7 +43,6 @@ public abstract class MaMWorld implements AutoCloseable
         monsters = ccFile.loadMonsters(this);
         MazeFiles = new HashMap<>();
         currentMaze = null;
-
     }
 
     protected abstract MaMPallet getDefaultPallate() throws CCFileFormatException;
@@ -90,15 +86,17 @@ public abstract class MaMWorld implements AutoCloseable
         return currentPallate;
     }
 
+    public abstract IMaMEnvironmentSet getEnvironmentSet();
+
     public abstract ISceneComposition renderHUDForWorld();
 
-    public abstract String getMazeName(int id);
-    public abstract String getScriptedEventsName(int id);
-    public abstract String getMonsterLayoutFile(int id);
-    public abstract String getHeadingFile(int id);
-    public abstract String getAreaNameFile(int id);
-    public abstract String getEventTextStringsFile(int id);
-    public abstract String getMapNameFile(int id);
+    public abstract String getMazeName(int id) throws CCFileFormatException;
+    public abstract String getScriptedEventsName(int id) throws CCFileFormatException;
+    public abstract String getMonsterLayoutFile(int id) throws CCFileFormatException;
+    public abstract String getHeadingFile(int id) throws CCFileFormatException;
+    public abstract String getAreaNameFile(int id) throws CCFileFormatException;
+    public abstract String getEventTextStringsFile(int id) throws CCFileFormatException;
+    public abstract String getMapNameFile(int id) throws CCFileFormatException;
 
     @Override
     public void close() throws Exception {
