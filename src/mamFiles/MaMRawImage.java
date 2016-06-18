@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.FileHandler;
 
 /**
  * Created by duckman on 9/06/2016.
@@ -56,7 +55,7 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
     //------------------------------------------------------------------------------------------------------------------
     protected static BufferedImage bytesToImage(Dimension size, byte[] data, MaMPallet pal) throws CCFileFormatException {
         int[] pixels = new int[size.width*size.height];
-        CCFileFormatException.throwIf(data.length < pixels.length);
+        CCFileFormatException.assertFalse(data.length < pixels.length);
 
         for(int i=0; i<pixels.length; i++)
         {
@@ -106,9 +105,9 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
 
     @Override
     public boolean saveProxy(String path) throws CCFileFormatException {
-        CCFileFormatException.throwIf(image == null);
-        CCFileFormatException.throwIf(getWidth() <= 0);
-        CCFileFormatException.throwIf(getHeight() <= 0);
+        CCFileFormatException.assertFalse(image == null);
+        CCFileFormatException.assertFalse(getWidth() <= 0);
+        CCFileFormatException.assertFalse(getHeight() <= 0);
         try {
             ImageIO.write(image, "png", new File(path));
         } catch (IOException e) {

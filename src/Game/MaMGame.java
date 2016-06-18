@@ -9,6 +9,7 @@ import Rendering.*;
 import Toolbox.FileHelpers;
 import Toolbox.Grid;
 import mamFiles.*;
+import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 import mamFiles.WOX.CCFileReaderWOX;
 import org.joda.time.DateTime;
 
@@ -185,6 +186,7 @@ public class MaMGame implements IMaMGame
         MaM2DMapComposition scene = new MaM2DMapComposition();
         if(maze != null)
         {
+            int i=0;
             for(int x=0; x<mapWidth; x++)
             {
                 for(int y=0; y<mapHeight; y++)
@@ -192,16 +194,42 @@ public class MaMGame implements IMaMGame
                     Grid<MaMTile> grid = maze.getMap();
                     MaMTile t = grid.get(x+mapX, y+mapY);
 
-                    RenderablePos tilePos = new RenderablePos(x*16, y*16, 1.0, RenderablePos.ScalePosition.TopLeft, 0);
+                    RenderablePos tilePos = new RenderablePos(x*8, y*8, 1.0, RenderablePos.ScalePosition.TopLeft, 0);
 
-                    int groundTile = t.getIndexBase();
-                    int groundTileStart = 0;
+                    //ground
+                    int groundTile = t.getIndexBase() + 5;
+                    IRenderableGameObject tileSprite = maze.getEnvironmentSet().getMapTile(groundTile);
+                    scene.addRenderable(tilePos, tileSprite);
 
-                    //TODO: getTilesSprite returns null...
-//                    MaMSprite tilesprite = maze.getTilesSprite();
-//                    BufferedImage image = tilesprite.getRenderedFrames()[groundTileStart + groundTile];
-//
-//                    scene.addRenderable(tilePos, IRenderableGameObject.fromImage(image));
+                    if(maze.isOutdoors())
+                    {
+                        //environ
+                        tilePos = tilePos.onTop();
+                        int environIndex = t.getIndexMiddle()+1;
+                        IRenderableGameObject environSprite = ((IMaMOutdoorEnvironmentSet)maze.getEnvironmentSet())
+                                                                .getMapEnviron(environIndex);
+                        if(environIndex != 4)
+                        {
+                            scene.addRenderable(tilePos, environSprite);
+                        }
+                    }
+
+                    //objects
+                    tilePos = tilePos.onTop();
+                    int objectIndex = t.getIndexTop()+3;
+                    IRenderableGameObject overlaySprite = maze.getEnvironmentSet().getMapObject(objectIndex);
+                    if(objectIndex != 8)
+                    {
+                        scene.addRenderable(tilePos, overlaySprite);
+                    }
+
+                    if(GlobalSettings.INSTANCE.debugMode())
+                    {
+                        tilePos = tilePos.onTop();
+                        //scene.addRenderable(tilePos, IRenderableGameObject.fromText("" + objectIndex, Color.BLUE, 8, 8));
+
+                    }
+                    i++;
                 }
             }
         }

@@ -66,6 +66,27 @@ public class RenderablePos
         this(xPos, yPos, scale, ScalePosition.Centre, depth);
     }
 
+    public RenderablePos(RenderablePos other) {
+        this.xPos = other.xPos;
+        this.yPos = other.yPos;
+        this.scale = other.scale;
+        this.scalePos = other.scalePos;
+        this.depth = other.depth;
+    }
+
+    public RenderablePos onTop() {
+        RenderablePos pos = new RenderablePos(this);
+        pos.depth = this.depth + 1;
+        return pos;
+    }
+
+    public RenderablePos below() {
+        RenderablePos pos = new RenderablePos(this);
+        pos.depth = this.depth - 1;
+        return pos;
+    }
+
+
     public int getxPos() {
         return xPos;
     }
@@ -90,5 +111,9 @@ public class RenderablePos
     {
         return  new Rectangle(xPos, yPos, width, height);
         //return this.scalePos.scaleRectangle(new Rectangle(xPos, yPos, width, height), scale);
+    }
+
+    public Rectangle getImageBoundsAfterOffset(int x, int y, double width, double height) {
+        return  new Rectangle(x+xPos, y+yPos, (int)width, (int)height);
     }
 }

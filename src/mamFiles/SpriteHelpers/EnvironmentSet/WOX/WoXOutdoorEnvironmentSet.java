@@ -39,11 +39,11 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
 
     @Override
     public IRenderableGameObject getMapEnviron(int environIndex) {
-        return this.basicMapEnvrion[environIndex];
+        return this.basicMapEnvrion[environIndex%this.basicMapEnvrion.length];
     }
 
     @Override
     public IRenderableGameObject getMapTile(int groundIndex) {
-        return this.basicMapGround[groundIndex];
+        return this.basicMapGround[groundIndex%this.basicMapGround.length];
     }
 }

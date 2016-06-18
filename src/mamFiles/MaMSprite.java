@@ -1,6 +1,7 @@
 package mamFiles;
 
 import Rendering.AnimationSettings;
+import Rendering.IRenderableGameObject;
 import Toolbox.*;
 
 import javax.imageio.ImageIO;
@@ -10,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntPredicate;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,6 +144,15 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
     }
 
+    public IRenderableGameObject[] eachFrameAsRenderable()
+    {
+        IRenderableGameObject[] renderables = new IRenderableGameObject[getRenderedFrames().length];
+        for (int i = 0; i < renderables.length; i++) {
+            renderables[i] = IRenderableGameObject.fromImage(getRenderedFrames()[i]);
+        }
+        return renderables;
+    }
+
 
 
     @Override
@@ -223,8 +232,8 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     @Override
     public boolean saveProxy(String path) throws CCFileFormatException {
         //return ImageHelpers.saveAsGif(path, this.getRenderedFrames(), 300, true);
-        CCFileFormatException.throwIf(width  <=0);
-        CCFileFormatException.throwIf(height <=0);
+        CCFileFormatException.assertFalse(width  <=0);
+        CCFileFormatException.assertFalse(height <=0);
 
         BufferedImage join = ImageHelpers.joinHorizontally(this.getRenderedFrames());
         //BufferedImage xBRJoin = ResizeXBR.xBR(join, 4);
@@ -268,7 +277,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
                 //this works because getProperties fills out a dummy array of the correct size.
                 sprite.renderedFrames = ImageHelpers.splitHorizontally(img, sprite.renderedFrames.length);
 
-                CCFileFormatException.throwIf(!FileHelpers.getFileNameTillFirstDot(path).equals(sprite.getName()));
+                CCFileFormatException.assertFalse(!FileHelpers.getFileNameTillFirstDot(path).equals(sprite.getName()));
                 return sprite;
             }
             else

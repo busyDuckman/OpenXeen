@@ -253,17 +253,38 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
 
     public MaMSprite getSprite(String fileName) throws CCFileFormatException
     {
-        return getSprite(hashFileName(fileName));
+        try
+        {
+            return getSprite(hashFileName(fileName));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
     public MaMSurface getSurface(String fileName) throws CCFileFormatException
     {
-        return getSurface(hashFileName(fileName));
+        try
+        {
+            return getSurface(hashFileName(fileName));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
     public MaMRawImage getRawImage(String fileName) throws CCFileFormatException
     {
-        return getRawImage(hashFileName(fileName));
+        try
+        {
+            return getRawImage(hashFileName(fileName));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -272,34 +293,85 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
 
     public MaMSprite getSprite(String fileName, MaMPallet pal) throws CCFileFormatException
     {
-        return getSprite(hashFileName(fileName), pal);
+        try
+        {
+            return getSprite(hashFileName(fileName), pal);
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
 
     public MaMPallet getPallet(String fileName) throws CCFileFormatException
     {
-        return getPallet(hashFileName(fileName));
+        try
+        {
+            return getPallet(hashFileName(fileName));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
     public MaMSurface getSurface(String fileName, MaMPallet pal) throws CCFileFormatException
     {
-        return getSurface(hashFileName(fileName), pal);
+        try
+        {
+            return getSurface(hashFileName(fileName), pal);
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
     public MaMRawImage getRawImage(String fileName, MaMPallet pal) throws CCFileFormatException
     {
-        return getRawImage(hashFileName(fileName), pal);
+        try
+        {
+            return getRawImage(hashFileName(fileName), pal);
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
     public MaMTextFile getText(String fileName) throws CCFileFormatException
-    { return getText(hashFileName(fileName)); }
+    {
+        try
+        {
+            return getText(hashFileName(fileName));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
+    }
 
 
     public MAMVocFile getVoc(String fileName) throws CCFileFormatException
-    { return getVoc(hashFileName(fileName)); }
+    {
+        try
+        {
+            return getVoc(hashFileName(fileName));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
+    }
 
     public MaMMazeFile getMapFile(String fileName, MaMWorld world, int mazeID) throws CCFileFormatException {
-        return getMapFile(hashFileName(fileName), world, mazeID);
+        try {
+            return getMapFile(hashFileName(fileName), world, mazeID);
+        }
+        catch (CCFileFormatException ex) {
+            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+        }
     }
 
     public int getNumberOfFiles() {

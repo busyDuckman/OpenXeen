@@ -87,10 +87,11 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             renderView(g, timeMS, hudView);
         }
 
-        MaM2DMapComposition mapView = this.game.renderMap(0,0,16,16);
+        MaM2DMapComposition mapView = this.game.renderMap(0,0,9,8);
+        //MaM2DMapComposition mapView = this.game.renderMap(0,0,16,16);
         if(mapView != null)
         {
-            renderView(g, timeMS, mapView);
+            renderView(g, timeMS, mapView, 234, 9, 1);
         }
 
     }
@@ -145,7 +146,20 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
 //        }
     }
 
-    protected void renderView(Graphics g, long timeMS, ISceneComposition view) {
+    protected void renderView(Graphics g,
+                              long timeMS,
+                              ISceneComposition view)
+    {
+        renderView(g, timeMS, view, 0, 0, 1);
+    }
+
+    protected void renderView(Graphics g,
+                              long timeMS,
+                              ISceneComposition view,
+                              int x,
+                              int y,
+                              double localScale)
+    {
         view.depthSort();
         for (Pair<RenderablePos, IRenderableGameObject> renderable : view.getRenderables())
         {
@@ -167,10 +181,12 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
                 continue;
             }
 
-            Rectangle bounds = renderable.getKey().getImageBounds(frame.getWidth(), frame.getHeight());
-            bounds = scaleRectangleNoTearing(bounds, scale);
+            Rectangle bounds = renderable.getKey().getImageBoundsAfterOffset(0, 0,
+                                                                frame.getWidth(),
+                                                                frame.getHeight());
+            bounds = scaleRectangleNoTearing(bounds, scale*localScale);
 
-            g.drawImage(frame,bounds.x, bounds.y, bounds.width, bounds.height, null);
+            g.drawImage(frame, (int)(x*scale)+bounds.x, (int)(y*scale)+bounds.y, bounds.width, bounds.height, null);
         }
     }
 

@@ -6,6 +6,7 @@ import Rendering.ISceneComposition;
 import com.sun.istack.internal.NotNull;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
+import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -86,7 +87,8 @@ public abstract class MaMWorld implements AutoCloseable
         return currentPallate;
     }
 
-    public abstract IMaMEnvironmentSet getEnvironmentSet();
+    public abstract IMaMIndoorEnvironmentSet getIndoorEnvironmentSet(int index);
+    public abstract IMaMEnvironmentSet getOutdoorEnvironmentSet(int index);
 
     public abstract ISceneComposition renderHUDForWorld();
 

@@ -1,6 +1,5 @@
 package mamFiles.WOX;
 
-import Game.MaMGame;
 import Game.Map.MaMTile;
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
@@ -10,9 +9,7 @@ import Toolbox.Direction;
 import Toolbox.Grid;
 import mamFiles.CCFileFormatException;
 import mamFiles.CCFileReader;
-import mamFiles.MAMFile;
 import mamFiles.MaMMazeFile;
-import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
@@ -39,9 +36,9 @@ public class WOXMazeFile extends MaMMazeFile
         if(reader.fileExists(mapDataFile))
         {
             byte[] mapData = reader.getFileRaw(mapDataFile);
-            CCFileFormatException.throwIf(mapData == null);
+            CCFileFormatException.assertFalse(mapData == null);
 
-            loadMaze(mapData, mapWidth, mapHeight);
+            loadMaze(mapData, mapWidth, mapHeight, world);
         }
         else
         {
@@ -49,7 +46,7 @@ public class WOXMazeFile extends MaMMazeFile
         }
     }
 
-    protected void loadMaze(byte[] data, int mapWidth, int mapHeight) throws CCFileFormatException {
+    protected void loadMaze(byte[] data, int mapWidth, int mapHeight, MaMWorld world) throws CCFileFormatException {
         //create a binary reader to save sanity.
         ByteArrayInputStream bisMapData = new ByteArrayInputStream(data);
         int mapSize = mapWidth * mapHeight;
@@ -222,19 +219,19 @@ public class WOXMazeFile extends MaMMazeFile
                 ////map[x, y].iMiddle += (wallLib[map[x, y].iMiddle] & 0xf);
                 //map[x, y].iMiddle += 8;
 
-                map.set(x, y, tile);
+                map.set(x, mapHeight-y-1, tile);
             }
         }
 
         //graphics
         if(this.isOutdoors)
         {
-            //TODO: use brain on this
-            //environmentSet = new WoXOutdoorEnvironmentSet();
+            //TODO: use index
+            environmentSet  = world.getOutdoorEnvironmentSet(0);
         }
         else
         {
-
+            environmentSet  = world.getIndoorEnvironmentSet(0);
         }
     }
 

@@ -80,8 +80,9 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
 
     @Override
     public IRenderableGameObject getMapObject(int objectIndex) {
-        objectIndex = objectIndex % 16;
-        return IRenderableGameObject.fromImage(basicMapTileSet.getRenderedFrames()[32 + objectIndex]);
+//        objectIndex = objectIndex % 16;
+//        return IRenderableGameObject.fromImage(basicMapTileSet.getRenderedFrames()[32 + objectIndex]);
+        return basicMapObjects[objectIndex%basicMapObjects.length];
     }
 
 }

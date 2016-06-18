@@ -21,8 +21,8 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
     //------------------------------------------------------------------------------------------------------------------
     protected MaMSprite[] frontWallsSprites;
     protected MaMSprite sideWallSprite;
-    protected MaMSprite mapTileSetFloorSprite;
-    protected MaMSprite mapTileSetWallSprite;
+    protected IRenderableGameObject[] mapTileSetFloorSprite;
+    protected IRenderableGameObject[] mapTileSetWallSprite;
 
     // frontWallMap(wallNum, mipmapLevel)
     protected Table<Integer, Integer, MaMSprite> frontWallMap = HashBasedTable.create();
@@ -55,7 +55,7 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
 
         this.frontWallsSprites = new MaMSprite[4];
         for (int i = 0; i < frontWallsSprites.length; i++) {
-            frontWallsSprites[i] = ccFile.getSprite("S" + key + i + ".FWL");  //Fxxxxi.FWL
+            frontWallsSprites[i] = ccFile.getSprite("F" + key + (i+1) + ".FWL");  //Fxxxxi.FWL
         }
 
         loadFrontWallSpriteTable();
@@ -70,9 +70,11 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
         // 32 wall tiles (V and H versions of 16 walls)
         // 2 Post tiles (V and H)
         // 16 ground tiles (outdoor).
-        this.mapTileSetFloorSprite.subSetOfFrames("indoor ground map tiles", 0,2);
-        this.mapTileSetFloorSprite.subSetOfFrames("indoor wall map tiles", 2,32+2);
-        this.mapTileSetFloorSprite.subSetOfFrames("surface map tiles", 0,16);
+        CCFileFormatException.assertFalse(allMapTiles == null);
+        this.mapTileSetFloorSprite = allMapTiles.subSetOfFrames("a", 0, 2)
+                                            .appendSprite("surface map tiles", allMapTiles.subSetOfFrames("b", 36, 16))
+                                            .eachFrameAsRenderable();
+        this.mapTileSetWallSprite = allMapTiles.subSetOfFrames("indoor wall map tiles", 2, 32+2).eachFrameAsRenderable();
     }
 
     public void loadFrontWallSpriteTable()
@@ -162,12 +164,12 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
 
     @Override
     public IRenderableGameObject getMapWall(int wallIndex) {
-        return null;
+        return mapTileSetWallSprite[wallIndex];
     }
 
 
     @Override
     public IRenderableGameObject getMapTile(int groundIndex) {
-        return null;
+        return mapTileSetFloorSprite[groundIndex];
     }
 }

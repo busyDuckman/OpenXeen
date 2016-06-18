@@ -160,8 +160,10 @@ public class BinaryHelpers
             long val = 0;
             for(int i=0; i<bytes; i++)
             {
-                val <<= 8;
-                val = val | (bis.read() & 0xff);
+                //edian
+//                val <<= 8;
+//                val = val | (bis.read() & 0xff);
+                val = val | ((bis.read() & 0xff)<<(i*8));
             }
 
             if(signed)

@@ -10,7 +10,8 @@ import mamFiles.CCFileReader;
 import mamFiles.MaMPallet;
 import mamFiles.MaMRawImage;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
-import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXEnvironmentSet;
+import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
+import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 import mamFiles.WOX.CCFileReaderWOX;
 
@@ -50,7 +51,8 @@ public class WoXWorld extends MaMWorld
     protected final CCFileReaderWOX ccFileWox() {return (CCFileReaderWOX)ccFile;}
     protected final CCFileReaderWOX ccFileAnimationsWox() {return (CCFileReaderWOX)ccFileAnimations;}
     protected WoxVariant variant;
-    protected WoXEnvironmentSet environmentSet;
+    protected WoXIndoorEnvironmentSet[] indoorEnvironmentSets;
+    protected WoXOutdoorEnvironmentSet[] outdoorEnvironmentSets;
 
     public WoXWorld(MaMGame game, CCFileReader ccFileReader) throws CCFileFormatException {
         super(game, ccFileReader);
@@ -59,7 +61,8 @@ public class WoXWorld extends MaMWorld
         //todo? clouds?
         ccFileCur = CCFileReaderWOX.open(FileHelpers.join(ccPath, "DARK.CUR"));
         ccFileAnimations = CCFileReaderWOX.open(FileHelpers.join(ccPath, "INTRO.CC"));
-        environmentSet = new WoXOutdoorEnvironmentSet(variant, ccFile);
+        outdoorEnvironmentSets = new WoXOutdoorEnvironmentSet[] { new WoXOutdoorEnvironmentSet(variant, ccFile) };
+        indoorEnvironmentSets = WoXIndoorEnvironmentSet.getEnvironmentSets(variant, ccFile);
     }
 
     @Override
@@ -72,8 +75,13 @@ public class WoXWorld extends MaMWorld
     }
 
     @Override
-    public IMaMEnvironmentSet getEnvironmentSet() {
-        return environmentSet;
+    public IMaMIndoorEnvironmentSet getIndoorEnvironmentSet(int index) {
+        return indoorEnvironmentSets[index];
+    }
+
+    @Override
+    public IMaMEnvironmentSet getOutdoorEnvironmentSet(int index) {
+        return outdoorEnvironmentSets[index];
     }
 
     @Override
@@ -125,8 +133,8 @@ public class WoXWorld extends MaMWorld
     //------------------------------------------------------------------------------------------------------------------
     protected static String makeMazeFileName(String prefix, String ext, int id) throws CCFileFormatException
     {
-        CCFileFormatException.throwIf(id < 0);
-        CCFileFormatException.throwIf(id >= 1000);
+        CCFileFormatException.assertFalse(id < 0);
+        CCFileFormatException.assertFalse(id >= 1000);
         String s = "00000"+id;
         s = s.substring(s.length() - 4);
         if(id >= 100)

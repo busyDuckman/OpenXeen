@@ -60,9 +60,17 @@ public class CCFileFormatException extends Exception
         return new CCFileFormatException("IO ERROR: " + message);
     }
 
-    public static void throwIf(boolean test) throws CCFileFormatException
+    public static void assertFalse(boolean test) throws CCFileFormatException
     {
         if(test)
+        {
+            throw new CCFileFormatException("Test failed");
+        }
+    }
+
+    public static void assertTrue(boolean test) throws CCFileFormatException
+    {
+        if(!test)
         {
             throw new CCFileFormatException("Test failed");
         }
@@ -84,5 +92,38 @@ public class CCFileFormatException extends Exception
     public static void notSupposedToBeHere() throws CCFileFormatException
     {
         throw new CCFileFormatException("Code execution reached somewhere it was not supposed to.");
+    }
+
+    public static void assertFalse(boolean test, String name, String key) throws CCFileFormatException
+    {
+        if(test)
+        {
+            throw new CCFileFormatException("Test failed, loading " + makeSafe(name) + " from " + makeSafe(key));
+        }
+    }
+
+    public static void assertTrue(boolean test, String name, String key) throws CCFileFormatException
+    {
+        if(!test)
+        {
+            throw new CCFileFormatException("Test failed, loading " + makeSafe(name) + " from " + makeSafe(key));
+        }
+    }
+
+    private static String makeSafe(String s)
+    {
+        return (s==null) ? "NULL" : s;
+    }
+
+    /**
+     * Often CCFileFormatException is thrown at a file processing level where the filename is not available.
+     * This helper allows methods higher up the chain to tag parsing errors with the originating file name.
+     */
+    public static CCFileFormatException WrapWithFilename(CCFileFormatException ex, String fileName)
+    {
+        return new CCFileFormatException("Error loading file " +
+                                            makeSafe(fileName) +
+                                            " because: " +
+                                            makeSafe(ex.getMessage()), ex);
     }
 }

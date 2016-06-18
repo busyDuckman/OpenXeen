@@ -6,7 +6,6 @@ import mamFiles.MaMPallet;
 import mamFiles.MaMSprite;
 
 import java.awt.*;
-import java.io.Console;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,10 +35,10 @@ public class SpriteFileWOX extends MaMSprite
             dp += 2;
             height = BYTES2INT(data[dp], data[dp+1]);
 
-            CCFileFormatException.throwIf(width  < 0);
-            CCFileFormatException.throwIf(height < 0);
-            CCFileFormatException.throwIf(width >= 1024);
-            CCFileFormatException.throwIf(width >= 1024);
+            CCFileFormatException.assertFalse(width  < 0);
+            CCFileFormatException.assertFalse(height < 0);
+            CCFileFormatException.assertFalse(width >= 1024);
+            CCFileFormatException.assertFalse(width >= 1024);
             rgbData = new byte[width * height * 3];
         }
 
@@ -203,6 +202,7 @@ public class SpriteFileWOX extends MaMSprite
 
     public SpriteFileWOX(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
         super(name, key, pal);
+        CCFileFormatException.assertFalse(data == null, name, key);
         BinaryHelpers.DebugDumpBinary(data, "sprite.last");
 
         //0002h	n * 4	The cells that are used to generate a frame where n is the number of frames in the sprite.
