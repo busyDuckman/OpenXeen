@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -269,7 +270,10 @@ public class CCFileReaderWOX extends CCFileReader
         }
         catch (Exception ex)
         {
-            System.out.println("Problem getting pallate, using standard.");
+            if(!inForceDiscovery())
+            {
+                System.out.println("Problem getting pallate, using standard.");
+            }
             return MaMPallet.getDefaultMaMPallate();
         }
     }

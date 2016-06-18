@@ -35,10 +35,10 @@ public class SpriteFileWOX extends MaMSprite
             dp += 2;
             height = BYTES2INT(data[dp], data[dp+1]);
 
-            CCFileFormatException.assertFalse(width  < 0);
-            CCFileFormatException.assertFalse(height < 0);
-            CCFileFormatException.assertFalse(width >= 1024);
-            CCFileFormatException.assertFalse(width >= 1024);
+            CCFileFormatException.assertFalse(width  < 0, "Cell() width  < 0");
+            CCFileFormatException.assertFalse(height < 0, "Cell() height < 0");
+            CCFileFormatException.assertFalse(width >= 1024, "Cell() width >= 1024");
+            CCFileFormatException.assertFalse(width >= 1024, "Cell() width >= 1024");
             rgbData = new byte[width * height * 3];
         }
 
@@ -202,7 +202,7 @@ public class SpriteFileWOX extends MaMSprite
 
     public SpriteFileWOX(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
         super(name, key, pal);
-        CCFileFormatException.assertFalse(data == null, name, key);
+        CCFileFormatException.assertFalse_WhenLoadingFrom(data == null, name, key);
         BinaryHelpers.DebugDumpBinary(data, "sprite.last");
 
         //0002h	n * 4	The cells that are used to generate a frame where n is the number of frames in the sprite.
@@ -248,6 +248,12 @@ public class SpriteFileWOX extends MaMSprite
         {
             List<Integer> cellOffsetsInThisFrame = frameSetup.get(i);
 
+            //TODO: More investigation into what a blank frame is for and how to handle
+            if(cellOffsetsInThisFrame.size() == 0)
+            {
+                frames[i] = FrameInfo.emptyFrame();
+            }
+
             frames[i] = sizeFrame(cells, cellOffsetsInThisFrame);
 
             //uncomment If I think a sprite may be accumulative (difference between frames, like a flc)
@@ -270,7 +276,7 @@ public class SpriteFileWOX extends MaMSprite
 
     }
 
-    protected FrameInfo sizeFrame(Map<Integer, Cell> cells, List<Integer> cellOffsetsInThisFrame) {
+    protected FrameInfo sizeFrame(Map<Integer, Cell> cells, List<Integer> cellOffsetsInThisFrame) throws CCFileFormatException {
         int frameX=Integer.MAX_VALUE;
         int frameY=Integer.MAX_VALUE;
         int frameWidth=0;
@@ -281,6 +287,13 @@ public class SpriteFileWOX extends MaMSprite
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
+        //CCFileFormatException.assertTrue(cellsInFrame.size() > 0, "SpriteFileWOX::sizeFrame() cellsInFrame.size() > 0");
+        if(cellsInFrame.size() == 0)
+        {
+            System.out.println("WTF: empty frame.");
+            return FrameInfo.emptyFrame();
+        }
+
         for(Cell cell : cellsInFrame)
         {
             frameX = Math.min(frameX, cell.x);
@@ -288,6 +301,7 @@ public class SpriteFileWOX extends MaMSprite
             frameWidth = Math.max(frameWidth, cell.x + cell.width);
             frameHeight = Math.max(frameHeight, cell.y + cell.height);
         }
+
         return new FrameInfo(frameX, frameY, frameWidth, frameHeight);
     }
 
@@ -304,6 +318,11 @@ public class SpriteFileWOX extends MaMSprite
 
             int cellOffset2 = BYTES2INT(data[p], data[p+1]);
             p += 2;
+
+            if((cellOffset1 == 0) && (cellOffset2 == 0))
+            {
+                System.out.println("Frame with no cells?");
+            }
 
             addCell(data, cellOffset1, cellList, cells);
             addCell(data, cellOffset2, cellList, cells);

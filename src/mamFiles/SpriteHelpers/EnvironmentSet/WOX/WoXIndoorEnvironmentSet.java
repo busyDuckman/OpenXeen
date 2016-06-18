@@ -50,6 +50,8 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
     public WoXIndoorEnvironmentSet(WoXWorld.WoxVariant variant, String environmentKey, CCFileReader ccFile) throws CCFileFormatException {
         super(variant, environmentKey, ccFile);
 
+        System.out.println("Loading environment set: " + environmentKey);
+
         String key = environmentKey.toUpperCase().trim();
         this.sideWallSprite = ccFile.getSprite("S" + key +".SWL");  // Sxxxx.SWL
 
@@ -58,7 +60,7 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
             frontWallsSprites[i] = ccFile.getSprite("F" + key + (i+1) + ".FWL");  //Fxxxxi.FWL
         }
 
-        loadFrontWallSpriteTable();
+        loadFrontWallSpriteTable(variant, key);
 
         // Tileset for indoors is different to outdoors.
         //   - It has walls
@@ -70,53 +72,85 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
         // 32 wall tiles (V and H versions of 16 walls)
         // 2 Post tiles (V and H)
         // 16 ground tiles (outdoor).
-        CCFileFormatException.assertFalse(allMapTiles == null);
+        CCFileFormatException.assertFalse(allMapTiles == null, "WoXIndoorEnvironmentSet() allMapTiles == null");
         this.mapTileSetFloorSprite = allMapTiles.subSetOfFrames("a", 0, 2)
                                             .appendSprite("surface map tiles", allMapTiles.subSetOfFrames("b", 36, 16))
                                             .eachFrameAsRenderable();
         this.mapTileSetWallSprite = allMapTiles.subSetOfFrames("indoor wall map tiles", 2, 32+2).eachFrameAsRenderable();
     }
 
-    public void loadFrontWallSpriteTable()
-    {
-        //first set spans two sprites
-        MaMSprite allFullSize = frontWallsSprites[0].appendSprite("full size", frontWallsSprites[1]);
-        ///next two span 1 sprite (due to storage space reduction)
-        MaMSprite allHalfSize = frontWallsSprites[2].subSetOfFrames("1/2 size", 0, 17);
-        MaMSprite allQuaterSize = frontWallsSprites[2].subSetOfFrames("1/4 size", 17, 17);
-        //last level, one sprite
-        MaMSprite allEighthSize = frontWallsSprites[3];//.subSetOfFrames("1/8 size", 0, 17);
+    public void loadFrontWallSpriteTable(WoXWorld.WoxVariant variant, String key) throws CCFileFormatException {
+        MaMSprite allFullSize=null;
+        MaMSprite allHalfSize=null;
+        MaMSprite allQuaterSize=null;
+        MaMSprite allEighthSize=null;
+        switch(variant)
+        {
+            case DARK_SIDE:
+                //first set spans two sprites
+                allFullSize = frontWallsSprites[0].appendSprite("full size", frontWallsSprites[1]);
+                ///next two span 1 sprite (due to storage space reduction)
+                allHalfSize = frontWallsSprites[2].subSetOfFrames("1/2 size", 0, 17);
+                allQuaterSize = frontWallsSprites[2].subSetOfFrames("1/4 size", 17, 17);
+                //last level, one sprite
+                allEighthSize = frontWallsSprites[3];//.subSetOfFrames("1/8 size", 0, 17);
+                break;
+            case CLOUDS:
+                //CCFileFormatException.throwFeatureNotReady("");
+                allFullSize = frontWallsSprites[0].appendSprite("full size", frontWallsSprites[1]);
+                ///next two span 1 sprite (due to storage space reduction)
+                allHalfSize = frontWallsSprites[2].subSetOfFrames("1/2 size", 0, 17);
+                allQuaterSize = frontWallsSprites[2].subSetOfFrames("1/4 size", 17, 17);
+                //last level, one sprite
+                allEighthSize = frontWallsSprites[3];//.subSetOfFrames("1/8 size", 0, 17);
+                break;
+            case SWORDS:
+                CCFileFormatException.throwFeatureNotReady("");
+                break;
+        }
+
 
         //load table.
-        loadSpritesIntoTable(allFullSize,   "full size", 0);
-        loadSpritesIntoTable(allHalfSize,   "1/2 size",  1);
-        loadSpritesIntoTable(allQuaterSize, "1/4 size",  2);
-        loadSpritesIntoTable(allEighthSize, "1/8 size",  3);
-
+        loadSpritesIntoTable(allFullSize,   key + " - full size", 0, variant);
+        loadSpritesIntoTable(allHalfSize,   key + " - 1/2 size",  1, variant);
+        loadSpritesIntoTable(allQuaterSize, key + " - 1/4 size",  2, variant);
+        loadSpritesIntoTable(allEighthSize, key + " - 1/8 size",  3, variant);
 
     }
 
-    private void loadSpritesIntoTable(MaMSprite sprite, String levelString, int levelNum) {
-        if(sprite.getRenderedFrames().length > 16)
+    private void loadSpritesIntoTable(MaMSprite sprite,
+                                      String levelString,
+                                      int levelNum,
+                                      WoXWorld.WoxVariant variant) throws CCFileFormatException
+    {
+        try
         {
-            //The towns(?) have an extra sprite to animate walking through a door.
-            sprite = sprite.whereFrames(sprite.getName(), I -> I != 7);
-        }
+            //TODO: this was 16 and worked for darkside, but cause issues for clouds
+            if(sprite.getRenderedFrames().length > 17)
+            {
+                //The towns(?) have an extra sprite to animate walking through a door.
+                sprite = sprite.whereFrames(sprite.getName(), I -> I != 7);
+            }
 
-        frontWallMap.put(0, levelNum, sprite.subSetOfFrames("Standard wall " + levelString, 0, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Torch wall " + levelString, 1, 5));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Wall with niche " + levelString, 6, 1));
-        //frontWallMap.put(1, levelNum, allFullSize.subSetOfFrames("Unknown " + levelString, 6, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Door (Closed) " + levelString, 7, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Door (Open) " + levelString, 8, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Grate (Closed) " + levelString, 9, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Bashed Wall " + levelString, 10, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Stairs (Up) " + levelString, 11, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Stairs (Down) " + levelString, 12, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Safe (Closed) " + levelString, 13, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Grate (Open) " + levelString, 14, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Safe (Open) " + levelString, 15, 1));
-        frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Posts " + levelString, 16, 1));
+            frontWallMap.put(0, levelNum, sprite.subSetOfFrames("Standard wall " + levelString, 0, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Torch wall " + levelString, 1, 5));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Wall with niche " + levelString, 6, 1));
+            //frontWallMap.put(1, levelNum, allFullSize.subSetOfFrames("Unknown " + levelString, 6, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Door (Closed) " + levelString, 7, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Door (Open) " + levelString, 8, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Grate (Closed) " + levelString, 9, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Bashed Wall " + levelString, 10, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Stairs (Up) " + levelString, 11, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Stairs (Down) " + levelString, 12, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Safe (Closed) " + levelString, 13, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Grate (Open) " + levelString, 14, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Safe (Open) " + levelString, 15, 1));
+            frontWallMap.put(1, levelNum, sprite.subSetOfFrames("Posts " + levelString, 16, 1));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.wrapWith(ex, sprite);
+        }
 
     }
 
@@ -134,7 +168,12 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
                 sets[5] = new WoXIndoorEnvironmentSet(variant, "TOWR", ccFile);
                 break;
             case CLOUDS:
-                CCFileFormatException.throwFeatureNotReady("Clouds environment set");
+                sets = new WoXIndoorEnvironmentSet[5];
+                sets[0] = new WoXIndoorEnvironmentSet(variant, "CAVE", ccFile);
+                sets[1] = new WoXIndoorEnvironmentSet(variant, "CSTL", ccFile);
+                sets[2] = new WoXIndoorEnvironmentSet(variant, "DUNG", ccFile);
+                sets[3] = new WoXIndoorEnvironmentSet(variant, "TOWN", ccFile);
+                sets[4] = new WoXIndoorEnvironmentSet(variant, "TOWR", ccFile);
                 break;
             case SWORDS:
                 CCFileFormatException.throwFeatureNotReady("Clouds environment set");

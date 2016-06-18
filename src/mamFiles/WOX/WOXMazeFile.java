@@ -36,7 +36,7 @@ public class WOXMazeFile extends MaMMazeFile
         if(reader.fileExists(mapDataFile))
         {
             byte[] mapData = reader.getFileRaw(mapDataFile);
-            CCFileFormatException.assertFalse(mapData == null);
+            CCFileFormatException.assertFalse(mapData == null, "WOXMazeFile(), mapData == null");
 
             loadMaze(mapData, mapWidth, mapHeight, world);
         }

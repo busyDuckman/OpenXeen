@@ -1,5 +1,6 @@
 package Rendering;
 
+import mamFiles.CCFileFormatException;
 import mamFiles.MAMFile;
 import mamFiles.MaMPallet;
 

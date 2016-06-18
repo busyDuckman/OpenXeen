@@ -67,7 +67,7 @@ public enum CCFileCache {
         {
             file = getFunc.apply();
             fileCache.put(key, file);
-            System.out.println("Caching: " + key);
+            //System.out.println("Caching: " + key);
         }
         try
         {

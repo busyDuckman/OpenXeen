@@ -205,6 +205,8 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
                 case "ICN":
                 case "FWL":
                 case "FAC":
+                case "VGA":
+                case "0BJ":
                     return getSprite(id);
                 case "GND":
                 case "SKY":
@@ -219,6 +221,15 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
                     return getVoc(id);
                 case "RAW":
                     return getRawImage(id);
+                case"":
+                    switch (fileNameNoExt)
+                    {
+                        case "FNT":
+                            return getSprite(id);
+                        case "NULLSND":
+                            return getVoc(id);
+                    }
+                    //DELIBERATE flow through to default
                 default:
                     return getMaMBinaryFile(id);
             }
@@ -259,7 +270,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -271,7 +282,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -283,7 +294,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -299,7 +310,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -312,7 +323,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -324,7 +335,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -336,7 +347,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -348,7 +359,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -361,7 +372,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
         catch (CCFileFormatException ex)
         {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -370,7 +381,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
             return getMapFile(hashFileName(fileName), world, mazeID);
         }
         catch (CCFileFormatException ex) {
-            throw CCFileFormatException.WrapWithFilename(ex, fileName);
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
         }
     }
 
@@ -724,5 +735,14 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
             e.printStackTrace();
         }
         return "!!!" + fileName + "@" + this.name + "!!![error reading file]";
+    }
+
+    protected boolean inForceDiscovery()
+    {
+        //TODO: Nasty hack
+        return Arrays.stream(Thread.currentThread()
+                .getStackTrace())
+                .map(StackTraceElement::getMethodName)
+                .anyMatch(S -> S.contains("forceDiscovery"));
     }
 }

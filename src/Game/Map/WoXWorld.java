@@ -5,10 +5,7 @@ import Rendering.ISceneComposition;
 import Rendering.MaM2DInsertionOrderComposition;
 import Rendering.RenderablePos;
 import Toolbox.FileHelpers;
-import mamFiles.CCFileFormatException;
-import mamFiles.CCFileReader;
-import mamFiles.MaMPallet;
-import mamFiles.MaMRawImage;
+import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXIndoorEnvironmentSet;
@@ -42,6 +39,7 @@ public class WoXWorld extends MaMWorld
                 String palFile = world.ccFileWox().getVariant().getDefaultPallate();
                 MaMPallet pal = world.ccFile.getPallet(palFile).withTransperency(0);
                 hud = world.ccFile.getRawImage("BACK.RAW", pal);
+
             }
             return hud;
         }
@@ -63,7 +61,7 @@ public class WoXWorld extends MaMWorld
         ccFileAnimations = CCFileReaderWOX.open(FileHelpers.join(ccPath, "INTRO.CC"));
         outdoorEnvironmentSets = new WoXOutdoorEnvironmentSet[] { new WoXOutdoorEnvironmentSet(variant, ccFile) };
         indoorEnvironmentSets = WoXIndoorEnvironmentSet.getEnvironmentSets(variant, ccFile);
-    }
+}
 
     @Override
     protected MaMPallet getDefaultPallate() throws CCFileFormatException {
@@ -91,6 +89,20 @@ public class WoXWorld extends MaMWorld
         try {
             scene.addRenderable(new RenderablePos(0,0, 1.0, RenderablePos.ScalePosition.TopLeft, 0),
                     variant.getHUD(this));
+
+            MaMSprite hudBorderGuys = ccFile.getSprite("BORDER.ICN");
+            MaMSprite hudBorderBat = hudBorderGuys.subSetOfFrames("hudBorderBat", 40, 12);
+            MaMSprite hudBorderFaceOnLefft = hudBorderGuys.subSetOfFrames("hudBorderFaceOnLefft", 0, 8);
+            MaMSprite hudBorderFaceOnRight = hudBorderGuys.subSetOfFrames("hudBorderFaceOnRight", 8, 8);
+            MaMSprite hudBorderWingedMonkey = hudBorderGuys.subSetOfFrames("hudBorderWingedMonkey", 16, 12);
+            MaMSprite hudBorderGeko = hudBorderGuys.subSetOfFrames("hudBorderGeko", 28, 12);
+
+            scene.addRenderable(new RenderablePos(107, 9, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderBat);
+            scene.addRenderable(new RenderablePos(0, 32, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderFaceOnLefft);
+            scene.addRenderable(new RenderablePos(215, 32, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderFaceOnRight);
+            scene.addRenderable(new RenderablePos(0, 82, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderWingedMonkey);
+            scene.addRenderable(new RenderablePos(194, 91, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderGeko);
+
         } catch (CCFileFormatException e) {
             e.printStackTrace();
         }
@@ -133,8 +145,8 @@ public class WoXWorld extends MaMWorld
     //------------------------------------------------------------------------------------------------------------------
     protected static String makeMazeFileName(String prefix, String ext, int id) throws CCFileFormatException
     {
-        CCFileFormatException.assertFalse(id < 0);
-        CCFileFormatException.assertFalse(id >= 1000);
+        CCFileFormatException.assertFalse(id < 0, "makeMazeFileName() id < 0");
+        CCFileFormatException.assertFalse(id >= 1000, "makeMazeFileName() id >= 1000");
         String s = "00000"+id;
         s = s.substring(s.length() - 4);
         if(id >= 100)

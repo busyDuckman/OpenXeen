@@ -23,7 +23,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
 {
     public static class FrameInfo
     {
-        transient public byte[] data;
+        transient public byte[] data; //rgba data
 
         protected int xPos;
         protected int yPos;
@@ -32,8 +32,9 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
 
         //protected BufferedImage[] preRenderedFrames;
         protected FrameInfo() {}
-        public FrameInfo(int xPos, int yPos, int width, int height)
-        {
+        public FrameInfo(int xPos, int yPos, int width, int height) throws CCFileFormatException {
+            CCFileFormatException.assertTrue(width > 0, "width > 0");
+            CCFileFormatException.assertTrue(height > 0, "height > 0");
             this.xPos = xPos;
             this.yPos = yPos;
             this.width = width;
@@ -51,8 +52,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
             //this.preRenderedFrames = ImageHelpers.copyOf(other.preRenderedFrames);
         }
 
-        public static FrameInfo fromParsableString(String s)
-        {
+        public static FrameInfo fromParsableString(String s) throws CCFileFormatException {
             if(s != null)
             {
                 int[] nums = Arrays.asList(s.split(",")).
@@ -64,8 +64,9 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
                 {
                     return new FrameInfo(nums[0], nums[1], nums[2], nums[3]);
                 }
-                System.out.println("Frame string (in proxy) not parsable: " + s);
+                CCFileFormatException.throwUnloadableProxy("Error parsing [FrameInfo::fromParsableString]: " + s);
             }
+            CCFileFormatException.throwUnloadableProxy("Error parsing [FrameInfo::fromParsableString]: NULL");
             return null;
         }
 
@@ -83,6 +84,20 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
 
         public String toParsableString() {
             return Arrays.stream(new int[] {xPos, yPos, width, height}).mapToObj(i -> ""+i).collect(Collectors.joining(","));
+        }
+
+        /**
+         * This is intended to be rendered when a frame is blank.
+         */
+        public static FrameInfo emptyFrame() {
+            try {
+                FrameInfo empty = new FrameInfo(0,0,1,1);
+                empty.data = new byte[] {0, 0, 0, 0};
+                return empty;
+            } catch (CCFileFormatException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 
@@ -112,8 +127,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         transparentIndex = 0;
     }
 
-    public MaMSprite appendSprite(String newName, MaMSprite another)
-    {
+    public MaMSprite appendSprite(String newName, MaMSprite another) throws CCFileFormatException {
         BufferedImage[] images = Stream.concat(Arrays.stream(this.getRenderedFrames()),
                                                Arrays.stream(another.getRenderedFrames()))
                                        .toArray(BufferedImage[]::new);
@@ -121,8 +135,10 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
     }
 
-    public MaMSprite subSetOfFrames(String newName, int start, int length)
-    {
+    public MaMSprite subSetOfFrames(String newName, int start, int length) throws CCFileFormatException {
+        CCFileFormatException.assertTrue(start >= 0, "subSetOfFrames(): start >= 0");
+        CCFileFormatException.assertTrue((start + length) <= this.getRenderedFrames().length,
+                                         "subSetOfFrames(): (start + length) <= this.getRenderedFrames().length");
         BufferedImage[] images = Arrays.stream(this.getRenderedFrames())
                                         .skip(start)
                                         .limit(length)
@@ -131,8 +147,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
     }
 
-    public MaMSprite whereFrames(String newName, IntPredicate indexOk)
-    {
+    public MaMSprite whereFrames(String newName, IntPredicate indexOk) throws CCFileFormatException {
         List<BufferedImage> okImages = new ArrayList<>();
         for (int i = 0; i < getRenderedFrames().length; i++) {
             if(indexOk.test(i)) {
@@ -144,8 +159,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
     }
 
-    public IRenderableGameObject[] eachFrameAsRenderable()
-    {
+    public IRenderableGameObject[] eachFrameAsRenderable() throws CCFileFormatException {
         IRenderableGameObject[] renderables = new IRenderableGameObject[getRenderedFrames().length];
         for (int i = 0; i < renderables.length; i++) {
             renderables[i] = IRenderableGameObject.fromImage(getRenderedFrames()[i]);
@@ -175,8 +189,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     }
 
     @Override
-    public BufferedImage[] getRenderedFrames()
-    {
+    public BufferedImage[] getRenderedFrames() {
         if((renderedFrames == null) && (frames != null))
         {
             renderedFrames = new BufferedImage[frames.length];
@@ -186,7 +199,9 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
                 // width, height are not correct for annoying sprites that change size.
                 //renderedFrames[i] = ImageHelpers.RGBA2Image(frames[i].data, width, height);
 
-                renderedFrames[i] = ImageHelpers.RGBA2Image(frames[i].data, frames[i].width, frames[i].height);
+                FrameInfo frame = frames[i];
+
+                renderedFrames[i] = ImageHelpers.RGBA2Image(frame.data, frame.width, frame.height);
             }
         }
         return renderedFrames;
@@ -200,10 +215,11 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     public String toString() {
         return "MaMSprite{" +
                 "name=" + name +
-                "frames=" + Arrays.toString(frames) +
-                ", transparentIndex=" + transparentIndex +
+                ((frames != null) ? (", frames=" + Arrays.toString(frames) +
+                                     ", transparentIndex=" + transparentIndex) : "") +
                 ", width=" + width +
                 ", height=" + height +
+                ", #images = " + getRenderedFrames().length +
                 '}';
     }
 
@@ -221,6 +237,15 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         return animationSettings;
     }
 
+    /**
+     * Useful in the debugger, set a watch on this and hit show image.
+     */
+    @Override
+    public BufferedImage asSpriteSheet()
+    {
+        return ImageHelpers.joinHorizontally(this.getRenderedFrames());
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Proxy
     //------------------------------------------------------------------------------------------------------------------
@@ -232,8 +257,9 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     @Override
     public boolean saveProxy(String path) throws CCFileFormatException {
         //return ImageHelpers.saveAsGif(path, this.getRenderedFrames(), 300, true);
-        CCFileFormatException.assertFalse(width  <=0);
-        CCFileFormatException.assertFalse(height <=0);
+        //TODO: clean up
+        CCFileFormatException.assertFalse(width  <= 0, "MaMSprite::saveProxy() width <= 0");
+        CCFileFormatException.assertFalse(height <= 0, "MaMSprite::saveProxy() height <= 0");
 
         BufferedImage join = ImageHelpers.joinHorizontally(this.getRenderedFrames());
         //BufferedImage xBRJoin = ResizeXBR.xBR(join, 4);
@@ -272,12 +298,14 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
             MaMSprite sprite = new MaMSprite(FileHelpers.getFileNameTillFirstDot(path),
                                             MAMFile.generateKeyFromPath(path),
                                             (MaMPallet)null);
-            if(sprite.loadProperties(FileHelpers.changeExtesion(path, "cfg")))
+            String propFileName = FileHelpers.changeExtesion(path, "cfg");
+            if(sprite.loadProperties(propFileName))
             {
                 //this works because getProperties fills out a dummy array of the correct size.
                 sprite.renderedFrames = ImageHelpers.splitHorizontally(img, sprite.renderedFrames.length);
 
-                CCFileFormatException.assertFalse(!FileHelpers.getFileNameTillFirstDot(path).equals(sprite.getName()));
+                CCFileFormatException.assertTrue(FileHelpers.getFileNameTillFirstDot(path).equals(sprite.getName()),
+                                                "fromPNGFile: name in sprite.loadProperties is wrong, should be " + sprite.getName());
                 return sprite;
             }
             else
@@ -354,15 +382,23 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
             String frameString = p.getProperty(propName);
             if(frameString != null)
             {
-                FrameInfo f = FrameInfo.fromParsableString(frameString);
-                if(f != null)
+                try
                 {
-                    frames[i] = f;
-                    continue;
+                    FrameInfo f = FrameInfo.fromParsableString(frameString);
+                    if(f != null)
+                    {
+                        frames[i] = f;
+                        continue;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
                 }
             }
 
             System.out.println("Error parsing property for frame: " + propName);
+            return false;
         }
 
         return true;

@@ -19,8 +19,8 @@ public class Main
         MaMGame game = null;
         try {
             //Create game
-            //game = new MaMGame("xeen.cc");
-            game = new MaMGame("dark.cc");
+            game = new MaMGame("xeen.cc");
+            //game = new MaMGame("dark.cc");
 
             //Create a renderer for the game (renderer is embedded in a JPanel)
             MaMPanel window = new MaMPanel(game);

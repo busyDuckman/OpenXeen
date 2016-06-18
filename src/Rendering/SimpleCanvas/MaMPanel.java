@@ -2,6 +2,7 @@ package Rendering.SimpleCanvas;
 
 import Game.IMaMGame;
 import Game.MaMActions;
+import Rendering.RenderablePos;
 import net.miginfocom.swing.MigLayout;
 import org.joda.time.DateTime;
 
@@ -187,6 +188,20 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
             case KeyEvent.VK_RIGHT:
                 game.doAction(MaMActions.WalkRight);
+                break;
+
+            //hack render pos offset
+            case KeyEvent.VK_I:
+                RenderablePos.decYHack();
+                break;
+            case KeyEvent.VK_J:
+                RenderablePos.decXHack();
+                break;
+            case KeyEvent.VK_K:
+                RenderablePos.incYHack();
+                break;
+            case KeyEvent.VK_L:
+                RenderablePos.incXHack();
                 break;
         }
     }

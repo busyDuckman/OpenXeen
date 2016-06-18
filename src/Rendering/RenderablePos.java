@@ -48,18 +48,38 @@ public class RenderablePos
         }
     };
 
-    int xPos;
-    int yPos;
-    double scale;
-    ScalePosition scalePos;
-    int depth;
+    final private int xPos;
+    final private int yPos;
+    final private double scale;
+    final private ScalePosition scalePos;
+    final private int depth;
 
-    public RenderablePos(int xPos, int yPos, double scale, ScalePosition scalePos, int depth) {
+    private static volatile int xPosHack=0;
+    private static volatile int yPosHack=0;
+
+    transient volatile int simpleHash = 0;
+
+    /**
+     * Nudging things around to find where a sprite should sit
+     */
+    final private boolean hackMe;
+
+    public RenderablePos(int xPos, int yPos, double scale, ScalePosition scalePos, int depth)
+    {
+        this(xPos, yPos, scale, scalePos, depth, false);
+    }
+
+    public RenderablePos(int xPos, int yPos, double scale, ScalePosition scalePos, int depth, boolean hackMe) {
         this.xPos = xPos;
         this.yPos = yPos;
         this.scale = scale;
         this.scalePos = scalePos;
         this.depth = depth;
+        this.hackMe = hackMe;
+        if(this.hackMe) {
+            System.out.println("hacking of pos enabled");
+            System.out.println("    hack is at " + xPosHack + ", " + yPosHack);
+        }
     }
 
     public RenderablePos(int xPos, int yPos, double scale, int depth) {
@@ -72,26 +92,79 @@ public class RenderablePos
         this.scale = other.scale;
         this.scalePos = other.scalePos;
         this.depth = other.depth;
+        hackMe = other.hackMe;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RenderablePos that = (RenderablePos) o;
+
+        if (xPos != that.xPos) return false;
+        if (yPos != that.yPos) return false;
+        if (Double.compare(that.scale, scale) != 0) return false;
+        if (depth != that.depth) return false;
+        return scalePos == that.scalePos;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = xPos;
+        result = 31 * result + yPos;
+        temp = Double.doubleToLongBits(scale);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (scalePos != null ? scalePos.hashCode() : 0);
+        result = 31 * result + depth;
+        return result;
     }
 
     public RenderablePos onTop() {
-        RenderablePos pos = new RenderablePos(this);
-        pos.depth = this.depth + 1;
-        return pos;
+        return new RenderablePos(xPos, yPos, scale, scalePos, depth+1, hackMe);
     }
 
     public RenderablePos below() {
-        RenderablePos pos = new RenderablePos(this);
-        pos.depth = this.depth - 1;
-        return pos;
+        return new RenderablePos(xPos, yPos, scale, scalePos, depth-1, hackMe);
     }
 
 
     public int getxPos() {
+        if(hackMe){
+            // Hash the hacked pos, print output if something changed.
+            // Then use the output to alter the code so the sprite is in
+            // the correct position.
+            int posXHack = xPos+xPosHack;
+            int posYHack = yPos+yPosHack;
+            int hash = posXHack *1000 + posYHack;
+            if(hash != simpleHash)
+            {
+                System.out.println("Renderable pos hacked to " + posXHack + ", " + posYHack);
+                simpleHash = hash;
+            }
+            return posXHack;
+        }
         return xPos;
     }
 
     public int getyPos() {
+        if(hackMe){
+            // Hash the hacked pos, print output if something changed.
+            // Then use the output to alter the code so the sprite is in
+            // the correct position.
+            int posXHack = xPos+xPosHack;
+            int posYHack = yPos+yPosHack;
+            int hash = posXHack *1000 + posYHack;
+            if(hash != simpleHash)
+            {
+                System.out.println("Renderable pos hacked to " + posXHack + ", " + posYHack);
+                simpleHash = hash;
+            }
+            return posYHack;
+        }
         return yPos;
     }
 
@@ -109,11 +182,36 @@ public class RenderablePos
 
     public Rectangle getImageBounds(int width, int height)
     {
-        return  new Rectangle(xPos, yPos, width, height);
+        return  new Rectangle(getxPos(), getyPos(), width, height);
+
+        //old code
+        //return  new Rectangle(xPos, yPos, width, height);
+
+        //even older code
         //return this.scalePos.scaleRectangle(new Rectangle(xPos, yPos, width, height), scale);
     }
 
     public Rectangle getImageBoundsAfterOffset(int x, int y, double width, double height) {
-        return  new Rectangle(x+xPos, y+yPos, (int)width, (int)height);
+        return  new Rectangle(getxPos(), getyPos(), (int)width, (int)height);
+        //return  new Rectangle(x+xPos, y+yPos, (int)width, (int)height);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    //Hacks to nude items around
+    //------------------------------------------------------------------------------------------------------------------
+    public static void incYHack() {
+        yPosHack++;
+    }
+
+    public static void decXHack() {
+        xPosHack--;
+    }
+
+    public static void decYHack() {
+        yPosHack--;
+    }
+
+    public static void incXHack() {
+        xPosHack++;
     }
 }

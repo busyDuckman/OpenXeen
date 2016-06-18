@@ -55,7 +55,7 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
     //------------------------------------------------------------------------------------------------------------------
     protected static BufferedImage bytesToImage(Dimension size, byte[] data, MaMPallet pal) throws CCFileFormatException {
         int[] pixels = new int[size.width*size.height];
-        CCFileFormatException.assertFalse(data.length < pixels.length);
+        CCFileFormatException.assertFalse(data.length < pixels.length, "bytesToImage(): data.length < pixels.length" );
 
         for(int i=0; i<pixels.length; i++)
         {
@@ -105,9 +105,9 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
 
     @Override
     public boolean saveProxy(String path) throws CCFileFormatException {
-        CCFileFormatException.assertFalse(image == null);
-        CCFileFormatException.assertFalse(getWidth() <= 0);
-        CCFileFormatException.assertFalse(getHeight() <= 0);
+        CCFileFormatException.assertFalse(image == null, "MaMRawImage::saveProxy() image == null");
+        CCFileFormatException.assertFalse(getWidth() <= 0, "MaMRawImage::saveProxy() getWidth() <= 0");
+        CCFileFormatException.assertFalse(getHeight() <= 0, "MaMRawImage::saveProxy() getHeight() <= 0");
         try {
             ImageIO.write(image, "png", new File(path));
         } catch (IOException e) {

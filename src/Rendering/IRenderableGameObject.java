@@ -1,5 +1,6 @@
 package Rendering;
 
+import Toolbox.ImageHelpers;
 import org.joda.time.DateTime;
 
 import java.awt.*;
@@ -15,6 +16,25 @@ public interface IRenderableGameObject
     BufferedImage getImage(int frame);
     AnimationSettings getAnimationSettings();
 
+    /**
+     * Useful in the debugger, set a watch on this and hit show image.
+     */
+    default BufferedImage asSpriteSheet()
+    {
+        AnimationSettings anim = getAnimationSettings();
+        if(anim == null)
+        {
+            return getImage(0);
+        }
+        else
+        {
+            BufferedImage[] images = new BufferedImage[anim.numberOfFrames];
+            for (int i = 0; i < images.length; i++) {
+                images[i] = getImage(i);
+            }
+            return ImageHelpers.joinHorizontally(images);
+        }
+    }
 
 
     static IRenderableGameObject fromImage(BufferedImage image)

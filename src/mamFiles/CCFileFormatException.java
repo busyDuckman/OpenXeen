@@ -60,19 +60,19 @@ public class CCFileFormatException extends Exception
         return new CCFileFormatException("IO ERROR: " + message);
     }
 
-    public static void assertFalse(boolean test) throws CCFileFormatException
+    public static void assertFalse(boolean test, String desc) throws CCFileFormatException
     {
         if(test)
         {
-            throw new CCFileFormatException("Test failed");
+            throw new CCFileFormatException("assertFalse failed: " + desc);
         }
     }
 
-    public static void assertTrue(boolean test) throws CCFileFormatException
+    public static void assertTrue(boolean test, String desc) throws CCFileFormatException
     {
         if(!test)
         {
-            throw new CCFileFormatException("Test failed");
+            throw new CCFileFormatException("assertTrue failed: " + desc);
         }
     }
 
@@ -94,36 +94,47 @@ public class CCFileFormatException extends Exception
         throw new CCFileFormatException("Code execution reached somewhere it was not supposed to.");
     }
 
-    public static void assertFalse(boolean test, String name, String key) throws CCFileFormatException
+    public static void assertFalse_WhenLoadingFrom(boolean test, String loading, String from) throws CCFileFormatException
     {
         if(test)
         {
-            throw new CCFileFormatException("Test failed, loading " + makeSafe(name) + " from " + makeSafe(key));
+            throw new CCFileFormatException("assertFalse failed, loading " + makeSafe(loading) + " from " + makeSafe(from));
         }
     }
 
-    public static void assertTrue(boolean test, String name, String key) throws CCFileFormatException
+    public static void assertTrue_WhenLoadingFrom(boolean test, String loading, String from) throws CCFileFormatException
     {
         if(!test)
         {
-            throw new CCFileFormatException("Test failed, loading " + makeSafe(name) + " from " + makeSafe(key));
+            throw new CCFileFormatException("assertTrue failed, loading " + makeSafe(loading) + " from " + makeSafe(from));
         }
     }
 
-    private static String makeSafe(String s)
+    private static String makeSafe(Object obj)
     {
-        return (s==null) ? "NULL" : s;
+        return (obj==null) ? "NULL" : ((obj instanceof String) ? (String)obj : makeSafe(obj.toString()));
     }
 
     /**
      * Often CCFileFormatException is thrown at a file processing level where the filename is not available.
      * This helper allows methods higher up the chain to tag parsing errors with the originating file name.
      */
-    public static CCFileFormatException WrapWithFilename(CCFileFormatException ex, String fileName)
+    public static CCFileFormatException wrapWithFilename(CCFileFormatException ex, String fileName)
     {
         return new CCFileFormatException("Error loading file " +
                                             makeSafe(fileName) +
                                             " because: " +
                                             makeSafe(ex.getMessage()), ex);
+    }
+
+    public static CCFileFormatException wrapWith(CCFileFormatException ex, MaMSprite sprite) {
+        return new CCFileFormatException("Error working with sprite " +
+                makeSafe(sprite) +
+                " because: " +
+                makeSafe(ex.getMessage()), ex);
+    }
+
+    public static void throwUnloadableProxy(String details) throws CCFileFormatException {
+        throw new CCFileFormatException("Error loading proxy: " + details);
     }
 }
