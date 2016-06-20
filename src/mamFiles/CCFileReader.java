@@ -274,6 +274,21 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
         }
     }
 
+
+    public final MaMSprite getSpriteOrNull(String fileName)
+    {
+        int id = hashFileName(fileName);
+        try {
+            if(fileExists(id))
+            {
+                return getSprite(id);
+            }
+        } catch (CCFileFormatException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public MaMSurface getSurface(String fileName) throws CCFileFormatException
     {
         try

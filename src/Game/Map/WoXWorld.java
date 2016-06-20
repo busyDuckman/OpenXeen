@@ -4,6 +4,7 @@ import Game.MaMGame;
 import Rendering.ISceneComposition;
 import Rendering.MaM2DInsertionOrderComposition;
 import Rendering.RenderablePos;
+import Toolbox.BlindIndexMaper;
 import Toolbox.FileHelpers;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
@@ -11,6 +12,8 @@ import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 import mamFiles.WOX.CCFileReaderWOX;
+
+import java.util.Map;
 
 /**
  * Created by duckman on 5/06/2016.
@@ -20,15 +23,49 @@ public class WoXWorld extends MaMWorld
     public enum WoxVariant
     {
         DARK_SIDE {
+            @Override
+            public String getIntroCCFileName() {
+                return "INTRO.CC";
+            }
 
+            @Override
+            public String getCurCCFileName() {
+                return "DARK.CUR";
+            }
         },
         CLOUDS {
+            @Override
+            public String getIntroCCFileName() {
+                return "INTRO.CC";
+            }
 
+            @Override
+            public String getCurCCFileName() {
+                return "XEEN.CUR";
+            }
         },
         SWORDS {
+            @Override
+            public String getIntroCCFileName() {
+                return null;
+            }
 
+            @Override
+            public String getCurCCFileName() {
+                return null;
+            }
         },
-        UNKNOWN;
+        UNKNOWN {
+            @Override
+            public String getIntroCCFileName() {
+                return null;
+            }
+
+            @Override
+            public String getCurCCFileName() {
+                return null;
+            }
+        };
 
 
         MaMRawImage hud=null;
@@ -43,6 +80,9 @@ public class WoXWorld extends MaMWorld
             }
             return hud;
         }
+
+        public abstract String getIntroCCFileName();
+        public abstract String getCurCCFileName();
     }
 
     protected CCFileReaderWOX ccFileCur;
@@ -57,8 +97,8 @@ public class WoXWorld extends MaMWorld
         String ccPath = FileHelpers.getParentDirectory(ccFile.getFilePath());
         variant = ccFileWox().getVariant().getWoxVariant();
         //todo? clouds?
-        ccFileCur = CCFileReaderWOX.open(FileHelpers.join(ccPath, "DARK.CUR"));
-        ccFileAnimations = CCFileReaderWOX.open(FileHelpers.join(ccPath, "INTRO.CC"));
+        ccFileCur = CCFileReaderWOX.open(FileHelpers.join(ccPath, variant.getCurCCFileName()));
+        ccFileAnimations = CCFileReaderWOX.open(FileHelpers.join(ccPath, variant.getIntroCCFileName()));
         outdoorEnvironmentSets = new WoXOutdoorEnvironmentSet[] { new WoXOutdoorEnvironmentSet(variant, ccFile) };
         indoorEnvironmentSets = WoXIndoorEnvironmentSet.getEnvironmentSets(variant, ccFile);
 }
@@ -90,24 +130,46 @@ public class WoXWorld extends MaMWorld
             scene.addRenderable(new RenderablePos(0,0, 1.0, RenderablePos.ScalePosition.TopLeft, 0),
                     variant.getHUD(this));
 
+            //  screen helpers
+            // ----------------------------------
             MaMSprite hudBorderGuys = ccFile.getSprite("BORDER.ICN");
             MaMSprite hudBorderBat = hudBorderGuys.subSetOfFrames("hudBorderBat", 40, 12);
-            MaMSprite hudBorderFaceOnLefft = hudBorderGuys.subSetOfFrames("hudBorderFaceOnLefft", 0, 8);
+            MaMSprite hudBorderFaceOnLefft = hudBorderGuys.subSetOfFrames("hudBorderFaceOnLeft", 0, 8);
             MaMSprite hudBorderFaceOnRight = hudBorderGuys.subSetOfFrames("hudBorderFaceOnRight", 8, 8);
             MaMSprite hudBorderWingedMonkey = hudBorderGuys.subSetOfFrames("hudBorderWingedMonkey", 16, 12);
             MaMSprite hudBorderGeko = hudBorderGuys.subSetOfFrames("hudBorderGeko", 28, 12);
 
-            scene.addRenderable(new RenderablePos(107, 9, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderBat);
-            scene.addRenderable(new RenderablePos(0, 32, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderFaceOnLefft);
+            scene.addRenderable(new RenderablePos(107, 9,  1.0, RenderablePos.ScalePosition.Top, 1), hudBorderBat);
+            scene.addRenderable(new RenderablePos(0,   32, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderFaceOnLefft);
             scene.addRenderable(new RenderablePos(215, 32, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderFaceOnRight);
-            scene.addRenderable(new RenderablePos(0, 82, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderWingedMonkey);
+            scene.addRenderable(new RenderablePos(0,   82, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderWingedMonkey);
             scene.addRenderable(new RenderablePos(194, 91, 1.0, RenderablePos.ScalePosition.Top, 1), hudBorderGeko);
+
 
         } catch (CCFileFormatException e) {
             e.printStackTrace();
         }
 
         return scene;
+    }
+
+//    Map<Integer, MaMSprite> npcFaceSprites = null;
+//    Map<Integer, MaMSprite> playeFaceSprites = null;
+
+    @Override
+    public MaMSprite getNPCFaceOrNull(int id) {
+        return ccFile.getSpriteOrNull("FACE" + ((id < 10) ? "0" : "") + id + ".FAC");
+//        if(npcFaceSprites == null)
+//        {
+//            npcFaceSprites = BlindIndexMaper.findMapping(I -> ccFile.getSpriteOrNull("FACE" + ((id < 10) ? "0" : "") + id + ".FAC"),
+//                                                        0, 200, 10);
+//        }
+//        return npcFaceSprites.getOrDefault(id, null);
+    }
+
+    @Override
+    public MaMSprite getPlayerFaceOrNull(int id) {
+        return ccFile.getSpriteOrNull("CHAR" + ((id < 10) ? "0" : "") + id + ".FAC");
     }
 
     @Override

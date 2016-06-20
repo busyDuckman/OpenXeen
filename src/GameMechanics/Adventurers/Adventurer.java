@@ -1,9 +1,15 @@
 package GameMechanics.Adventurers;
 
 import Game.MaMActions;
+import Game.MaMGame;
+import Game.Map.MaMWorld;
 import GameMechanics.Equipment.*;
 import GameMechanics.Inventory;
 import GameMechanics.Stat;
+import GameMechanics.Stats;
+import Rendering.IRenderableGameObject;
+import mamFiles.CCFileReader;
+import mamFiles.MaMSprite;
 
 import java.util.List;
 
@@ -78,7 +84,7 @@ public class Adventurer
     int birthDOY;
     int birthYear;
 
-    Stat might;
+    Stat<Stats.Might> might;
     Stat intellegence;
     Stat personality;
     Stat endurance;
@@ -117,6 +123,17 @@ public class Adventurer
     int curSplAdventure;
     int curSplCombat;
 
+    int faceNum = 1;
+
+
+    public Adventurer(String name, CharGender sex, CharRace race, CharClass klass, int faceNum) {
+        this.name = name;
+        this.sex = sex;
+        this.race = race;
+        this.klass = klass;
+        this.faceNum = faceNum;
+    }
+
     /*
      * Called evey ?
      *  -age char
@@ -127,4 +144,6 @@ public class Adventurer
     {
 
     }
+
+
 }

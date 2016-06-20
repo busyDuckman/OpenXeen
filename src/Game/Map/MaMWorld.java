@@ -8,6 +8,7 @@ import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,4 +111,7 @@ public abstract class MaMWorld implements AutoCloseable
     {
         this.currentMaze = getMazeFiles().get(mapID);
     }
+
+    public abstract MaMSprite getNPCFaceOrNull(int id);
+    public abstract MaMSprite getPlayerFaceOrNull(int id);
 }

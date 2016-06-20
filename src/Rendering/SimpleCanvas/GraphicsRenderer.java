@@ -75,24 +75,17 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
     public void refresh(Graphics g, long timeMS)
     {
         MaM3DSceneComposition view = this.game.render();
-
-        if(view != null)
-        {
-            render3DView(g, timeMS, view);
-        }
+        render3DView(g, timeMS, view);
 
         ISceneComposition hudView = this.game.renderHUDForWorld();
-        if(view != null)
-        {
-            renderView(g, timeMS, hudView);
-        }
+        renderView(g, timeMS, hudView);
+
+        ISceneComposition partyView = this.game.renderParty();
+        renderView(g, timeMS, partyView);
 
         MaM2DMapComposition mapView = this.game.renderMap(0,0,9,8);
         //MaM2DMapComposition mapView = this.game.renderMap(0,0,16,16);
-        if(mapView != null)
-        {
-            renderView(g, timeMS, mapView, 234, 9, 1);
-        }
+        renderView(g, timeMS, mapView, 234, 9, 1);
 
     }
 
@@ -160,6 +153,10 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
                               int y,
                               double localScale)
     {
+        if(view == null) {
+            return;
+        }
+
         view.depthSort();
         for (Pair<RenderablePos, IRenderableGameObject> renderable : view.getRenderables())
         {
@@ -191,6 +188,9 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
     }
 
     protected void render3DView(Graphics g, long timeMS, MaM3DSceneComposition view) {
+        if(view == null) {
+            return;
+        }
         //view.depthSort();
         //this should already be depth sorted.
         for (Pair<RenderablePos, IRenderableGameObject> renderable : view.getRenderables())

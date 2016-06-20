@@ -123,7 +123,10 @@ public class RenderablePos
         return result;
     }
 
-    public RenderablePos onTop() {
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    public RenderablePos above() {
         return new RenderablePos(xPos, yPos, scale, scalePos, depth+1, hackMe);
     }
 
@@ -131,7 +134,13 @@ public class RenderablePos
         return new RenderablePos(xPos, yPos, scale, scalePos, depth-1, hackMe);
     }
 
+    public RenderablePos translate(int x, int y) {
+        return new RenderablePos(xPos+x, yPos+y, scale, scalePos, depth-1, hackMe);
+    }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Getters and setters
+    //------------------------------------------------------------------------------------------------------------------
     public int getxPos() {
         if(hackMe){
             // Hash the hacked pos, print output if something changed.

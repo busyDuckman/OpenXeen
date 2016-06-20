@@ -25,4 +25,21 @@ public class Stat<T extends Stats>
         this.baseLevel = stat.baseLevel;
         this.temporaryLevel = stat.temporaryLevel;
     }
+
+    public int getBaseLevel() {
+        return baseLevel;
+    }
+
+    public int getTemporaryLevel() {
+        return temporaryLevel;
+    }
+
+    public T getType() {
+        return type;
+    }
+
+    public boolean isOfType(Stats stat)
+    {
+        return stat == type;
+    }
 }

@@ -4,6 +4,10 @@ import Game.Map.MaMTile;
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
 import Game.Monsters.MaMMonster;
+import GameMechanics.Adventurers.Adventurer;
+import GameMechanics.Adventurers.CharClass;
+import GameMechanics.Adventurers.CharGender;
+import GameMechanics.Adventurers.CharRace;
 import GameMechanics.Magic.PartyEnchantments.IPartyEnchantment;
 import Rendering.*;
 import Toolbox.FileHelpers;
@@ -14,7 +18,6 @@ import mamFiles.WOX.CCFileReaderWOX;
 import org.joda.time.DateTime;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
@@ -30,6 +33,7 @@ public class MaMGame implements IMaMGame
     int food;
     DateTime dateTime;
     MaMGameStates gameState;
+    List<Adventurer> party;
 
 
     //everything that is not the party
@@ -45,6 +49,8 @@ public class MaMGame implements IMaMGame
         loadWorld(ccFile);
 
         activePartyEnchantments = new ArrayList<>();
+
+        setupDefaultGameState();
     }
 
     public MaMGame(String ccFilePath) throws CCFileFormatException
@@ -53,6 +59,7 @@ public class MaMGame implements IMaMGame
         loadWorld(ccFile);
 
         activePartyEnchantments = new ArrayList<>();
+        setupDefaultGameState();
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -101,6 +108,13 @@ public class MaMGame implements IMaMGame
                 break;
         }
     }
+
+    private void setupDefaultGameState()
+    {
+        party = new ArrayList<>();
+        party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, new CharClass(), 1));
+    }
+
 
     //-------------------------------------------------------------------------------------------------
     // Getters and Setters
@@ -204,7 +218,7 @@ public class MaMGame implements IMaMGame
                     if(maze.isOutdoors())
                     {
                         //environ
-                        tilePos = tilePos.onTop();
+                        tilePos = tilePos.above();
                         int environIndex = t.getIndexMiddle()+1;
                         IRenderableGameObject environSprite = ((IMaMOutdoorEnvironmentSet)maze.getEnvironmentSet())
                                                                 .getMapEnviron(environIndex);
@@ -215,7 +229,7 @@ public class MaMGame implements IMaMGame
                     }
 
                     //objects
-                    tilePos = tilePos.onTop();
+                    tilePos = tilePos.above();
                     int objectIndex = t.getIndexTop()+3;
                     IRenderableGameObject overlaySprite = maze.getEnvironmentSet().getMapObject(objectIndex);
                     if(objectIndex != 8)
@@ -225,7 +239,7 @@ public class MaMGame implements IMaMGame
 
                     if(GlobalSettings.INSTANCE.debugMode())
                     {
-                        tilePos = tilePos.onTop();
+                        tilePos = tilePos.above();
                         //scene.addRenderable(tilePos, IRenderableGameObject.fromText("" + objectIndex, Color.BLUE, 8, 8));
 
                     }
@@ -243,6 +257,54 @@ public class MaMGame implements IMaMGame
         return world.renderHUDForWorld();
     }
 
+    @Override
+    public ISceneComposition renderParty() {
+        MaM2DInsertionOrderComposition scene = new MaM2DInsertionOrderComposition();
+
+        //  character faces
+        // ----------------------------------
+        MaMSprite[] faces = new MaMSprite[6];
+
+        //dimensions
+        //int spacing = 36;
+        int partyAreaStart = 8;
+        int faceAreaLen = 216;
+        int maxPartySize = 6;
+
+        for (int i = 0; i < faces.length; i++) {
+            try
+            {
+                faces[i] = world.getPlayerFaceOrNull(i+1).subSetOfFrames("normal face for " + i, 0, 1);
+
+                //calculate pos
+                int faceWidth = faces[i].getRenderedFrames()[0].getWidth();
+                int faceSlotSize = faceAreaLen / maxPartySize;
+                int faceIndent = (faceSlotSize - faceWidth) / 2;
+
+                //face
+                RenderablePos pos = new RenderablePos(
+                        (i*faceSlotSize) + faceIndent + partyAreaStart,
+                        150, 1.0, RenderablePos.ScalePosition.Top, 1);
+                scene.addRenderable(pos, faces[i]);
+
+                //hp bar
+                IRenderableGameObject hpBar = world.getCcFile()
+                                                   .getSpriteOrNull("HPBARS.ICN")
+                                                   .subSetOfFrames("HP bar", i%4, 1);
+
+                int hpWidth = hpBar.getImage(0).getWidth();
+                int hpIndent = (faceSlotSize - hpWidth) / 2;
+                scene.addRenderable(pos.translate(hpIndent-faceIndent, 32).above(), hpBar);
+
+            }
+            catch (CCFileFormatException e)
+            {
+                //e.printStackTrace();
+            }
+        }
+
+        return scene;
+    }
 
     public static String getModVersionOfPath(String path, String modName)
     {

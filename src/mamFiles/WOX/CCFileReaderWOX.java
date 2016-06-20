@@ -1,5 +1,6 @@
 package mamFiles.WOX;
 
+import Game.GlobalSettings;
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
 import Toolbox.BinaryHelpers;
@@ -107,7 +108,10 @@ public class CCFileReaderWOX extends CCFileReader
             ccFile.loadKnownFiles(filePath);
 
             //generate local copies
-            ccFile.makeProxiesOfAllEntries();
+            if(GlobalSettings.INSTANCE.rebuildProxies())
+            {
+                ccFile.makeProxiesOfAllEntries();
+            }
 
             //done
             return ccFile;

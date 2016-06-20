@@ -43,6 +43,11 @@ public interface IMaMGame extends AutoCloseable
     ISceneComposition renderHUDForWorld();
 
     /**
+     * Renders the player characters and their
+     */
+    ISceneComposition renderParty();
+
+    /**
      * 0 = no danger; to 1.0 = full danger.
      * 2.0 = holy shit.
      */
