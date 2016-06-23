@@ -16,7 +16,7 @@ import static Toolbox.BinaryHelpers.*;
  * Created by duckman on 10/05/2016.
  *
  */
-public class SpriteFileWOX extends MaMSprite
+public class WOXSpriteFile extends MaMSprite
 {
 
     protected static class Cell extends Rectangle
@@ -200,7 +200,7 @@ public class SpriteFileWOX extends MaMSprite
 
 
 
-    public SpriteFileWOX(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
+    public WOXSpriteFile(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
         super(name, key, pal);
         CCFileFormatException.assertFalse_WhenLoadingFrom(data == null, name, key);
         BinaryHelpers.DebugDumpBinary(data, "sprite.last");
@@ -287,7 +287,7 @@ public class SpriteFileWOX extends MaMSprite
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
-        //CCFileFormatException.assertTrue(cellsInFrame.size() > 0, "SpriteFileWOX::sizeFrame() cellsInFrame.size() > 0");
+        //CCFileFormatException.assertTrue(cellsInFrame.size() > 0, "WOXSpriteFile::sizeFrame() cellsInFrame.size() > 0");
         if(cellsInFrame.size() == 0)
         {
             System.out.println("WTF: empty frame.");

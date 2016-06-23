@@ -1,11 +1,6 @@
 package mamFiles;
 
 import Toolbox.LRUCache;
-import com.google.common.collect.ClassToInstanceMap;
-import com.sun.istack.internal.NotNull;
-
-import java.util.IdentityHashMap;
-import java.util.function.IntFunction;
 
 /**
  * Created by duckman on 12/06/2016.
@@ -40,18 +35,18 @@ public enum CCFileCache {
         R apply() throws CCFileFormatException;
     }
 
-    public final <T extends MAMFile> T cachedGetFile(CCFileReader reader,
-                                                        int id,
-                                                        FuncGetMaMFile<T> getFunc)
+    public final <T extends MAMFile> T cachedGetFile(MaMCCFileReader reader,
+                                                     int id,
+                                                     FuncGetMaMFile<T> getFunc)
             throws CCFileFormatException
     {
         return cachedGetFile(MAMFile.generateKeyFromCCFile(id, reader), () -> getFunc.apply(id));
     }
 
-    public final <T extends MAMFile, W extends MAMFile> T cachedGetFile(CCFileReader reader,
-                                                     int id,
-                                                     W with,
-                                                     FuncGetMaMFile2<T, W> getFunc)
+    public final <T extends MAMFile, W extends MAMFile> T cachedGetFile(MaMCCFileReader reader,
+                                                                        int id,
+                                                                        W with,
+                                                                        FuncGetMaMFile2<T, W> getFunc)
             throws CCFileFormatException
     {
         return cachedGetFile(MAMFile.generateKeyFromJoin(MAMFile.generateKeyFromCCFile(id, reader), with),

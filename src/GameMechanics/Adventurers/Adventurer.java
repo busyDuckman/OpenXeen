@@ -1,15 +1,10 @@
 package GameMechanics.Adventurers;
 
 import Game.MaMActions;
-import Game.MaMGame;
-import Game.Map.MaMWorld;
 import GameMechanics.Equipment.*;
 import GameMechanics.Inventory;
 import GameMechanics.Stat;
 import GameMechanics.Stats;
-import Rendering.IRenderableGameObject;
-import mamFiles.CCFileReader;
-import mamFiles.MaMSprite;
 
 import java.util.List;
 
@@ -85,25 +80,25 @@ public class Adventurer
     int birthYear;
 
     Stat<Stats.Might> might;
-    Stat intellegence;
-    Stat personality;
-    Stat endurance;
-    Stat speed;
-    Stat accuracy;
-    Stat luck;
-    Stat armour_temp;
-    Stat level;
-    Stat leveltemp;
-    Stat age;
-    Stat fireResist;
-    Stat coldResist;
-    Stat elecResist;
-    Stat poisonResist;
-    Stat energyResist;
-    Stat magicResist;
-    Stat hitPoints;
-    Stat spellPoints;
-    Stat experiencePoints;
+    Stat<Stats.Intelligence> intelligence;
+    Stat<Stats.Personality> personality;
+    Stat<Stats.Endurance> endurance;
+    Stat<Stats.Speed> speed;
+    Stat<Stats.Accuracy> accuracy;
+    Stat<Stats.Luck> luck;
+    Stat<Stats.Armour> armour;
+    Stat<Stats.Level> level;
+    //Stat<Stats.Leveltemp> level;
+    Stat<Stats.Age> age;
+    Stat<Stats.FireResist> fireResist;
+    Stat<Stats.ColdResist> coldResist;
+    Stat<Stats.ElecResist> elecResist;
+    Stat<Stats.PoisonResist> poisonResist;
+    Stat<Stats.EnergyResist> energyResist;
+    Stat<Stats.MagicResist> magicResist;
+    Stat<Stats.HitPoints> hitPoints;
+    Stat<Stats.SpellPoints> spellPoints;
+    Stat<Stats.ExperiencePoints> experiencePoints;
 
     List<CharSkill> skills;
     List<Award> Awards;
@@ -143,6 +138,10 @@ public class Adventurer
     void updateChar()
     {
 
+    }
+
+    public void copThis()
+    {
     }
 
 

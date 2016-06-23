@@ -5,7 +5,6 @@ import GameMechanics.Magic.PartyEnchantments.IPartyEnchantment;
 import Rendering.ISceneComposition;
 import Rendering.MaM2DMapComposition;
 import Rendering.MaM3DSceneComposition;
-import mamFiles.CCFileReader;
 import org.joda.time.DateTime;
 
 import java.util.List;

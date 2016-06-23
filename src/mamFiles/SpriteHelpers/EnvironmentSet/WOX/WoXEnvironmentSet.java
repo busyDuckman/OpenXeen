@@ -3,7 +3,7 @@ package mamFiles.SpriteHelpers.EnvironmentSet.WOX;
 import Game.Map.WoXWorld;
 import Rendering.IRenderableGameObject;
 import mamFiles.CCFileFormatException;
-import mamFiles.CCFileReader;
+import mamFiles.MaMCCFileReader;
 import mamFiles.MaMSprite;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 
@@ -38,7 +38,7 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
      */
     public WoXEnvironmentSet(WoXWorld.WoxVariant variant,
                              String environmentKey,
-                             CCFileReader ccFile) throws CCFileFormatException {
+                             MaMCCFileReader ccFile) throws CCFileFormatException {
 
         if(environmentKey != null)
         {
@@ -69,12 +69,12 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
     }
 
     @Override
-    public IRenderableGameObject getSky(int skyIndex) {
+    public IRenderableGameObject getSky() {
         return skySprite;
     }
 
     @Override
-    public IRenderableGameObject getGround(int groundIndex) {
+    public IRenderableGameObject getGround() {
         return groundSprite;
     }
 

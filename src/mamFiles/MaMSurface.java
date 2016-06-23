@@ -2,7 +2,7 @@ package mamFiles;
 
 import Rendering.AnimationSettings;
 import Toolbox.HProperties;
-import mamFiles.WOX.SpriteFileWOX;
+import mamFiles.WOX.WOXSpriteFile;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -26,6 +26,7 @@ public class MaMSurface extends MAMFile implements Rendering.IRelativeToLocation
     public MaMSurface(MaMSprite aSprite, String key)
     {
         super(aSprite.name, key);
+        this.sprite = aSprite;
     }
 
     @Override
@@ -64,7 +65,7 @@ public class MaMSurface extends MAMFile implements Rendering.IRelativeToLocation
     }
 
     public MaMSurface fromPng(String path) throws CCFileFormatException {
-        MaMSprite sprite = SpriteFileWOX.fromPNGFile(path);
+        MaMSprite sprite = WOXSpriteFile.fromPNGFile(path);
         return new MaMSurface(sprite, MAMFile.generateKeyFromPath(path));
     }
 

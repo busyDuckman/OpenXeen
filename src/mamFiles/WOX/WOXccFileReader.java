@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -22,7 +21,7 @@ import static Toolbox.BinaryHelpers.*;
 /**
  * Created by duckman on 7/05/2016.
  */
-public class CCFileReaderWOX extends CCFileReader
+public class WOXccFileReader extends MaMCCFileReader
 {
     public  enum WoXCCVariant {
         CLOUDS_INTRO (null, WoXWorld.WoxVariant.CLOUDS),
@@ -62,12 +61,12 @@ public class CCFileReaderWOX extends CCFileReader
 
     WoXCCVariant variant;
 
-    protected CCFileReaderWOX(String name, WoXCCVariant variant) {
+    protected WOXccFileReader(String name, WoXCCVariant variant) {
         super(name);
         this.variant = variant;
     }
 
-    public static CCFileReaderWOX open(String filePath)
+    public static WOXccFileReader open(String filePath)
     {
         //validate params and get file info
         if(!FileHelpers.fileExists(filePath))
@@ -78,7 +77,7 @@ public class CCFileReaderWOX extends CCFileReader
         String name = path.getFileName().toString();
 
         //create cc file reader.
-        CCFileReaderWOX ccFile = new CCFileReaderWOX(name, getVariant(filePath));
+        WOXccFileReader ccFile = new WOXccFileReader(name, getVariant(filePath));
         try
         {
             //Open the file stream
@@ -243,13 +242,13 @@ public class CCFileReaderWOX extends CCFileReader
     @Override
     protected MaMSprite __getSprite(int id, MaMPallet pal) throws CCFileFormatException
     {
-        return new SpriteFileWOX(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
+        return new WOXSpriteFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
     }
 
     @Override
     protected MaMPallet __getPallet(int id) throws CCFileFormatException
     {
-        return new PalletWOX(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
+        return new WOXPallet(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
     }
 
     @Override

@@ -50,15 +50,15 @@ public class MaM3DSceneComposition implements ISceneComposition {
         renderables.add(new Pair<>(pos, obj));
     }
 
-    public synchronized void setGround(MaMSprite ground)
+    public synchronized void setGround(IRenderableGameObject ground)
     {
         addRenderable(MaM3dScenePos.Ground.getRenderablePosition(), ground);
     }
 
-    public synchronized void setSky(MaMSprite sky)
+    public synchronized void setSky(IRenderableGameObject sky)
     {
-        IRenderableGameObject skyTop = IRenderableGameObject.fromImage(sky.getRenderedFrames()[0]);
-        IRenderableGameObject skyBottom = IRenderableGameObject.fromImage(sky.getRenderedFrames()[1]);
+        IRenderableGameObject skyTop = IRenderableGameObject.fromImage(sky.getImage(0));
+        IRenderableGameObject skyBottom = IRenderableGameObject.fromImage(sky.getImage(1));
 
         addRenderable(MaM3dScenePos.TopHalfOfsky.getRenderablePosition(), skyTop);
         addRenderable(MaM3dScenePos.BottomHalfOfsky.getRenderablePosition(), skyBottom);

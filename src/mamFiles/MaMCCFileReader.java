@@ -4,7 +4,7 @@ import Game.Map.MaMWorld;
 import Game.Monsters.MaMMonster;
 import Toolbox.FileHelpers;
 import Toolbox.IValidatable;
-import mamFiles.WOX.SpriteFileWOX;
+import mamFiles.WOX.WOXSpriteFile;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * Created by duckman on 3/05/2016.
  */
-public abstract class CCFileReader extends MAMFile implements AutoCloseable
+public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
 {
 
     protected static class CCFileTocEntry implements IValidatable
@@ -51,7 +51,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
                     '}';
         }
 
-        public byte[] readAndDecryptFile(CCFileReader ccFile) throws CCFileFormatException
+        public byte[] readAndDecryptFile(MaMCCFileReader ccFile) throws CCFileFormatException
         {
             try
             {
@@ -87,7 +87,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
     //-------------------------------------------------------------------------------------------------
     // Constructor
     //-------------------------------------------------------------------------------------------------
-    protected CCFileReader(String fileName)
+    protected MaMCCFileReader(String fileName)
     {
         super(FileHelpers.getFileNameNoExtension(fileName), "root@" + fileName);
         filePath = fileName;
@@ -612,7 +612,6 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
                         System.out.println("Error creating path: " + path);
                     }
                 }
-
             }
             catch (CCFileFormatException e)
             {
@@ -636,7 +635,7 @@ public abstract class CCFileReader extends MAMFile implements AutoCloseable
             //sprite
             try
             {
-                MaMSprite sprite = new SpriteFileWOX("SPRITE_FOR_"+fileName,
+                MaMSprite sprite = new WOXSpriteFile("SPRITE_FOR_"+fileName,
                                                     MAMFile.generateKeyFromCCFile(id, this),
                                                     getFileRaw(id),
                                                     getPalletForFile(id));

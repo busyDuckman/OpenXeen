@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 /**
  * Created by duckman on 8/05/2016.
  */
-public class CCFileReaderWOXTest
+public class WOXccFileReaderTest
 {
     @Before
     public void setUp() throws Exception {
@@ -25,9 +25,9 @@ public class CCFileReaderWOXTest
     public void hashFileName() throws Exception
     {
         //actual files, with is known hash values
-        assertEquals(CCFileReaderWOX._hashFileName("AAZE0002.TXT"), 0x7CA1);
-        assertEquals(CCFileReaderWOX._hashFileName("GROUP.VGA"), 0xFF8E);
-        assertEquals(CCFileReaderWOX._hashFileName("POW10.ICN"), 0x0062);
+        assertEquals(WOXccFileReader._hashFileName("AAZE0002.TXT"), 0x7CA1);
+        assertEquals(WOXccFileReader._hashFileName("GROUP.VGA"), 0xFF8E);
+        assertEquals(WOXccFileReader._hashFileName("POW10.ICN"), 0x0062);
     }
 
 }

@@ -57,6 +57,74 @@ public abstract class Stats
 
         return getDescriptions()[i];
     }
+
+    public class Intelligence extends StatBasic {
+            @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class Personality extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class Endurance extends StatBasic{
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class Speed extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class Accuracy extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class Luck extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class Armour extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class Level extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class FireResist extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class ColdResist extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class ElecResist extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class PoisonResist extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class EnergyResist extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class MagicResist extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class HitPoints extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class SpellPoints extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
+
+    public class ExperiencePoints extends StatBasic {
+        @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
+    }
 }
 
 //public enum Stats

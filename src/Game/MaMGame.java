@@ -14,7 +14,7 @@ import Toolbox.FileHelpers;
 import Toolbox.Grid;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
-import mamFiles.WOX.CCFileReaderWOX;
+import mamFiles.WOX.WOXccFileReader;
 import org.joda.time.DateTime;
 
 import java.awt.*;
@@ -44,7 +44,7 @@ public class MaMGame implements IMaMGame
     //-------------------------------------------------------------------------------------------------
     // Constructor
     //-------------------------------------------------------------------------------------------------
-    public MaMGame(CCFileReader ccFile) throws CCFileFormatException
+    public MaMGame(MaMCCFileReader ccFile) throws CCFileFormatException
     {
         loadWorld(ccFile);
 
@@ -55,7 +55,7 @@ public class MaMGame implements IMaMGame
 
     public MaMGame(String ccFilePath) throws CCFileFormatException
     {
-        CCFileReader ccFile = CCFileReaderWOX.open(ccFilePath);
+        MaMCCFileReader ccFile = WOXccFileReader.open(ccFilePath);
         loadWorld(ccFile);
 
         activePartyEnchantments = new ArrayList<>();
@@ -65,7 +65,7 @@ public class MaMGame implements IMaMGame
     //-------------------------------------------------------------------------------------------------
     // World
     //-------------------------------------------------------------------------------------------------
-    protected void loadWorld(CCFileReader ccFile) throws CCFileFormatException
+    protected void loadWorld(MaMCCFileReader ccFile) throws CCFileFormatException
     {
         world = new WoXWorld(this, ccFile);
         world.loadMaps();
@@ -184,8 +184,11 @@ public class MaMGame implements IMaMGame
             MaMMonster mon = world.getMonsters()[testMonsterID%world.getMonsters().length];
             view.addMonster(new Point(100,0), mon);
 
-            view.setGround(world.getCcFile().getSprite("CAVE.GND"));
-            view.setSky(world.getCcFile().getSprite("SKY.SKY"));
+            view.setGround(world.getOutdoorEnvironmentSet(0).getGround());
+            //.getSprite("CAVE.GND"));
+            view.setSky(world.getOutdoorEnvironmentSet(0).getSky());
+            view.addRenderable(new RenderablePos(8,50,1.0, 3).hackMe(), world.getCcFile().getSurface("DESERT.SRF"));
+            //CCFileFormatException.stub();
 
         } catch (CCFileFormatException e) {
             e.printStackTrace();

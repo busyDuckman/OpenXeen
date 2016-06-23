@@ -4,16 +4,14 @@ import Game.MaMGame;
 import Rendering.ISceneComposition;
 import Rendering.MaM2DInsertionOrderComposition;
 import Rendering.RenderablePos;
-import Toolbox.BlindIndexMaper;
 import Toolbox.FileHelpers;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
+import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
-import mamFiles.WOX.CCFileReaderWOX;
-
-import java.util.Map;
+import mamFiles.WOX.WOXccFileReader;
 
 /**
  * Created by duckman on 5/06/2016.
@@ -85,20 +83,20 @@ public class WoXWorld extends MaMWorld
         public abstract String getCurCCFileName();
     }
 
-    protected CCFileReaderWOX ccFileCur;
-    protected final CCFileReaderWOX ccFileWox() {return (CCFileReaderWOX)ccFile;}
-    protected final CCFileReaderWOX ccFileAnimationsWox() {return (CCFileReaderWOX)ccFileAnimations;}
+    protected WOXccFileReader ccFileCur;
+    protected final WOXccFileReader ccFileWox() {return (WOXccFileReader)ccFile;}
+    protected final WOXccFileReader ccFileAnimationsWox() {return (WOXccFileReader)ccFileAnimations;}
     protected WoxVariant variant;
     protected WoXIndoorEnvironmentSet[] indoorEnvironmentSets;
     protected WoXOutdoorEnvironmentSet[] outdoorEnvironmentSets;
 
-    public WoXWorld(MaMGame game, CCFileReader ccFileReader) throws CCFileFormatException {
+    public WoXWorld(MaMGame game, MaMCCFileReader ccFileReader) throws CCFileFormatException {
         super(game, ccFileReader);
         String ccPath = FileHelpers.getParentDirectory(ccFile.getFilePath());
         variant = ccFileWox().getVariant().getWoxVariant();
         //todo? clouds?
-        ccFileCur = CCFileReaderWOX.open(FileHelpers.join(ccPath, variant.getCurCCFileName()));
-        ccFileAnimations = CCFileReaderWOX.open(FileHelpers.join(ccPath, variant.getIntroCCFileName()));
+        ccFileCur = WOXccFileReader.open(FileHelpers.join(ccPath, variant.getCurCCFileName()));
+        ccFileAnimations = WOXccFileReader.open(FileHelpers.join(ccPath, variant.getIntroCCFileName()));
         outdoorEnvironmentSets = new WoXOutdoorEnvironmentSet[] { new WoXOutdoorEnvironmentSet(variant, ccFile) };
         indoorEnvironmentSets = WoXIndoorEnvironmentSet.getEnvironmentSets(variant, ccFile);
 }
@@ -108,7 +106,7 @@ public class WoXWorld extends MaMWorld
         return ccFileWox().getPallet(ccFileWox().getVariant().getDefaultPallate());
     }
 
-    public CCFileReaderWOX getCCFileCur() {
+    public WOXccFileReader getCCFileCur() {
         return ccFileCur;
     }
 
@@ -118,7 +116,7 @@ public class WoXWorld extends MaMWorld
     }
 
     @Override
-    public IMaMEnvironmentSet getOutdoorEnvironmentSet(int index) {
+    public IMaMOutdoorEnvironmentSet getOutdoorEnvironmentSet(int index) {
         return outdoorEnvironmentSets[index];
     }
 

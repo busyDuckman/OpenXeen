@@ -30,12 +30,12 @@ public class CCFileFormatException extends Exception
     }
 
 
-    public static CCFileFormatException fromBadHeader(CCFileReader file, String s)
+    public static CCFileFormatException fromBadHeader(MaMCCFileReader file, String s)
     {
         return new CCFileFormatException("Invalid File Header, " + s);
     }
 
-    public static CCFileFormatException fromBadReadLength(CCFileReader file, int readLen, int expectedLen) {
+    public static CCFileFormatException fromBadReadLength(MaMCCFileReader file, int readLen, int expectedLen) {
         if (readLen  == -1)
         {
             return new CCFileFormatException("End of file reached.");
@@ -76,7 +76,7 @@ public class CCFileFormatException extends Exception
         }
     }
 
-    public static CCFileFormatException fromMissingFile(String file, CCFileReader reader) {
+    public static CCFileFormatException fromMissingFile(String file, MaMCCFileReader reader) {
         return new CCFileFormatException("Missing file \"" + file + "\" in \"" + reader.getFilePath() + "\"");
     }
 
@@ -136,5 +136,14 @@ public class CCFileFormatException extends Exception
 
     public static void throwUnloadableProxy(String details) throws CCFileFormatException {
         throw new CCFileFormatException("Error loading proxy: " + details);
+    }
+
+    /**
+     * This is a stub to allow try blocks to compile even though I had to
+     * temporarily comment out the one line of code that needed the block.
+     */
+    public static void stub() throws CCFileFormatException
+    {
+
     }
 }

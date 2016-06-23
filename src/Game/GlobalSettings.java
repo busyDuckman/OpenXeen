@@ -8,7 +8,7 @@ public enum GlobalSettings
     INSTANCE;
 
     boolean debugMode = true;
-    boolean rebuildProxies = false;
+    boolean rebuildProxies = true;
 
     public boolean debugMode() {
         return debugMode;

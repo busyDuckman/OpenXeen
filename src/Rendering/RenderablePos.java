@@ -95,6 +95,10 @@ public class RenderablePos
         hackMe = other.hackMe;
     }
 
+    public RenderablePos hackMe() {
+        return new RenderablePos(xPos, yPos, scale,scalePos,depth, true);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

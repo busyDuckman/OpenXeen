@@ -43,7 +43,7 @@ public abstract class MAMFile implements IHasProxy, IHasProperties
         return key;
     }
 
-    public static String generateKeyFromCCFile(int id, CCFileReader reader)
+    public static String generateKeyFromCCFile(int id, MaMCCFileReader reader)
     {
         // "C 1234@c:\games\xeen\dark.cc"
         return "C " + id + "@" + reader.filePath;

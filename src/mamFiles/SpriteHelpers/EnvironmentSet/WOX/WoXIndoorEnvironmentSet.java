@@ -5,7 +5,7 @@ import Rendering.IRenderableGameObject;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import mamFiles.CCFileFormatException;
-import mamFiles.CCFileReader;
+import mamFiles.MaMCCFileReader;
 import mamFiles.MaMSprite;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 
@@ -47,7 +47,7 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
      * @param environmentKey
      * @param ccFile
      */
-    public WoXIndoorEnvironmentSet(WoXWorld.WoxVariant variant, String environmentKey, CCFileReader ccFile) throws CCFileFormatException {
+    public WoXIndoorEnvironmentSet(WoXWorld.WoxVariant variant, String environmentKey, MaMCCFileReader ccFile) throws CCFileFormatException {
         super(variant, environmentKey, ccFile);
 
         System.out.println("Loading environment set: " + environmentKey);
@@ -155,7 +155,7 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
     }
 
     public static WoXIndoorEnvironmentSet[] getEnvironmentSets(WoXWorld.WoxVariant variant,
-                                                         CCFileReader ccFile) throws CCFileFormatException {
+                                                         MaMCCFileReader ccFile) throws CCFileFormatException {
         WoXIndoorEnvironmentSet[] sets = new WoXIndoorEnvironmentSet[0];
         switch (variant) {
             case DARK_SIDE:

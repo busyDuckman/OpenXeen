@@ -8,7 +8,7 @@ import Toolbox.BinaryHelpers;
 import Toolbox.Direction;
 import Toolbox.Grid;
 import mamFiles.CCFileFormatException;
-import mamFiles.CCFileReader;
+import mamFiles.MaMCCFileReader;
 import mamFiles.MaMMazeFile;
 
 import java.awt.*;
@@ -31,7 +31,7 @@ public class WOXMazeFile extends MaMMazeFile
 
         //DAT file, eg maze0001.DAT holds the terrain
         String mapDataFile = world.getMazeName(mazeID);
-        CCFileReader reader = ((WoXWorld)world).getCCFileCur();
+        MaMCCFileReader reader = ((WoXWorld)world).getCCFileCur();
 
         if(reader.fileExists(mapDataFile))
         {

@@ -9,8 +9,8 @@ public interface IMaMEnvironmentSet
 {
     IRenderableGameObject getObject(int objectIndex, int mipMapLevel);
 
-    IRenderableGameObject getSky(int skyIndex);
-    IRenderableGameObject getGround(int groundIndex);
+    IRenderableGameObject getSky();
+    IRenderableGameObject getGround();
 
     IRenderableGameObject getMapTile(int groundIndex);
     IRenderableGameObject getMapObject(int objectIndex);

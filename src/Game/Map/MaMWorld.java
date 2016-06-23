@@ -7,8 +7,8 @@ import com.sun.istack.internal.NotNull;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
+import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,12 +32,12 @@ public abstract class MaMWorld implements AutoCloseable
     Map<Integer, MaMMazeFile> MazeFiles;
     MaMMazeFile currentMaze;
 
-    protected CCFileReader ccFile;
-    protected CCFileReader ccFileAnimations;
+    protected MaMCCFileReader ccFile;
+    protected MaMCCFileReader ccFileAnimations;
 
     protected MaMPallet currentPallate;
 
-    public MaMWorld(MaMGame game, CCFileReader ccFileReader) throws CCFileFormatException
+    public MaMWorld(MaMGame game, MaMCCFileReader ccFileReader) throws CCFileFormatException
     {
         this.ccFile = ccFileReader;
         this.game = game;
@@ -76,11 +76,11 @@ public abstract class MaMWorld implements AutoCloseable
         MazeFiles.put(maze.getMazeID(), maze);
     }
 
-    public CCFileReader getCcFile() {
+    public MaMCCFileReader getCcFile() {
         return ccFile;
     }
 
-    public CCFileReader getCcFileAnimations() {
+    public MaMCCFileReader getCcFileAnimations() {
         return ccFileAnimations;
     }
 
@@ -89,7 +89,7 @@ public abstract class MaMWorld implements AutoCloseable
     }
 
     public abstract IMaMIndoorEnvironmentSet getIndoorEnvironmentSet(int index);
-    public abstract IMaMEnvironmentSet getOutdoorEnvironmentSet(int index);
+    public abstract IMaMOutdoorEnvironmentSet getOutdoorEnvironmentSet(int index);
 
     public abstract ISceneComposition renderHUDForWorld();
 

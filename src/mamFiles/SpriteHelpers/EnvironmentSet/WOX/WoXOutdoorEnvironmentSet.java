@@ -3,7 +3,7 @@ package mamFiles.SpriteHelpers.EnvironmentSet.WOX;
 import Game.Map.WoXWorld;
 import Rendering.IRenderableGameObject;
 import mamFiles.CCFileFormatException;
-import mamFiles.CCFileReader;
+import mamFiles.MaMCCFileReader;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 
 /**
@@ -28,7 +28,7 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
      * @param environmentKey
      * @param ccFile
      */
-    public WoXOutdoorEnvironmentSet(WoXWorld.WoxVariant variant, CCFileReader ccFile) throws CCFileFormatException {
+    public WoXOutdoorEnvironmentSet(WoXWorld.WoxVariant variant, MaMCCFileReader ccFile) throws CCFileFormatException {
         super(variant, null, ccFile);
     }
 
