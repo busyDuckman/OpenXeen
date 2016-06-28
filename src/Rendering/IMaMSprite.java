@@ -1,6 +1,7 @@
 package Rendering;
 
 import mamFiles.CCFileFormatException;
+import mamFiles.IHasProxy;
 import mamFiles.MAMFile;
 import mamFiles.MaMPallet;
 
@@ -17,5 +18,6 @@ public interface IMaMSprite extends IRenderableGameObject
 
     int getHeight();
 
-    BufferedImage[] getRenderedFrames();
+    //Now in IRenderableGameObject as a default
+    //BufferedImage[] getRenderedFrames();
 }

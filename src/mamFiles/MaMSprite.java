@@ -119,7 +119,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         transparentIndex = 0;
     }
 
-    protected MaMSprite(String name, String key, BufferedImage[] frames)
+    public  MaMSprite(String name, String key, BufferedImage[] frames)
     {
         super(name, key);
         pallet = null;

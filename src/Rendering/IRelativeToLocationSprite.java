@@ -8,10 +8,15 @@ import java.awt.image.BufferedImage;
  */
 public interface IRelativeToLocationSprite extends IRenderableGameObject
 {
-    BufferedImage getImage(Point mapPosRelative, int frame);
+    /**
+     * Returns a overlay of this surface on the ground.
+     * @param mapPosRelative The relative map position of the tile to be filled with this surface.
+     *                       NB: null returns full ground over.
+     */
+    IRenderableGameObject getSurfaceOverlay(Point mapPosRelative);
 
     @Override
     default BufferedImage getImage(int frame) {
-        return getImage(new Point(0,0), frame);
+        return getSurfaceOverlay(new Point(0,0)).getImage(frame);
     }
 }

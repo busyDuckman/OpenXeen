@@ -1,5 +1,6 @@
 package Rendering.SimpleCanvas;
 
+import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.MaMActions;
 import Rendering.RenderablePos;
@@ -188,6 +189,10 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
             case KeyEvent.VK_RIGHT:
                 game.doAction(MaMActions.WalkRight);
+                break;
+
+            case KeyEvent.VK_H:
+                GlobalSettings.INSTANCE.setDisableHUD(!GlobalSettings.INSTANCE.isHUDDisabled());
                 break;
 
             //hack render pos offset

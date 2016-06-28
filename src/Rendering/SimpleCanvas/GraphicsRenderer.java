@@ -1,5 +1,6 @@
 package Rendering.SimpleCanvas;
 
+import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.Monsters.MaMMonster;
 import Rendering.*;
@@ -77,11 +78,14 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
         MaM3DSceneComposition view = this.game.render();
         render3DView(g, timeMS, view);
 
-        ISceneComposition hudView = this.game.renderHUDForWorld();
-        renderView(g, timeMS, hudView);
+        if(!GlobalSettings.INSTANCE.isHUDDisabled())
+        {
+            ISceneComposition hudView = this.game.renderHUDForWorld();
+            renderView(g, timeMS, hudView);
 
-        ISceneComposition partyView = this.game.renderParty();
-        renderView(g, timeMS, partyView);
+            ISceneComposition partyView = this.game.renderParty();
+            renderView(g, timeMS, partyView);
+        }
 
         MaM2DMapComposition mapView = this.game.renderMap(0,0,9,8);
         //MaM2DMapComposition mapView = this.game.renderMap(0,0,16,16);
@@ -92,52 +96,6 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
     //------------------------------------------------------------------------------------------------------------------
     // Helper methods
     //------------------------------------------------------------------------------------------------------------------
-    /**
-     * So...
-     * If a sprite is rendered so its edge in world space is (X + W)
-     * Then its edge in view space is (X*scale + W*scale).
-     * BUT: Consider the Sprite adjacent o it (X2 + W2), such that X2 = (X + W)+1;
-     *
-     * Problem: X2*scale != (X*scale + W*scale)+1.
-     *   This causes occasional tears when scaling sprites in a non integral fashion.
-     *
-     * I'm 90% sure scaling rectangles by outer dimensions fixes this, if not
-     * the other code here can be used instead.
-     */
-    private static Rectangle scaleRectangleNoTearing(Rectangle r, double scale) {
-
-        int x = (int)Math.round(r.x * scale);
-        int y = (int)Math.round(r.y * scale);
-        int right = (int)Math.round((r.x+r.width) * scale);
-        int bottom = (int)Math.round((r.y+r.height) * scale);
-        return new Rectangle(x, y, right-x, bottom-y);
-
-//        if(scale > 1.0) //magnification must respect tearing
-//        {
-//            int x = (int)Math.round(r.x * scale);
-//            int y = (int)Math.round(r.y * scale);
-//
-//            //scale to edge of next sprite (note the +1)
-//            int right = (int)Math.round((r.x+r.width+1) * scale);
-//            int bottom = (int)Math.round((r.y+r.height+1) * scale);
-//
-//            //rectangle to pixel before next bound
-//            return new Rectangle(x, y, right-x-1, bottom-y-1);
-//        }
-//        else if(scale < 1.0) //minification should be fine
-//        {
-//            int x = (int)Math.round(r.x * scale);
-//            int y = (int)Math.round(r.y * scale);
-//            int right = (int)Math.round((r.x+r.width) * scale);
-//            int bottom = (int)Math.round((r.y+r.height) * scale);
-//            return new Rectangle(x, y, right-x, bottom-y);
-//        }
-//        else
-//        {
-//            //no scale
-//            return r;
-//        }
-    }
 
     protected void renderView(Graphics g,
                               long timeMS,
@@ -181,7 +139,7 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             Rectangle bounds = renderable.getKey().getImageBoundsAfterOffset(0, 0,
                                                                 frame.getWidth(),
                                                                 frame.getHeight());
-            bounds = scaleRectangleNoTearing(bounds, scale*localScale);
+            bounds = ISceneComposition.scaleRectangleNoTearing(bounds, scale*localScale);
 
             g.drawImage(frame, (int)(x*scale)+bounds.x, (int)(y*scale)+bounds.y, bounds.width, bounds.height, null);
         }
@@ -216,7 +174,7 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             }
 
             Rectangle bounds = renderable.getKey().getImageBounds(frame.getWidth(), frame.getHeight());
-            bounds = scaleRectangleNoTearing(bounds, scale);
+            bounds = ISceneComposition.scaleRectangleNoTearing(bounds, scale);
 
             g.drawImage(frame,bounds.x, bounds.y, bounds.width, bounds.height, null);
         }

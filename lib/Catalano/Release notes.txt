@@ -1,0 +1,723 @@
+Catalano Framework 1.5 road map
+-----------------------------------------
+
+* Android Compatibility
+  - Compiled against Android 2.33 (API 10). May work with newer versions.
+
+* Catalano.Core
+    - Added: Argsort in the ArraysUtil.
+    - Added: Serialization in DoubleRange,FloatRange and IntRange.
+
+* Catalano.Image
+    - New: Color.
+
+    - Added: getSize in the FastBitmap.
+    - Added: Overloads in get;set Red, Green, ...
+
+    - Optimized: getGray() now is using bitwise operation.
+
+    - Changed: ArrayList<> to List<> in BlobDetection and ICornersDetector.
+
+* Catalano.Imaging.Filters
+    - New: Nick Threshold.
+    - New: Curve Level.
+    - New: Weighted Median.
+    - New: Watershed.
+    - New: Median Cut.
+
+    - Added: FourWay or EightWay in BlobDetection.
+
+    - Optimized: Gaussian Box Blur.
+    - Optimized: Blob Detection.
+    - Optimized: Flood Fill.
+
+    - Fixed: ZhangSuen Thinning.
+    - Fixed: Distance Transform.
+    - Fixed: Fourier Transform.
+
+* Catalano.Imaging.Filters.Artistic
+    - New: Lut folder (Contains luts for gradient map).
+    - Fixed: Gradient Map.
+
+* Catalano.Imaging.ActiveContour
+    - New: Ovuscule.
+
+* Catalano.Imaging.Corners
+    - Added: ICornersFeatureDetector.
+
+* Catalano.Imaging.Corners.FREAK.
+    - Added: ICornersFeatureDetector support in Fast Retina Keypoint Detector.
+    - Added: toBinary() and toHex() in Fast Retina Keypoint class.
+
+* Catalano.Imaging.Shapes
+    - New: IntPolygon.
+
+* Catalano.Imaging.Tools
+    - New: Variation Laplacian.
+    - New: Document Skew Checker.
+    - New: Image Histogram.
+    - New: Orthogonal Variant Moments.
+    - New: Maitra Moments.
+    - New: Local Ternary Pattern.
+
+    - Reworked: Hu moments for FastBitmap.
+    - Reworked: Image moments.
+
+    - Added: Decompose() in the Kernel.
+    - Added: AboZaid Normalized central moment in Image moments.
+    - Added: getCentroid, getOrientation in Image moments.
+    - Added: eighth moment in Hu moments.
+    - Added: Universal Quality Index in Objective Fidelity.
+    - Added: MAE in Objective Fidelity.
+
+    - Fixed: Sobel Horizontal SD3x3 in the Convolution Kernel.
+    - Fixed: bins in ImageStatistics now is working.
+
+* Catalano.IO
+    - New: Serialization.
+    - New: CSV Parser.
+
+* Catalano.MachineLearning.Classification
+    - New: Sparse Multiclass Support Vector Machine.
+    - New: Multiclass Support Vector Machine.
+    - New: Sparse Support Vector Machine.
+    - New: Support Vector Machine.
+
+* Catalano.MachineLearning.Classification.DecisionTree
+    - New: Decision Tree.
+    - New: Decision Variable.
+
+* Catalano.MachineLearning.Classification.DecisionTree.Learning
+    - New: Gradient Boosting Tree.
+    - New: Random Forest.
+    - New: Ada Boost.
+
+* Catalano.MachineLearning
+    - New: LeaveOneOut Cross Validation.
+    - New: ClassificationDataset.
+    - New: Benchmark Classifier.
+    - New: Supplied Validation.
+    - New: Holdout Validation.
+    - New: Codification.
+    - New: Confusion Matrix.
+    - New: Standartization.
+    - New: Normalization.
+
+* Catalano.MachineLearning.Regression
+    - New: Gradient Boosting Tree.
+    - New: Random Forest.
+    - New: Regression Tree.
+    - New: K Nearest Neighbours.
+
+* Catalano.Math
+    - New: Topsoe Divergence in Distance.
+    - New: Taneja Divergence in Distance.
+    - New: Kumar-Johnson Divergence in Distance.
+    - New: Jensen Difference Divergence in Distance.
+    - New: Arithmetic Geometric Divergence in Distance.
+    - New: J-Divergence in Distance.
+    - New: Jensen-Shannon Divergence in Distance.
+    - New: Kullback Leibler Divergence in Distance.
+    - New: Distances namespace (All distances is refactored).
+    - New: Rational Number.
+
+    - Added: isNumeric in the Tools.
+    - Added: Pseudo Inverse in the Matrix.
+    - Added: SwapColumn, SwapRow in the Matrix.
+    - Added: getColumns, getRows in the Matrix.
+    - Added: Remove Rows and Columns in the Matrix.
+    - Added: Determinant, Inverse in the Matrix.
+    - Added: Digital Root in the Tools.
+    - Added: Norm1, Norm2, NormF and NormP in the Matrix.
+    - Added: Outer Product in the Matrix.
+
+    - Renamed: IsPowerOf2 to isPowerOf2.
+
+    - Fixed: FFT2 in the FourierTransform.
+
+* Catalano.Math.Distances
+    - New: Bhattacharyya distance.
+    - New: ChiSquare Distance.
+    - New: Intersection Distance.
+
+* Catalano.Math.Decompositions
+    - New: Eigenvalue Decomposition.
+    - New: Cholesky Decomposition.
+
+    - Added: inverse in the Singular Value Decomposition.
+
+* Catalano.Statistics
+    - New: Hellinger Kernel.
+    - New: TStudent Kernel.
+    - New: Symmetric Triangle Kernel.
+    - New: Squared Sinc Kernel.
+    - New: Spline Kernel.
+    - New: Spherical Kernel.
+    - New: Log Kernel.
+    - New: Thin Plate Splines Kernel.
+
+    - Added: Skewness and Kurtosis in Histogram Statistics.
+    - Added: Normalize in Histogram.
+    - Added: Jensen Shannon divergence.
+    - Added: Kullback Leibler divergence.
+    - Added: Coefficient of Variation in the Tools.
+    - Added: Max and Min in the Tools.
+
+
+
+
+Catalano Framework 1.4 release notes
+-----------------------------------------
+
+Version updates and fixes:
+
+* Catalano.Android.Image
+    - Added: Clear method in FastBitmap.
+    - Added: get; setCoordinateSystem. (Now you can work with X and Y coordinates or I and J like the matrix.)
+    - Added: getData method.
+    - Added: indicateGrayscale in FastBitmap. (Used to optimized some filters to avoid clone in the memory.)
+
+    - Optimized: Several operation filters (e.g grayscale, log, etc...)*
+    - Optimized: Several filters that need to do a copy**.
+* There are directly accessing the pixels.
+** There are using recycle internally when needs some copies.
+
+* Catalano.Core.Structs
+   - New: Binary Heap.
+
+* Catalano.Image
+   - Added: get; setCoordinateSystem.
+   - Added: get; setRGBData method.
+   - Added: get; setGrayData method.
+
+   - Fixed: some constructors in FastBitmap when are loading argb images.
+
+* Catalano.Image.Filters
+   - New: Separable Convolution.
+   - New: Image Pyramids.
+   - New: Weber Local Descriptor.
+   - New: CLAHE (Contrast Limited Adaptive Histogram Equalization).
+   - New: Fast Radial Symmetry Transform.
+   - New: Histogram Matching.
+   - New: Alpha Trimmed Mean Filter.
+   - New: Outline.
+   - New: Mode.
+   - New: Unsharp Mask.
+   - New: Fast Variance.
+   - New: Poisson Noise.
+
+   - Added: setFillColor grayscale support in Rotate.
+   - Added: Ultimate Eroded Point in Distance Transform.
+   - Added: Geometric mean in Grayscale conversion.
+   - Added: getMaximumDistance in Distance Transform.
+   - Added: support grayscale in Flood Fill.
+
+   - Removed: get; setArithmetic in Sauvola/Niblack/WolfJoulion Threshold. (these filters are using separable convolution for to enhance the performance)
+
+   - Renamed: Wolf Joulion Threshold to Wolf Jolion Threshold
+   - Renamed: Fast Gaussian Blur to Gaussian Box Blur.
+
+   - Fixed: Distance Transform wasn't working with image pixels around the bottom borders.
+   - Fixed: Replicate option in Convolution (fixed in Concurrent too).
+   - Fixed: Gaussian Box Blur in grayscale images.
+   - Fixed: Objective Fidelity was returning infinity values when occur 0 difference.
+
+* Catalano.Image.Tools
+   - New: Suk Flusser Moments.
+   - New: Color Moments.
+   - New: Kernel.
+   - New: Chain Code.
+   - New: Contour.
+   - New: Filters Sequence.
+
+   - Fixed: Smooth Noise Robust in Convolution Kernel.
+   - Fixed: Blob Detection for grayscale images.
+   - Added: new method Compute in Hu Moments.
+   - Added: Ultimate Eroded Points in Shape Descriptors.
+   - Added: Roughness in Shape Descriptors.
+
+* Catalano.Image.Concurrent.Filters
+   - New: Alpha Trimmed Mean.
+   - New: Fast Variance.
+
+* Catalano.Vision.Temporal
+   - New: Mean Background Detector.
+   - New: Median Background Detector.
+
+* Catalano.MachineLearning
+   - New: K Nearest Neighbour.
+
+* Catalano.Math
+    - New: Taylor Series.
+
+    - Added: reshape, isSymmetric, isEqual in Matrix.
+    - Added: generic Transpose in Matrix.
+    - Added: getReal, getImaginary in ComplexNumber for 1,2 dimensions.
+    - Added: Sum in Matrix.
+    - Added: CreateMatrix2D in Matrix.
+    - Added: CreateMatrix1D in Matrix.
+    - Added: Greatest common divisor in Tools.
+    - Added: new overload in Chessboard distance.
+
+* Catalano.Math.Decompositions
+    - New: LU Decomposition.
+    - New: QR Decomposition.
+    - New: Singular Value Decomposition.
+
+* Catalano.Math.Graph
+   - New: Page Rank.
+   - New: Hits.
+
+   - Added: isSymmetric, setStochasticMatrix, CreateStochasticMatrix in Adjacency Matrix.
+
+* Catalano.Math.Graph.Pathfinding
+   - New: ANode.
+   - New: NodeMap.
+   - New: AStar.
+
+* Catalano.Math.Geometry
+   - New: Discrete Curve Evolution.
+
+* Catalano.Math.Transforms
+    - New: Fast Hilbert Transform.
+
+    - Added: FFTShift, FFTShift2 in Fourier Transform.
+
+    - Fixed: FFT, FFT2 in Fourier Transform. Now is working in Asymetric scaling. Removed power of 2 limitation in FFT and FFT2.
+
+* Catalano.Statistics
+   - New: Dissimilarity.
+   - New: Approximation.
+
+   - Added: Decimal scale in Normalization
+
+   - Renamed: DataPreprocessing to Normalization.
+
+   - Fixed: Pearson Correlation in Tools.
+
+* Catalano.Statistics.Kernels
+   - Added: Bessel.
+   - Added: Circular.
+   - Added: Dirichlet.
+   - Added: Histogram Intersection.
+   - Added: Hyper Secant.
+   - Added: Inverse Multiquadric.
+   - Added: Multiquadric.
+   - Added: Rational Quadratic.
+   - Added: Tensor.
+   - Added: Wave.
+
+   - Added: Alpha Trimmed Mean in Tools.
+   - Added: Sum in Tools.
+
+* Catalano.Statistics.Regression
+   - New: Regression Analysis.
+   - New: Logarithmic Regression.
+   - New: Exponential Regression.
+   - New: Power Regression.
+   - New: Polynomial Regression.
+
+* Android Compatibility
+  - Compiled against Android 2.2 (API 8). May work with newer versions.
+
+
+
+
+Catalano Framework 1.3.1 release notes
+-----------------------------------------
+
+
+Version updates and fixes:
+
+* Catalano.Image.Tools
+
+   - Fixed: Objective Fidelity. (Division by zero)
+
+
+
+
+Catalano Framework 1.3 release notes
+-----------------------------------------
+
+
+Version updates and fixes:
+
+* Catalano.Android.Image
+
+   - Added: recycle() method.
+
+* Catalano.Core
+
+   - Added: Swap method in Double Point, Float Point and Int Point.
+
+* Catalano.Image
+   - New: Fast Graphics.
+
+   - Added: Support to work with Alpha channel. (Can save image in 32 bits).
+
+* Catalano.Image.Filters
+   - New: Distance Transform.
+   - New: Extract Biggest Blob.
+   - New: Fast Retina Keypoint (FREAK).
+   - New: Conservative Smoothing.
+   - New: WolfJolion Threshold.
+   - New: Sauvola Threshold.
+   - New: Niblack Threshold.
+   - New: Homogenity Edge Detector.
+   - New: Morphologic Gradient Image.
+   - New: Granulometry.
+   - New: Desaturation.
+   - New: Fast Gaussian Blur.
+   - New: Log filter.
+   - New: Exp filter.
+   - New: SIS Threshold.
+   - New: YCbCr Filtering.
+   - New: HSL Filtering.
+   - New: Gaussian Noise.
+   - New: Additive Noise.
+   - New: Rotate Bilinear.
+   - New: Rotate Bicubic.
+   - New: Rotate Nearest Neighbor.
+
+   - Added: Relative intensity in HoughLine.
+   - Added: DrawLine for grayscale images in HoughLine.
+   - Added: Replicate option in Convolution.
+   - Added: Minimum and Maximum decomposition in Grayscale.
+   - Added: new constructor, methods, enum in Blobs Filtering.
+   - Added: new methods: getWidth(); getHeight(); getRectangle(); in Blob.
+   - Added: Derivative SNR in Objective Fidelity.
+   - Added: new method getPSNR in Objective Fidelity.
+   - Added: Maximum Error Circularity in Shape Descriptors.
+   - Added: Minimum Circumscribed Circle in Shape Descriptors.
+   - Added: Star Point in ShapeDescriptors.
+   - Added: Maximum Inscribed Circle in Shape Descriptors.
+   - Added: Delta CMC in ColorDifference.
+   - Added: setSize, setPosition in Crop.
+   - Added: new constructor in Fast Corners Detector.
+   - Added: setNewSize in Resize.
+   - Added: RGB to Grayscale in Color Converter.
+   - Added: Noise Robust Gradient Operator in Convolution Kernel.
+   - Added: new constructor in Gradient Image. (now supports division in convolution).
+
+   - Optimized: Feret Points in Shape Descriptors.
+   - Optimized: Crop.
+
+   - Modified: drawLine to DrawLine in Hough Line.
+
+   - Fixed: RGB image in Harris Corner Detector.
+   - Fixed: constructor FastBitmap when load rgb array.
+   - Fixed: setRed in Fast Bitmap.
+   - Fixed: Feret diameter in Shape Descriptors(now is returning euclidean distance).
+   - Fixed: Variance (Constructor was setting radius 1 all the time).
+
+* Catalano.Image.Filters.Artistic
+
+   - New: Gradient Map.
+   - New: Fake HDR.
+   - New: Film Grain.
+   - New: Solarize.
+   - New: Specular Bloom.
+   - New: Pencil Sketch.
+   - New: Opacity.
+   - New: Blend.
+   - New: Heat map.
+   - New: Oil Painting.
+
+* Catalano.Image.Tools
+
+   - New: Nearest Neighbor Matrix
+
+* Catalano.Image.Shapes
+
+    - New: IntRectangle
+
+* Catalano.Image.Concurrent.Filters
+   - New: Conservative Smoothing.
+   - New: Log filter.
+   - New: Exp fiter.
+   - Work: WolfJolion Threshold.
+   - New: Sauvola Threshold.
+   - New: Niblack Threshold.
+   - Work: Homogenity Edge Detector.
+   - New: Morphologic Gradient Image.
+   - New: Desaturation.
+   - New: SIS Threshold.
+   - New: HSL Filtering.
+   - New: YCbCr Filtering.
+
+   - Added: Replicate option in Convolution.
+
+* Catalano.Math.Geometry
+
+   - New: Ramer Douglas Peucker
+
+* Catalano.Math
+
+   - New: Matrix3x3
+   - New: Vector 3
+   - New: Vector 4
+
+   - Added: Pow in Complex Number.
+   - Added: MaxIndex and MinIndex in Matrix (2D support).
+   - Added: QuasiEuclidean in Distance.
+   - Added: Hypotenuse in Tools.
+
+   - Changed: FastMath to Approximation.
+
+
+
+
+Catalano Framework 1.2 release notes
+-----------------------------------------
+
+
+Version updates and fixes:
+
+* Catalano.Core
+   - Added: Generic sort: Keys, Values.
+   - Added: New methods for conversion between float to Float object, int to Integer, etc... .
+
+* Catalano.Imaging.Concurrent.Filters
+   - New: Hysteresis Threshold.
+   - New: Difference Edge Detector.
+   - New: Closing.
+   - New: Opening.
+   - New: Dilatation.
+   - New: Erosion.
+   - New: Image Normalization.
+   - New: Rosin Threshold.
+   - New: Bernsen Threshold.
+   - New: Bradley Local Threshold.
+   - New: Maximum Entropy Threshold.
+   - New: Sharpen.
+   - New: Emboss.
+   - New: Blur.
+   - New: Convolution.
+   - New: Otsu Threshold.
+   - New: Color Filtering.
+   - New: Variance.
+   - New: Maximum.
+   - New: Minimum.
+   - New: Sobel Edge Detector.
+   - New: Median.
+   - New: Mean.
+   - New: Invert.
+   - New: Threshold.
+   - New: Grayscale.
+
+* Catalano.Image
+   - New: Rosin Threshold.
+   - New: FAST-9 Corners Detector.
+   - New: FAST-12 Corners Detector.
+   - New: Image Normalization.
+   - New: Gray World.
+   - New: White Patch.
+   - New: Modified White Patch.
+   - New: Variance filter.
+   - New: Isotropic Compass Edge Detector.
+   - New: Kirsch Compass Edge Detector.
+   - New: Sobel Compass Edge Detector.
+   - New: Scharr Compass Edge Detector.
+   - New: Prewitt Compass Edge Detector.
+   - New: Roberts Cross Edge Detector.
+   - New: Robinson Compass Edge Detector.
+   - New: Compass Convolution Kernel.
+   - New: Expand.
+   - New: Interpolation.
+
+   - Added: new method setRGB in FastBitmap class.
+   - Added: Scale intensity in Sobel Edge Detector.
+   - Added: RGB -> O1O2 in Color Converter.
+   - Added: RGB -> C1C2C3 in ColorConverter.
+   - Added: Static method Minimum, Maximum and Variance in ImageStatistics.
+
+   - Improved: FFT performs with images with no power 2.
+   - Improved: Gamma correction is faster now. Eliminate a useless copy of image.
+
+   - Renamed: Expansion to ImagePadding.
+   - Renamed: Name of methods in Objective Fidelity.
+   - Renamed: Haralick to HaralickDescriptors.
+
+   - Fixed: Objective Fidelity measures.
+   - Fixed: Sobel Edge Detector.
+   - Fixed: Resize reworked, now works with Android.
+   - Fixed: Gamma correction was hardcoded boundaries.
+   - Fixed: FastBitmap (Android) is mutable when you load a bitmap non mutable.
+
+* Catalano.MachineLearning
+   - New: KMeans.
+
+* Catalano.Math
+  - New: Fast Fourier Transform.
+  - New: Hilbert Transform.
+  - New: Matrix3x3.
+  - New: Vector4.
+  - New: Vector3.
+
+  - Added: new overloads in Matrix(Add; Subtract)
+  - Added: new methods in Matrix(Fill; isZero; Divide; Clear; Submatrix, Abs, Log, Exp, getColumn, getRow).
+  - Added: new overloads in square euclidean.
+  - Added: atan2 in Approximation.
+
+  - Fixed: Divide in ComplexNumber.
+
+  - Renamed: FastMath to Approximation.
+
+* Catalano.Statistics
+  - General Discrete Distribution.
+
+* Android Compatibility
+  - Compiled against Android 2.2 (API 8). May work with newer versions.
+
+
+
+Catalano Framework 1.1 release notes
+-----------------------------------------
+
+
+Version updates and fixes:
+
+* Catalano.Image
+  - New: Harris Corners Detector.
+  - New: Bernsen Threshold.
+  - New: Quadrilateral Transformation.
+  - New: Histogram of Oriented Gradients.
+  - New: Saturation Correction.
+  - New: Brightness Correction.
+  - New: Contrast Correction.
+  - New: HSL Linear.
+  - New: Vertical Run Length Smoothing.
+  - New: Horizontal Run Length Smoothing.
+  - New: Canny edge detector.
+  - New: Hysteresis Threshold.
+  - New: HoughLine Transformation.
+  - New: Sobel edge detector.
+  - New: Difference edge detector.
+
+  - Added: new constructor for GLCM.
+  - Added: new static method for Integral Image (FromFastBitmap).
+  - Added: RGBtoCMYK and CMYKtoRGB in ColorConverter.
+
+  - Improved: Bradley Local Threshold is more fast now.
+  - Improved: Image Quantization convert automatically the number in power of 2.
+  - Improved: Maximum now works with RGB space.
+  - Improved: Minimum filter is more fast now, eliminated unnecessary counter.
+  - Improved: Morph is more fast now.
+  - Improved: FastBitmap now converts automatically ARGB to RGB.
+
+  - Renamed: ShapeFeatures to ShapeDescriptors.
+  - Renamed: GrayLevelCoocurrenceMatrix to GrayLevelCooccurrenceMatrix.
+  - Renamed: RunLenghtFeatures now is RunLengthFeatures.
+  - Renamed: Parameters in GaborFilter now is more intuitive.
+  - Renamed: GradientOperator to ConvolutionKernel.
+  - Renamed: ExtractRGBChannel enumerator: ExtractRGB to Channel.
+  - Renamed: ExtractNormalizedRGBChannel enumerator: ExtractNormalizedRGB to Channel.
+  - Renamed: ExtractYCbCrChannel enumerator: ExtractYCbCr to Channel.
+
+  - Fixed: Image Quantization was with division by zero.
+  - Fixed: Bradley Local Threshold was with wrong calculation.
+  - Fixed: Integral Image was sum wrong table.
+  - Fixed: Morph was set gray values in RGB space.
+  - Fixed: Rotate Channels was working with grayscale.
+  - Fixed: Flood Fill was with overhead.
+  - Fixed: Crop now works in Android version.
+  - Fixed: Dilatation and Erosion.
+  - Fixed: RGB->HSL->RGB.
+  - Fixed: GLCM numPairs now is fixed when you call Compute once more.
+
+  - Documented: ConvolutionKernel(Kernels is all documented).
+
+* Catalano.Math
+  - New: FastMath: Support Low and High precisions.
+  - New: Geometry: Points Cloud.
+  - New: Geometry: Quadrilateral Transformation Calc.
+  - New: Distance: Squared Euclidean.
+  - New: Tools: Angle, NextPowerOf2, PreviousPowerOf2.
+
+  - Renamed: Gabor parameters greek alphabet now is more intuitive.
+
+* Android Compatibility
+  - Compiled against Android 2.2 (API 8). May work with newer versions.
+
+
+
+
+Catalano Framework 1.0 release notes
+-----------------------------------------
+12.05.2013.    
+
+Version updates and fixes:
+
+* Catalano.Image
+  - New: Erosion, Dilatation, Opening and Closing now supports 8bpp and 24bpp
+  - New: Gabor Filter
+  - New: IsoData Classifier
+  - New: Color Difference
+  - New: Zernike Moments
+  - New: Maximum Entropy Threshold
+  - New: Color Converter (RGB -> HLS -> RGB).
+  - New: Color Converter (RGB -> CIE-LAB -> RGB).
+  - New: Color Converter (XYZ -> CIE-LAB -> XYZ).
+  - New: Image Moments (Image moments was separeted from Hu Moments).
+  - New: setImage now works with itself.
+  - New: Conversion in float type of Fast Bitmap
+
+  - Fixed: Image Statistics was working only red channel for RGB color space.
+
+* Catalano.MachineLearning
+  - New: Support Vector Machines
+
+* Catalano.Math.Functions
+  - New: Gabor
+  - New: Normal
+  - New: Gamma
+  - New: Beta
+
+* Catalano.Math
+  - New: Methods (Max, Min, MaxIndex, MinIndex) in Matrix
+  - New: Special
+  - New: Constants
+  - New: Method Truncated Power in Tools
+
+* Catalano.Statistics
+  - New: method Match Histograms in Histogram
+
+* Catalano.Statistics.Distributions
+  - New: ChiSquare Distribution
+  - New: Cauchy Distribution
+  - New: Continuous Uniform Distribution
+  - New: Empirical Distribution
+  - New: Exponential Distribution
+  - New: Fisher Distribution
+  - New: Gamma Distribution
+  - New: Inverse Gamma Distribution
+  - New: Kolmogorov Smirnov Distribution
+  - New: Lognormal Distribution
+  - New: Nakagami Distribution
+  - New: Normal Distribution
+  - New: Rayleigh Distribution
+  - New: TStudent Distribution
+  - New: Weibull Distribution
+  - New: Bernoulli Distribution
+  - New: Binomial Distribution
+  - New: Discrete Uniform Distribution
+
+* Catalano.Statistics.Kernels
+  - New: Anova
+  - New: BSpline
+  - New: Cauchy
+  - New: ChiSquare
+  - New: Gaussian
+  - New: Linear
+
+* Android Compatibility
+  - Compiled against Android 2.2 (API 8). May work with newer versions.
+
+
+
+
+Catalano Framework 0.8 release notes
+-----------------------------------------
+12.05.2013.    
+
+Initial release.

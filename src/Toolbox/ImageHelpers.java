@@ -3,7 +3,6 @@ package Toolbox;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.FileImageOutputStream;
@@ -13,11 +12,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static Toolbox.BinaryHelpers.*;
 
@@ -110,7 +106,7 @@ public class ImageHelpers
         return imgARGB;
     }
 
-    public static int[] Image2RGBA(BufferedImage image)
+    public static int[] image2RGBA(BufferedImage image)
     {
         int[] data = new int[image.getWidth() * image.getHeight()];
         image.getRGB(0,0,image.getWidth(), image.getHeight(), data, 0, image.getWidth());
@@ -134,6 +130,40 @@ public class ImageHelpers
         return new BufferedImage(cm, raster, pm, null);
 
     }
+
+    /**
+     * Evey alpha value in the image as an array.
+     */
+    public static byte[] getAlphaChannel(BufferedImage image)
+    {
+        int[] data = image2RGBA(image);
+        byte[] alphachannel = new byte[image.getWidth()*image.getHeight()];
+        for (int i = 0; i < data.length; i++) {
+            //alphachannel[i] = (byte)(data[i] & 0xff);
+            Color c = new Color(data[i], true);
+            alphachannel[i] = (byte)(c.getAlpha() & 0xff);
+        }
+        return alphachannel;
+    }
+
+    /**
+     * Evey alpha value in the image as an array.
+     */
+    public static BufferedImage applyAlphaChannel(BufferedImage image, byte[] alpha)
+    {
+        int[] data = image2RGBA(image);
+        for (int i = 0; i < data.length; i++) {
+            //data[i] = data[i] & ((alpha[i]<<24) & 0xffffff);
+
+
+            Color c = new Color(data[i], true);
+            c = new Color(c.getRed(), c.getGreen(), c.getBlue(), BinaryHelpers.INT(alpha[i]));
+            data[i] = c.getRGB();
+        }
+        return RGBA2Image(data, image.getWidth(), image.getHeight());
+    }
+
+
 
     /**
      * Some code ripped from the net

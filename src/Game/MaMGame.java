@@ -12,8 +12,10 @@ import GameMechanics.Magic.PartyEnchantments.IPartyEnchantment;
 import Rendering.*;
 import Toolbox.FileHelpers;
 import Toolbox.Grid;
+import Toolbox.MaMGameException;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
+import mamFiles.WOX.WOXSurface;
 import mamFiles.WOX.WOXccFileReader;
 import org.joda.time.DateTime;
 
@@ -182,15 +184,123 @@ public class MaMGame implements IMaMGame
         try
         {
             MaMMonster mon = world.getMonsters()[testMonsterID%world.getMonsters().length];
-            view.addMonster(new Point(100,0), mon);
+            //view.addMonster(new Point(100,0), mon);
 
             view.setGround(world.getOutdoorEnvironmentSet(0).getGround());
             //.getSprite("CAVE.GND"));
             view.setSky(world.getOutdoorEnvironmentSet(0).getSky());
-            view.addRenderable(new RenderablePos(8,50,1.0, 3).hackMe(), world.getCcFile().getSurface("DESERT.SRF"));
+
+            MaMSurface surf = world.getCcFile().getSurface("DESERT.SRF");
+
+            surf = world.getCcFile().getSurface("LAVA.SRF");
+            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), ((WOXSurface)surf).getSurfaceOverlay(null));
+
+
+            surf = world.getCcFile().getSurface("TFLR.SRF");
+            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,0)));
+            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,1)));
+            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,2)));
+            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,3)));
+            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,4)));
+
+//            IRenderableGameObject rSurf = IRenderableGameObject.fromImage(surf.getImage(0));
+//            view.addRenderable(new RenderablePos(8,109,1.0, 3), rSurf);
+//
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(1));
+//            view.addRenderable(new RenderablePos(8,109,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(2));
+//            view.addRenderable(new RenderablePos(201,109,1.0, 3), rSurf);
+//
+//            //1 tile forward
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(3));
+//            view.addRenderable(new RenderablePos(8,93,1.0, 3), rSurf);
+//
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(4));
+//            view.addRenderable(new RenderablePos(31,93,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(5));
+//            view.addRenderable(new RenderablePos(169,93,1.0, 3), rSurf);
+//
+//            //2 tiles forward
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(6));
+//            view.addRenderable(new RenderablePos(8,81,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(7));
+//            view.addRenderable(new RenderablePos(8,81,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(8));
+//            view.addRenderable(new RenderablePos(63,81,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(9));
+//            view.addRenderable(new RenderablePos(145,81,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(10));
+//            view.addRenderable(new RenderablePos(202,81,1.0, 3), rSurf);
+//
+//            //3 tiles forward
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(11));
+//            view.addRenderable(new RenderablePos(8,73,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(12));
+//            view.addRenderable(new RenderablePos(8,73,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(13));
+//            view.addRenderable(new RenderablePos(30,73,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(14));
+//            view.addRenderable(new RenderablePos(87,73,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(15));
+//            view.addRenderable(new RenderablePos(129,73,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(16));
+//            view.addRenderable(new RenderablePos(154,73,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(17));
+//            view.addRenderable(new RenderablePos(181,73,1.0, 3), rSurf);
+//
+//            //4 tiles forward
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(18));
+//            view.addRenderable(new RenderablePos(8,67,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(19));
+//            view.addRenderable(new RenderablePos(38,67,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(20));
+//            view.addRenderable(new RenderablePos(84,67,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(21));
+//            view.addRenderable(new RenderablePos(103,67,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(22));
+//            view.addRenderable(new RenderablePos(117,67,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(23));
+//            view.addRenderable(new RenderablePos(117,67,1.0, 3), rSurf);
+//
+//            rSurf = IRenderableGameObject.fromImage(surf.getImage(24));
+//            view.addRenderable(new RenderablePos(134,67,1.0, 3), rSurf);
+
+
+            //view.addSurface(new  Point(0, 1), surf);
+            for(int i=0; i<5; i++)
+            {
+                for(int j=-4; j<9; j++)
+                {
+                    Point p = new Point(i,j);
+                    //IRenderableGameObject rSurf = IRenderableGameObject.fromImage(surf.getImage(p, 0));
+                    //view.addRenderable(new RenderablePos(8,107-i*3,1.0, 3).hackMe(), rSurf);
+                    //view.addSurface(p, surf);
+                }
+            }
             //CCFileFormatException.stub();
 
         } catch (CCFileFormatException e) {
+            e.printStackTrace();
+        } catch (MaMGameException e) {
             e.printStackTrace();
         }
 

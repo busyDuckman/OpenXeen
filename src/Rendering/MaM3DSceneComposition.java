@@ -1,11 +1,14 @@
 package Rendering;
 
 import Game.Monsters.MaMMonster;
+import Toolbox.MaMGameException;
 import javafx.util.Pair;
+import mamFiles.CCFileFormatException;
 import mamFiles.MaMSprite;
 import mamFiles.MaMSurface;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,19 +47,18 @@ public class MaM3DSceneComposition implements ISceneComposition {
     }
 
     @Override
-    public synchronized void addRenderable(RenderablePos pos, IRenderableGameObject obj)
-    {
+    public synchronized void addRenderable(RenderablePos pos, IRenderableGameObject obj) throws MaMGameException {
+        MaMGameException.assertTrue(pos != null, "MaM3DSceneComposition::addRenderable(...) pos != null");
+        MaMGameException.assertTrue(obj != null, "MaM3DSceneComposition::addRenderable(...) obj != null");
         sorted = false;
         renderables.add(new Pair<>(pos, obj));
     }
 
-    public synchronized void setGround(IRenderableGameObject ground)
-    {
+    public synchronized void setGround(IRenderableGameObject ground) throws MaMGameException {
         addRenderable(MaM3dScenePos.Ground.getRenderablePosition(), ground);
     }
 
-    public synchronized void setSky(IRenderableGameObject sky)
-    {
+    public synchronized void setSky(IRenderableGameObject sky) throws MaMGameException {
         IRenderableGameObject skyTop = IRenderableGameObject.fromImage(sky.getImage(0));
         IRenderableGameObject skyBottom = IRenderableGameObject.fromImage(sky.getImage(1));
 
@@ -64,13 +66,67 @@ public class MaM3DSceneComposition implements ISceneComposition {
         addRenderable(MaM3dScenePos.BottomHalfOfsky.getRenderablePosition(), skyBottom);
     }
 
-    public synchronized void addSurface(Point relativePos, MaMSurface surface)
-    {
-        addRenderable(MaM3dScenePos.SurfaceTile1StepForward1Left.getRenderablePosition(), surface);
+    public synchronized void addSurface(Point relativePos, MaMSurface surface) throws MaMGameException {
+//        RenderablePos pos = relativePointToSurfaceRenderPos(relativePos);
+//        if(pos != null)
+//        {
+//            BufferedImage img = surface.getImage(relativePos, 0);
+//            if(img != null)
+//            {
+//                addRenderable(pos, IRenderableGameObject.fromImage(img));
+//            }
+//        }
+
+        addRenderable(MaM3dScenePos.Ground.getRenderablePosition(), surface.getSurfaceOverlay(relativePos));
     }
 
-    public synchronized void addMonster(Point relativePos, MaMMonster monster)
+    public RenderablePos relativePointToSurfaceRenderPos(Point relativePos)
     {
+        MaM3dScenePos pos = relativePointToSurfaceScenePos(relativePos);
+        if(pos != null)
+        {
+            return pos.getRenderablePosition();
+        }
+        return null;
+    }
+
+    protected MaM3dScenePos relativePointToSurfaceScenePos(Point relativePos)
+    {
+        switch (relativePos.x)
+        {
+            case 0:
+                switch (relativePos.y)
+                {
+                    case 0: return MaM3dScenePos.SurfaceTileplayerIscurrentlyOn;
+                    case 1: return MaM3dScenePos.SurfaceTileDirectly1StepForward;
+                    case 2: return MaM3dScenePos.SurfaceTileDirectly2StepsForward;
+                    case 3: return MaM3dScenePos.SurfaceTileDirectly3StepsForward;
+                    case 4: return MaM3dScenePos.SurfaceTileDirectly4StepsForward;
+                }
+                break;
+            case -1:
+                switch (relativePos.y)
+                {
+                    case 0: return MaM3dScenePos.SurfaceTileDirectly1StepLeft;
+                    case 1: return MaM3dScenePos.SurfaceTile1StepForward1Left;
+                    case 2: return MaM3dScenePos.SurfaceTile2StepsForward1Left;
+                    case 3: return MaM3dScenePos.SurfaceTile3StepsForward1Left;
+                    case 4: return MaM3dScenePos.SurfaceTile4StepsForward1Left;
+                }
+                break;
+            case -2:
+                switch (relativePos.y)
+                {
+                    case 3: return MaM3dScenePos.WallTile3StepsForward2StepsLeft;
+                    case 4: return MaM3dScenePos.WallTile3StepsForward2StepsLeft;
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    public synchronized void addMonster(Point relativePos, MaMMonster monster) throws MaMGameException {
         addRenderable(MaM3dScenePos.MonsterCurrentMiddle.getRenderablePosition(), monster.getAttackAnimation());
     }
 

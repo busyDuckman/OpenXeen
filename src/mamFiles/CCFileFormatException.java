@@ -3,10 +3,7 @@ package mamFiles;
 /**
  * Created by duckman on 7/05/2016.
  */
-public class CCFileFormatException extends Exception
-{
-    public CCFileFormatException() {
-    }
+public class CCFileFormatException extends Toolbox.MaMGameException {
 
     public CCFileFormatException(String message) {
         super(message);
@@ -27,6 +24,22 @@ public class CCFileFormatException extends Exception
     @Override
     public String toString() {
         return "CCFile Format Error " + super.toString();
+    }
+
+    public static void assertFalse(boolean test, String desc) throws CCFileFormatException
+    {
+        if(test)
+        {
+            throw new CCFileFormatException("assertFalse failed: " + desc);
+        }
+    }
+
+    public static void assertTrue(boolean test, String desc) throws CCFileFormatException
+    {
+        if(!test)
+        {
+            throw new CCFileFormatException("assertTrue failed: " + desc);
+        }
     }
 
 
@@ -60,40 +73,6 @@ public class CCFileFormatException extends Exception
         return new CCFileFormatException("IO ERROR: " + message);
     }
 
-    public static void assertFalse(boolean test, String desc) throws CCFileFormatException
-    {
-        if(test)
-        {
-            throw new CCFileFormatException("assertFalse failed: " + desc);
-        }
-    }
-
-    public static void assertTrue(boolean test, String desc) throws CCFileFormatException
-    {
-        if(!test)
-        {
-            throw new CCFileFormatException("assertTrue failed: " + desc);
-        }
-    }
-
-    public static CCFileFormatException fromMissingFile(String file, MaMCCFileReader reader) {
-        return new CCFileFormatException("Missing file \"" + file + "\" in \"" + reader.getFilePath() + "\"");
-    }
-
-    public static void throwFeatureNotReady() throws CCFileFormatException
-    {
-        throwFeatureNotReady(null);
-    }
-    public static void throwFeatureNotReady(String message) throws CCFileFormatException
-    {
-        throw new CCFileFormatException("MaM Feature not developed yet: " + ((message != null) ? message : "(N/A)"));
-    }
-
-    public static void notSupposedToBeHere() throws CCFileFormatException
-    {
-        throw new CCFileFormatException("Code execution reached somewhere it was not supposed to.");
-    }
-
     public static void assertFalse_WhenLoadingFrom(boolean test, String loading, String from) throws CCFileFormatException
     {
         if(test)
@@ -108,11 +87,6 @@ public class CCFileFormatException extends Exception
         {
             throw new CCFileFormatException("assertTrue failed, loading " + makeSafe(loading) + " from " + makeSafe(from));
         }
-    }
-
-    private static String makeSafe(Object obj)
-    {
-        return (obj==null) ? "NULL" : ((obj instanceof String) ? (String)obj : makeSafe(obj.toString()));
     }
 
     /**
@@ -138,12 +112,4 @@ public class CCFileFormatException extends Exception
         throw new CCFileFormatException("Error loading proxy: " + details);
     }
 
-    /**
-     * This is a stub to allow try blocks to compile even though I had to
-     * temporarily comment out the one line of code that needed the block.
-     */
-    public static void stub() throws CCFileFormatException
-    {
-
-    }
 }

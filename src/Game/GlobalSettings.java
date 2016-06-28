@@ -8,7 +8,8 @@ public enum GlobalSettings
     INSTANCE;
 
     boolean debugMode = true;
-    boolean rebuildProxies = true;
+    boolean rebuildProxies = false;
+    private boolean disableHUD = true;
 
     public boolean debugMode() {
         return debugMode;
@@ -26,5 +27,13 @@ public enum GlobalSettings
     }
     public void setRebuildProxies(boolean rebuildProxies) {
         this.rebuildProxies = rebuildProxies;
+    }
+
+    public void setDisableHUD(boolean disableHUD) {
+        this.disableHUD = disableHUD;
+    }
+
+    public boolean isHUDDisabled() {
+        return disableHUD;
     }
 }
