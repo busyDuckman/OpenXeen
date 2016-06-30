@@ -1,10 +1,9 @@
 package mamFiles;
 
 import Rendering.AnimationSettings;
+import Rendering.IRenderableGameObject;
 import Toolbox.HProperties;
-import mamFiles.WOX.WOXSpriteFile;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -12,41 +11,53 @@ import java.awt.image.BufferedImage;
  *
  * More info [http://xeen.wikia.com/wiki/SRF_File_Format]
  * Bigger picture [http://xeen.wikia.com/wiki/MAZExxxx.DAT_File_Format]
+ *
+ * This surface class is kept abstract. WoXSurface deals with paint by area
+ * surfaces, I also envision perspective transform surfaces being a possibility.
  */
-public class MaMSurface extends MAMFile implements Rendering.IRelativeToLocationSprite
+public abstract class MaMSurface extends MAMFile implements Rendering.IRelativeToLocationSprite
 {
     protected final static int[] viewWidthLut = {3,5,7,7};
     protected final static int[] ySumLut = {0,3,8,15};
 
-    MaMSprite sprite;
+    /**
+     * The entire ground.
+     */
+    IRenderableGameObject groundSurface;
 
     /**
-     * @param aSprite A sprite, with a key not equal to the key parameter
+     * @param mamStyleSprite A sprite, with 25 frames
      */
-    public MaMSurface(MaMSprite aSprite, String key)
+    public MaMSurface(MaMSprite mamStyleSprite, String key)
     {
-        super(aSprite.name, key);
-        this.sprite = aSprite;
+        super(mamStyleSprite.name, key);
     }
 
-    @Override
-    public BufferedImage getImage(Point mapPosRelative, int frame)
-    {
-        int x = mapPosRelative.x;
-        int y = mapPosRelative.y;
-        if((y>=0)&&(y<viewWidthLut.length))
-        {
-            int divergence = viewWidthLut[y] / 2;
-            if((x >= -divergence)&&(x <= divergence))
-            {
-                int relativeFrame = ySumLut[y]+x+divergence;
-                return this.sprite.getRenderedFrames()[relativeFrame];
-            }
-        }
+    protected abstract BufferedImage compileToOneImage(MaMSprite mamStyleSprite);
 
-        //bad location
-        return null;
-    }
+//    @Override
+//    public BufferedImage getImage(Point mapPosRelative, int frame)
+//    {
+//        int x = mapPosRelative.x;
+//        int y = mapPosRelative.y;
+//        if((y>=0)&&(y<viewWidthLut.length))
+//        {
+//            int divergence = viewWidthLut[y] / 2;
+//            if((x >= -divergence)&&(x <= divergence))
+//            {
+//                int relativeFrame = ySumLut[y]+x+divergence;
+//                return this.sprite.getRenderedFrames()[relativeFrame];
+//            }
+//        }
+//
+//        //bad location
+//        return null;
+//    }
+
+//    @Override
+//    public BufferedImage getImage(int frame) {
+//        return sprite.getRenderedFrames()[frame];
+//    }
 
     @Override
     public AnimationSettings getAnimationSettings() {
@@ -61,20 +72,20 @@ public class MaMSurface extends MAMFile implements Rendering.IRelativeToLocation
 
     @Override
     public boolean saveProxy(String path) throws CCFileFormatException {
-        return sprite.saveProxy(path);
+        return groundSurface.asIHasProxyObject().saveProxy(path);
     }
 
-    public MaMSurface fromPng(String path) throws CCFileFormatException {
-        MaMSprite sprite = WOXSpriteFile.fromPNGFile(path);
-        return new MaMSurface(sprite, MAMFile.generateKeyFromPath(path));
-    }
+//    public MaMSurface fromPng(String path) throws CCFileFormatException {
+//        MaMSprite sprite = WOXSpriteFile.fromPNGFile(path);
+//        return new MaMSurface(sprite, MAMFile.generateKeyFromPath(path));
+//    }
 
 
     @Override
     public boolean setProperties(HProperties p) {
         //TODO: sprite key and this key are saved to the same property
         p = p.push("Sprite");
-        sprite.setProperties(p);
+        groundSurface.asIHasPropertiesObject().setProperties(p);
         p = p.pop();
         return super.setProperties(p);
     }
@@ -82,7 +93,7 @@ public class MaMSurface extends MAMFile implements Rendering.IRelativeToLocation
     @Override
     public boolean getProperties(HProperties p) {
         p = p.push("Sprite");
-        sprite.getProperties(p);
+        groundSurface.asIHasPropertiesObject().getProperties(p);
         p = p.pop();
         return super.getProperties(p);
     }

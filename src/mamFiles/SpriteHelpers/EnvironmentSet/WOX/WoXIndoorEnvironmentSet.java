@@ -7,6 +7,7 @@ import com.google.common.collect.Table;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMCCFileReader;
 import mamFiles.MaMSprite;
+import mamFiles.MaMSurface;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 
 import java.awt.*;
@@ -206,6 +207,12 @@ public class WoXIndoorEnvironmentSet extends WoXEnvironmentSet implements IMaMIn
         return mapTileSetWallSprite[wallIndex];
     }
 
+
+    @Override
+    public MaMSurface getSurface(int surfaceIndex) throws CCFileFormatException {
+        CCFileFormatException.throwFeatureNotReady("No surfaces for indoor maps yet.");
+        return null;
+    }
 
     @Override
     public IRenderableGameObject getMapTile(int groundIndex) {

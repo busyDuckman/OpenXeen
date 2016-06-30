@@ -4,7 +4,7 @@ import java.awt.*;
 
 public enum Direction
 {
-    UP(0, 1) {
+    UP(0, -1) {
         @Override
         public Direction turnLeft() {
             return LEFT;
@@ -14,7 +14,7 @@ public enum Direction
         public Direction turnLeft() {
             return UP;
         }},
-    DOWN(0, -1) {
+    DOWN(0, 1) {
         @Override
         public Direction turnLeft() {
             return RIGHT;

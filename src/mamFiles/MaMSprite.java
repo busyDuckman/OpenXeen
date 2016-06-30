@@ -119,7 +119,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         transparentIndex = 0;
     }
 
-    protected MaMSprite(String name, String key, BufferedImage[] frames)
+    public  MaMSprite(String name, String key, BufferedImage[] frames)
     {
         super(name, key);
         pallet = null;
@@ -158,16 +158,6 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
 
         return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
     }
-
-    public IRenderableGameObject[] eachFrameAsRenderable() throws CCFileFormatException {
-        IRenderableGameObject[] renderables = new IRenderableGameObject[getRenderedFrames().length];
-        for (int i = 0; i < renderables.length; i++) {
-            renderables[i] = IRenderableGameObject.fromImage(getRenderedFrames()[i]);
-        }
-        return renderables;
-    }
-
-
 
     @Override
     public MaMPallet getPallet() {

@@ -45,9 +45,22 @@ public class Grid<T>
         return values[y*numXValues + x];
     }
 
+    public boolean isValidLocation(int x, int y)
+    {
+        return (x >=0) && (x < numXValues) && (y >= 0) && (y < numYValues);
+    }
+
     public T get(Point pos)
     {
         return values[pos.y*numXValues + pos.x];
+    }
+
+    public int getWidth() {
+        return numXValues;
+    }
+
+    public int getHeight() {
+        return numYValues;
     }
 
     public int size()

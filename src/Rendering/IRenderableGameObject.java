@@ -1,6 +1,12 @@
 package Rendering;
 
+import Toolbox.IHasProperties;
 import Toolbox.ImageHelpers;
+import mamFiles.CCFileFormatException;
+import mamFiles.IHasProxy;
+import mamFiles.MAMFile;
+import mamFiles.MaMSprite;
+import mamFiles.WOX.WOXSpriteFile;
 import org.joda.time.DateTime;
 
 import java.awt.*;
@@ -79,6 +85,88 @@ public interface IRenderableGameObject
         g.dispose();
         return IRenderableGameObject.fromImage(img);
         }
+
+    default BufferedImage[] getRenderedFrames()
+    {
+        AnimationSettings anim = getAnimationSettings();
+        if(anim != null)
+        {
+            BufferedImage[] images = new BufferedImage[anim.getNumberOfFrames()];
+            for (int i = 0; i < anim.getNumberOfFrames(); i++) {
+                images[i] = getImage(i);
+            }
+            return images;
+        }
+        else
+        {
+            return new BufferedImage[] {getImage(0)};
+        }
+    }
+
+    default IRenderableGameObject[] eachFrameAsRenderable() throws CCFileFormatException {
+        IRenderableGameObject[] renderables = new IRenderableGameObject[getRenderedFrames().length];
+        for (int i = 0; i < renderables.length; i++) {
+            renderables[i] = IRenderableGameObject.fromImage(getRenderedFrames()[i]);
+        }
+        return renderables;
+    }
+
+    default IHasProxy asIHasProxyObject()
+    {
+        String name = (this instanceof MAMFile) ? ((MAMFile)this).getName() : "via asIHasProxyObject()";
+        String key = MAMFile.generateUniqueKey(name);
+        if(this instanceof IHasProxy)
+        {
+            return (IHasProxy)this;
+        }
+        else
+        {
+            return new MaMSprite(name, key, this.getRenderedFrames());
+        }
+    }
+
+    default IHasProperties asIHasPropertiesObject()
+    {
+        String name = (this instanceof MAMFile) ? ((MAMFile)this).getName() : "via asIHasProxyObject()";
+        String key = MAMFile.generateUniqueKey(name);
+        if(this instanceof IHasProperties)
+        {
+            return (IHasProperties)this;
+        }
+        else
+        {
+            return new MaMSprite(name, key, this.getRenderedFrames());
+        }
+    }
+
+    default IRenderableGameObject applyMask(byte[] mask)
+    {
+        BufferedImage[] sourceImages = getRenderedFrames();
+        BufferedImage[] maskedImages = new BufferedImage[sourceImages.length];
+        for (int i = 0; i < maskedImages.length; i++) {
+            if(maskedImages.length != (sourceImages[i].getWidth() * sourceImages[i].getHeight()))
+            {
+                maskedImages[i] = ImageHelpers.applyAlphaChannel(sourceImages[i], mask);
+            }
+        }
+
+        String name = (this instanceof MAMFile) ? ((MAMFile)this).getName() : "via applyMask()";
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, maskedImages);
+
+    }
+
+    default IRenderableGameObject applyAlphaTransform(int level,  ImageHelpers.AlphaTransforms transform)
+    {
+        BufferedImage[] sourceImages = getRenderedFrames();
+        BufferedImage[] destImages= new BufferedImage[sourceImages.length];
+        for (int i = 0; i < destImages.length; i++) {
+            destImages[i] = ImageHelpers.applyAlphaTransform(sourceImages[i], level, transform, true);
+        }
+        String name = (this instanceof MAMFile) ? ((MAMFile)this).getName() : "via applyMask()";
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, destImages);
+    }
 }
 
 final class ImageWrapper implements IRenderableGameObject

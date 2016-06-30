@@ -8,7 +8,8 @@ public enum GlobalSettings
     INSTANCE;
 
     boolean debugMode = true;
-    boolean rebuildProxies = true;
+    boolean rebuildProxies = false;
+    private boolean disableHUD = false;
 
     public boolean debugMode() {
         return debugMode;
@@ -19,12 +20,20 @@ public enum GlobalSettings
     }
 
     /**
-     * True if ccFiles should save proxie files when loaded/
+     * True if ccFiles should save proxie files when loaded.
      */
     public boolean rebuildProxies() {
         return rebuildProxies;
     }
     public void setRebuildProxies(boolean rebuildProxies) {
         this.rebuildProxies = rebuildProxies;
+    }
+
+    public void setDisableHUD(boolean disableHUD) {
+        this.disableHUD = disableHUD;
+    }
+
+    public boolean isHUDDisabled() {
+        return disableHUD;
     }
 }

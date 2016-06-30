@@ -4,6 +4,7 @@ import Game.Map.WoXWorld;
 import Rendering.IRenderableGameObject;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMCCFileReader;
+import mamFiles.MaMSurface;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 
 /**
@@ -11,6 +12,15 @@ import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
  */
 public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMOutdoorEnvironmentSet
 {
+
+    private static final String[] surfaceNameLut = new String[] {
+            null, "DIRT.SRF", "GRASS.SRF", "SNOW.SRF",
+            "SWAMP.SRF", "LAVA.SRF", "DESERT.SRF", "ROAD.SRF",
+            "WATER.SRF", "TFLR.SRF", "SKY.SRF", "CROAD.SRF",
+            "SEWER.SRF", "CLOUD.SRF", "SCORTCH.SRF",
+            "SPACE.SRF"};
+
+    private final MaMSurface[] surfaces;
 
     /**
      * Loads a set of environment sprites.
@@ -30,6 +40,15 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
      */
     public WoXOutdoorEnvironmentSet(WoXWorld.WoxVariant variant, MaMCCFileReader ccFile) throws CCFileFormatException {
         super(variant, null, ccFile);
+
+        surfaces = new MaMSurface[surfaceNameLut.length];
+        for (int i = 0; i < surfaceNameLut.length; i++) {
+            String surfaceName = surfaceNameLut[i];
+            if(surfaceName != null)
+            {
+                surfaces[i] = ccFile.getSurface(surfaceName);
+            }
+        }
     }
 
     @Override
@@ -40,6 +59,11 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
     @Override
     public IRenderableGameObject getMapEnviron(int environIndex) {
         return this.basicMapEnvrion[environIndex%this.basicMapEnvrion.length];
+    }
+
+    @Override
+    public MaMSurface getSurface(int surfaceIndex) throws CCFileFormatException {
+        return surfaces[(surfaceIndex+21)%surfaces.length];
     }
 
     @Override

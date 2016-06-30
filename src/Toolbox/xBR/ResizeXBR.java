@@ -5,7 +5,6 @@ import Toolbox.IntegerImage;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.function.Function;
 
 /**
  * Created by duckman on 29/05/2016.
@@ -100,7 +99,7 @@ public class ResizeXBR
         // scaled
         int scaledWidth = width * scale;
         int scaledHeight = height * scale;
-        int[] srcData = ImageHelpers.Image2RGBA(src);
+        int[] srcData = ImageHelpers.image2RGBA(src);
         IntegerImage destData = new IntegerImage(width*scale, height*scale, Color.magenta);
         int[] kernel = new int[21];
 

@@ -10,12 +10,13 @@ import GameMechanics.Adventurers.CharGender;
 import GameMechanics.Adventurers.CharRace;
 import GameMechanics.Magic.PartyEnchantments.IPartyEnchantment;
 import Rendering.*;
-import Toolbox.FileHelpers;
-import Toolbox.Grid;
+import Toolbox.*;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
+import mamFiles.WOX.WOXSurface;
 import mamFiles.WOX.WOXccFileReader;
 import org.joda.time.DateTime;
+import static Toolbox.PointHelper.*;
 
 import java.awt.*;
 import java.util.*;
@@ -39,6 +40,14 @@ public class MaMGame implements IMaMGame
     //everything that is not the party
     protected MaMWorld world;
     private List<IPartyEnchantment> activePartyEnchantments;
+    Point partyPos;
+    Direction partyDir;
+    private boolean debugInfo;
+
+    //-------------------------------------------------------------------------------------------------
+    // Sprites
+    //-------------------------------------------------------------------------------------------------
+    protected IRenderableGameObject[] mapArrow;
 
 
     //-------------------------------------------------------------------------------------------------
@@ -70,25 +79,47 @@ public class MaMGame implements IMaMGame
         world = new WoXWorld(this, ccFile);
         world.loadMaps();
         world.setCurrentMap(1);
+
+        // load sprites
+        //------------------
+
+        //arrow frames happen to be in the same order as the Direction enum.
+        mapArrow = ccFile.getSprite("GLOBAL.ICN")
+                        .subSetOfFrames("MapArrow", 1, 4)
+                .applyAlphaTransform(128, ImageHelpers.AlphaTransforms.SUB)
+                        //.applyAlphaTransform(64, ImageHelpers.AlphaTransforms.ADD_NOISE)
+                        .eachFrameAsRenderable();
     }
 
-    public void doAction(MaMActions action)
+    private void setupDefaultGameState()
     {
-        switch (action)
-        {
+        party = new ArrayList<>();
+        party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, new CharClass(), 1));
+        partyPos = new Point(4, 4);
+        partyDir = Direction.UP;
+    }
+
+    public void doAction(MaMActions action) {
+        switch (action) {
             case WalkForward:
-                testMonsterID++;
+                //testMonsterID++;
+                this.partyPos = navigate(partyPos, partyDir, 1);
                 break;
             case WalkBackWard:
-                testMonsterID--;
+                //testMonsterID--;
+                this.partyPos = navigate(partyPos, partyDir, -1);
                 break;
             case WalkLeft:
+                this.partyPos = navigate(partyPos, partyDir.turnLeft(), 1);
                 break;
             case WalkRight:
+                this.partyPos = navigate(partyPos, partyDir.turnRight(), 1);
                 break;
             case TurnLeft:
+                partyDir = partyDir.turnLeft();
                 break;
             case TurnRight:
+                partyDir = partyDir.turnRight();
                 break;
             case Inspect:
                 break;
@@ -107,12 +138,7 @@ public class MaMGame implements IMaMGame
             case Sleep:
                 break;
         }
-    }
-
-    private void setupDefaultGameState()
-    {
-        party = new ArrayList<>();
-        party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, new CharClass(), 1));
+        System.out.println(getDebugInfo());
     }
 
 
@@ -182,23 +208,81 @@ public class MaMGame implements IMaMGame
         try
         {
             MaMMonster mon = world.getMonsters()[testMonsterID%world.getMonsters().length];
-            view.addMonster(new Point(100,0), mon);
+            //view.addMonster(new Point(100,0), mon);
 
             view.setGround(world.getOutdoorEnvironmentSet(0).getGround());
             //.getSprite("CAVE.GND"));
             view.setSky(world.getOutdoorEnvironmentSet(0).getSky());
-            view.addRenderable(new RenderablePos(8,50,1.0, 3).hackMe(), world.getCcFile().getSurface("DESERT.SRF"));
-            //CCFileFormatException.stub();
+
+            //MaMSurface surf = world.getCcFile().getSurface("DESERT.SRF");
+
+//            surf = world.getCcFile().getSurface("LAVA.SRF");
+//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), ((WOXSurface)surf).getSurfaceOverlay(null));
+//
+//
+//            surf = world.getCcFile().getSurface("TFLR.SRF");
+//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,0)));
+//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,1)));
+//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,2)));
+//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,3)));
+//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,4)));
+
+
+            //render the current view
+            Grid<MaMTile> map = world.getCurrentMaze().getMap();
+            Point viewNormal = partyDir.getVector();
+            Point viewNormalOrth = partyDir.turnRight().getVector();
+            for(int vsY=0; vsY<10; vsY++)
+            {
+                for(int vsX=-9; vsX<9; vsX++)
+                {
+                    //vsY steps forward
+                    Point fwd = new Point(vsY * viewNormal.x, vsY * viewNormal.y);
+
+                    //vsX steps right
+                    Point right = new Point(vsX * viewNormalOrth.x, vsX * viewNormalOrth.y);
+
+                    //get world position
+                    int xPos = partyPos.x + fwd.x + right.x;
+                    int yPos = partyPos.y + fwd.y + right.y;
+
+                    //render item at xPos, yPos  to xsX, vsY
+                    if(map.isValidLocation(xPos, yPos))
+                    {
+                        MaMTile tile =  map.get(xPos, yPos);
+                        int surfaceNum = tile.getIndexBase();
+                        MaMSurface surf = world.getOutdoorEnvironmentSet(0).getSurface(surfaceNum);
+
+                        if(surf != null)
+                        {
+
+                            IRenderableGameObject surfaceLayer = surf.getSurfaceOverlay(new Point(vsX, vsY));
+
+                            if(surfaceLayer != null)
+                            {
+                                // surfaceLayer is null if not renderable on screen, as the view sweep
+                                // we make is deliberately too large so this is normal.
+                                view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surfaceLayer);
+                            }
+                        }
+                    }
+
+                }
+            }
 
         } catch (CCFileFormatException e) {
+            e.printStackTrace();
+        } catch (MaMGameException e) {
             e.printStackTrace();
         }
 
         return view;
     }
 
+
     @Override
-    public MaM2DMapComposition renderMap(int mapX, int mapY, int mapWidth, int mapHeight) {
+    public MaM2DMapComposition renderMap(int mapX, int mapY, int mapWidth, int mapHeight)
+    {
         MaMMazeFile maze = this.world.getCurrentMaze();
         MaM2DMapComposition scene = new MaM2DMapComposition();
         if(maze != null)
@@ -208,8 +292,13 @@ public class MaMGame implements IMaMGame
             {
                 for(int y=0; y<mapHeight; y++)
                 {
+                    //world space x and y
+                    int wsX = x + mapX;
+                    int wsY = y + mapY;
+
+                    //tile info
                     Grid<MaMTile> grid = maze.getMap();
-                    MaMTile t = grid.get(x+mapX, y+mapY);
+                    MaMTile t = grid.get(wsX, wsY);
 
                     RenderablePos tilePos = new RenderablePos(x*8, y*8, 1.0, RenderablePos.ScalePosition.TopLeft, 0);
 
@@ -240,6 +329,13 @@ public class MaMGame implements IMaMGame
                         scene.addRenderable(tilePos, overlaySprite);
                     }
 
+                    //draw arrow
+                    if(equalsXY(partyPos, wsX, wsY))
+                    {
+                        tilePos = tilePos.above();
+                        scene.addRenderable(tilePos, mapArrow[partyDir.ordinal()]);
+                    }
+
                     if(GlobalSettings.INSTANCE.debugMode())
                     {
                         tilePos = tilePos.above();
@@ -255,6 +351,18 @@ public class MaMGame implements IMaMGame
     }
 
     @Override
+    public MaM2DMapComposition renderWizardEyeView(int width, int height) {
+        int x = partyPos.x - (width  / 2);
+        int y = partyPos.y - (height / 2);
+        Grid<MaMTile> map = world.getCurrentMaze().getMap();
+
+        //clamp x and y so we are not rendering off the map.
+        x = Math.min(map.getWidth()-1-width, Math.max(x, 0));
+        y = Math.min(map.getHeight()-1-height, Math.max(y, 0));
+        return renderMap(x, y, width, height);
+    }
+
+    @Override
     public ISceneComposition renderHUDForWorld()
     {
         return world.renderHUDForWorld();
@@ -264,7 +372,7 @@ public class MaMGame implements IMaMGame
     public ISceneComposition renderParty() {
         MaM2DInsertionOrderComposition scene = new MaM2DInsertionOrderComposition();
 
-        //  character faces
+        //  Character faces
         // ----------------------------------
         MaMSprite[] faces = new MaMSprite[6];
 
@@ -324,5 +432,9 @@ public class MaMGame implements IMaMGame
         if(world != null) {
             world.close();
         }
+    }
+
+    public String getDebugInfo() {
+        return "pos=" + point2String(partyPos) + ", dir=" + partyDir;
     }
 }
