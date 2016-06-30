@@ -9,7 +9,7 @@ public enum GlobalSettings
 
     boolean debugMode = true;
     boolean rebuildProxies = false;
-    private boolean disableHUD = true;
+    private boolean disableHUD = false;
 
     public boolean debugMode() {
         return debugMode;
@@ -20,7 +20,7 @@ public enum GlobalSettings
     }
 
     /**
-     * True if ccFiles should save proxie files when loaded/
+     * True if ccFiles should save proxie files when loaded.
      */
     public boolean rebuildProxies() {
         return rebuildProxies;
