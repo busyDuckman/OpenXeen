@@ -2,6 +2,7 @@ package Rendering;
 
 import Toolbox.IHasProperties;
 import Toolbox.ImageHelpers;
+import mamFiles.CCFileFormatException;
 import mamFiles.IHasProxy;
 import mamFiles.MAMFile;
 import mamFiles.MaMSprite;
@@ -102,6 +103,14 @@ public interface IRenderableGameObject
         }
     }
 
+    default IRenderableGameObject[] eachFrameAsRenderable() throws CCFileFormatException {
+        IRenderableGameObject[] renderables = new IRenderableGameObject[getRenderedFrames().length];
+        for (int i = 0; i < renderables.length; i++) {
+            renderables[i] = IRenderableGameObject.fromImage(getRenderedFrames()[i]);
+        }
+        return renderables;
+    }
+
     default IHasProxy asIHasProxyObject()
     {
         String name = (this instanceof MAMFile) ? ((MAMFile)this).getName() : "via asIHasProxyObject()";
@@ -145,6 +154,18 @@ public interface IRenderableGameObject
         String key = MAMFile.generateUniqueKey(name);
         return new MaMSprite(name, key, maskedImages);
 
+    }
+
+    default IRenderableGameObject applyAlphaTransform(int level,  ImageHelpers.AlphaTransforms transform)
+    {
+        BufferedImage[] sourceImages = getRenderedFrames();
+        BufferedImage[] destImages= new BufferedImage[sourceImages.length];
+        for (int i = 0; i < destImages.length; i++) {
+            destImages[i] = ImageHelpers.applyAlphaTransform(sourceImages[i], level, transform, true);
+        }
+        String name = (this instanceof MAMFile) ? ((MAMFile)this).getName() : "via applyMask()";
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, destImages);
     }
 }
 

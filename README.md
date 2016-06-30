@@ -1,7 +1,7 @@
 ---
  OpenXeen
 ---
-![Last Screen Shot](doco/Dev%20History/openXeen8.png?raw=true "Last Screen Shot")
+![Last Screen Shot](doco/Dev%20History/openXeen9.png?raw=true "Last Screen Shot")
 
 OpenXeen is a mod for Might and Magic IV & V - World of Xeen (WOX), programmed by duuckman (Dr Warren Creemers).
 It is a game engine rewrite in java designed to make MaM gaming more available.

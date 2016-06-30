@@ -184,11 +184,11 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
                 break;
 
             case KeyEvent.VK_LEFT:
-                game.doAction(MaMActions.WalkLeft);
+                game.doAction(MaMActions.TurnLeft);
                 break;
 
             case KeyEvent.VK_RIGHT:
-                game.doAction(MaMActions.WalkRight);
+                game.doAction(MaMActions.TurnRight);
                 break;
 
             case KeyEvent.VK_H:

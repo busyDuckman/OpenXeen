@@ -159,16 +159,6 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         return new MaMSprite(newName, MAMFile.generateUniqueKey(newName), images);
     }
 
-    public IRenderableGameObject[] eachFrameAsRenderable() throws CCFileFormatException {
-        IRenderableGameObject[] renderables = new IRenderableGameObject[getRenderedFrames().length];
-        for (int i = 0; i < renderables.length; i++) {
-            renderables[i] = IRenderableGameObject.fromImage(getRenderedFrames()[i]);
-        }
-        return renderables;
-    }
-
-
-
     @Override
     public MaMPallet getPallet() {
         return pallet;

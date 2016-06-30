@@ -87,7 +87,7 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             renderView(g, timeMS, partyView);
         }
 
-        MaM2DMapComposition mapView = this.game.renderMap(0,0,9,8);
+        MaM2DMapComposition mapView = this.game.renderWizardEyeView(9,8);
         //MaM2DMapComposition mapView = this.game.renderMap(0,0,16,16);
         renderView(g, timeMS, mapView, 234, 9, 1);
 

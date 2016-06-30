@@ -14,6 +14,7 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static Toolbox.BinaryHelpers.*;
 
@@ -153,9 +154,7 @@ public class ImageHelpers
     {
         int[] data = image2RGBA(image);
         for (int i = 0; i < data.length; i++) {
-            //data[i] = data[i] & ((alpha[i]<<24) & 0xffffff);
-
-
+            //TODO: I am not proud of this
             Color c = new Color(data[i], true);
             c = new Color(c.getRed(), c.getGreen(), c.getBlue(), BinaryHelpers.INT(alpha[i]));
             data[i] = c.getRGB();
@@ -255,5 +254,91 @@ public class ImageHelpers
         }
 
         return images;
+    }
+
+    public enum AlphaTransforms
+    {
+        SET_MAX {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(Math.min(alpha, level));
+            }
+        },
+        SET_MIN {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(Math.max(alpha, level));
+            }
+        },
+        SET_FOR_ALL {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(level);
+            }
+        },
+        ADD {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(alpha + level);
+            }
+        },
+        SUB {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(alpha - level);
+            }
+        },
+        DIVIDE {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(alpha / level);
+            }
+        },
+        MULTIPLY {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(alpha * level);
+            }
+        },
+        ADD_NOISE {
+            @Override
+            public int applyTransform(int alpha, int level) {
+                return clamp(alpha + rand.nextInt(level/2) - level);
+            }
+        },
+        NO_OPERATION {
+        @Override
+        public int applyTransform(int alpha, int level) {
+            return clamp(alpha);
+        }
+    };
+
+        public abstract int applyTransform(int alpha, int level);
+
+        private static int clamp(int alpha) {return Math.max(0, Math.min(255, alpha));}
+        private static Random rand = new Random(9001);
+    }
+
+    /**
+     * Alter the alpha values of an image in several useful ways.
+     * @param level A parameter to the transform operation.
+     * @param transform The transform to perform.
+     * @param nonZeroAlphaOnly If true, then only visible pixels are altered.
+     */
+    public static BufferedImage applyAlphaTransform(BufferedImage image,
+                                                    int level,
+                                                    AlphaTransforms transform,
+                                                    boolean nonZeroAlphaOnly) {
+        int[] data = image2RGBA(image);
+        for (int i = 0; i < data.length; i++) {
+            //TODO: I am not proud of this
+            Color c = new Color(data[i], true);
+            if(!(nonZeroAlphaOnly && (c.getAlpha() == 0)))
+            {
+                c = new Color(c.getRed(), c.getGreen(), c.getBlue(), transform.applyTransform(c.getAlpha(), level));
+                data[i] = c.getRGB();
+            }
+        }
+        return RGBA2Image(data, image.getWidth(), image.getHeight());
     }
 }

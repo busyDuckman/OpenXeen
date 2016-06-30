@@ -39,6 +39,7 @@ public interface IMaMGame extends AutoCloseable
 
     MaM3DSceneComposition render();
     MaM2DMapComposition renderMap(int mapX, int mapY, int mapWidth, int mapHeight);
+    MaM2DMapComposition renderWizardEyeView(int width, int height);
     ISceneComposition renderHUDForWorld();
 
     /**
