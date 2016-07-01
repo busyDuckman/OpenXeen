@@ -357,8 +357,8 @@ public class MaMGame implements IMaMGame
         Grid<MaMTile> map = world.getCurrentMaze().getMap();
 
         //clamp x and y so we are not rendering off the map.
-        x = Math.min(map.getWidth()-1-width, Math.max(x, 0));
-        y = Math.min(map.getHeight()-1-height, Math.max(y, 0));
+        x = Math.min(map.getWidth()-width, Math.max(x, 0));
+        y = Math.min(map.getHeight()-height, Math.max(y, 0));
         return renderMap(x, y, width, height);
     }
 

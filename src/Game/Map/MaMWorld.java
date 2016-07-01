@@ -31,6 +31,8 @@ public abstract class MaMWorld implements AutoCloseable
 
     Map<Integer, MaMMazeFile> MazeFiles;
     MaMMazeFile currentMaze;
+    MaMMazeView currentMazeView;
+
 
     protected MaMCCFileReader ccFile;
     protected MaMCCFileReader ccFileAnimations;
