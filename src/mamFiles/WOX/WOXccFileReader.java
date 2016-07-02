@@ -182,9 +182,9 @@ public class WOXccFileReader extends MaMCCFileReader
         {
             CCFileTocEntry toc = new CCFileTocEntry();
             int offset = i * 8;
-            toc.ID = BYTES2INT(rawToc[offset], rawToc[offset + 1]);
-            toc.offset = BYTES2INT(rawToc[offset + 2], rawToc[offset + 3], rawToc[offset + 4]);
-            toc.length = BYTES2INT(rawToc[offset+5], rawToc[offset + 6]);
+            toc.ID = BYTES2INT_lsb(rawToc[offset], rawToc[offset + 1]);
+            toc.offset = BYTES2INT_lsb(rawToc[offset + 2], rawToc[offset + 3], rawToc[offset + 4]);
+            toc.length = BYTES2INT_lsb(rawToc[offset+5], rawToc[offset + 6]);
             toc.padding = rawToc[offset+7];
 
             if(!toc.isValid())
@@ -233,6 +233,10 @@ public class WOXccFileReader extends MaMCCFileReader
     @Override
     protected void decrypt(byte[] data)
     {
+        if(variant == WoXCCVariant.DARK_CUR)
+        {
+            return;
+        }
         for (int i = 0; i < data.length; i++)
         {
             data[i] = (byte)((data[i] ^ 0x35) & 0xff);

@@ -150,12 +150,12 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
         return getMazeSpace(wsPos.x, wsPos.y);
     }
 
-    protected final MaMMazeFile getMazeFileForPoint(Point wsPos)
+    public final MaMMazeFile getMazeFileForPoint(Point wsPos)
     {
         return getMazeFileForPoint(wsPos.x, wsPos.y);
     }
 
-    protected final MaMMazeFile getMazeFileForPoint(int wsX, int wsY)
+    public final MaMMazeFile getMazeFileForPoint(int wsX, int wsY)
     {
         Point jsPos = getJoinSpace(wsX, wsY);
         MaMMazeFile maze = recentMazes.getOrDefault(jsPos, null);

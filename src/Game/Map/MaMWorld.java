@@ -5,7 +5,6 @@ import Game.Monsters.MaMMonster;
 import Rendering.ISceneComposition;
 import com.sun.istack.internal.NotNull;
 import mamFiles.*;
-import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 
@@ -29,8 +28,8 @@ public abstract class MaMWorld implements AutoCloseable
 
     String worldName;
 
-    Map<Integer, MaMMazeFile> MazeFiles;
-    MaMMazeFile currentMaze;
+    Map<Integer, MaMMazeFile> mazeFiles;
+    Map<String, MaMMazeView> mazeViews;
     MaMMazeView currentMazeView;
 
 
@@ -45,8 +44,9 @@ public abstract class MaMWorld implements AutoCloseable
         this.game = game;
         currentPallate = getDefaultPallate();
         monsters = ccFile.loadMonsters(this);
-        MazeFiles = new HashMap<>();
-        currentMaze = null;
+        mazeFiles = new HashMap<>();
+        mazeViews = new HashMap<>();
+        currentMazeView = null;
     }
 
     protected abstract MaMPallet getDefaultPallate() throws CCFileFormatException;
@@ -64,18 +64,19 @@ public abstract class MaMWorld implements AutoCloseable
     }
 
     public abstract void loadMaps() throws CCFileFormatException;
+    public abstract void loadMazeViews() throws CCFileFormatException;
 
     public Map<Integer, MaMMazeFile> getMazeFiles() {
-        return MazeFiles;
+        return mazeFiles;
     }
 
-    public MaMMazeFile getCurrentMaze() {
-        return currentMaze;
+    public MaMMazeView getCurrentMazeView() {
+        return currentMazeView;
     }
 
     public void addMaze(@NotNull MaMMazeFile maze)
     {
-        MazeFiles.put(maze.getMazeID(), maze);
+        mazeFiles.put(maze.getMazeID(), maze);
     }
 
     public MaMCCFileReader getCcFile() {
@@ -109,9 +110,14 @@ public abstract class MaMWorld implements AutoCloseable
         this.ccFileAnimations.close();
     }
 
-    public void setCurrentMap(int mapID)
-    {
-        this.currentMaze = getMazeFiles().get(mapID);
+//    public void setMazeView(int mapID)
+//    {
+//        this.currentMaze = getMazeFiles().get(mapID);
+//    }
+
+
+    public void setMazeView(String name) {
+        this.currentMazeView = mazeViews.get(name);
     }
 
     public abstract MaMSprite getNPCFaceOrNull(int id);

@@ -1,5 +1,6 @@
 package mamFiles;
 
+import Game.Map.MaMMazeView;
 import Game.Map.MaMTile;
 import Toolbox.Grid;
 import mamFiles.CCFileFormatException;
@@ -18,6 +19,10 @@ public abstract class MaMMazeFile extends MAMFile
     protected String name;
     protected int mazeID;
     protected Grid<MaMTile> map;
+    /**
+     * -1 = nno map
+     * Use as per joiningMaps[Direction.Left.ordinal()]
+     */
     protected int[] joiningMaps;
     protected List<String> cantCastList;
     protected boolean canRest;
