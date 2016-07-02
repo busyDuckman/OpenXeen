@@ -27,13 +27,13 @@ public class WOXSpriteFile extends MaMSprite
             int dp = offset;
 
             // Read the position and size of the cell from the data stream
-            x= BYTES2INT(data[dp], data[dp+1]);
+            x= BYTES2INT_lsb(data[dp], data[dp+1]);
             dp += 2;
-            width = BYTES2INT(data[dp], data[dp+1]);
+            width = BYTES2INT_lsb(data[dp], data[dp+1]);
             dp += 2;
-            y = BYTES2INT(data[dp], data[dp+1]);
+            y = BYTES2INT_lsb(data[dp], data[dp+1]);
             dp += 2;
-            height = BYTES2INT(data[dp], data[dp+1]);
+            height = BYTES2INT_lsb(data[dp], data[dp+1]);
 
             CCFileFormatException.assertFalse(width  < 0, "Cell() width  < 0");
             CCFileFormatException.assertFalse(height < 0, "Cell() height < 0");
@@ -91,13 +91,13 @@ public class WOXSpriteFile extends MaMSprite
             int patternSteps[] = { 0, 1, 1, 1, 2, 2, 3, 3, 0, -1, -1, -1, -2, -2, -3, -3 };
 
             // Read the position and size of the cell from the data stream
-            xOffset = BYTES2INT(data[dp], data[dp+1]);
+            xOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
             dp += 2;
-            width = BYTES2INT(data[dp], data[dp+1]);
+            width = BYTES2INT_lsb(data[dp], data[dp+1]);
             dp += 2;
-            yOffset = BYTES2INT(data[dp], data[dp+1]);
+            yOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
             dp += 2;
-            height = BYTES2INT(data[dp], data[dp+1]);
+            height = BYTES2INT_lsb(data[dp], data[dp+1]);
             dp += 2;
 
 
@@ -149,7 +149,7 @@ public class WOXSpriteFile extends MaMSprite
                                 break;
 
                             case 3:   // Stream copy command.
-                                opr1 = BYTES2INT(data[dp], data[dp+1]);//  *((WORD *)&cellData[dp]);
+                                opr1 = BYTES2INT_lsb(data[dp], data[dp+1]);//  *((WORD *)&cellData[dp]);
                                 dp += 2; byteCount += 2;
                                 for( i = 0 ; i < len + 4 ; i++, xPos++ )
                                 {
@@ -216,7 +216,7 @@ public class WOXSpriteFile extends MaMSprite
 
         //The number of frames in the sprite. This is a word with the LSB first.
         int p=0;
-        int numFrames = BYTES2INT(data[p], data[p+1]);
+        int numFrames = BYTES2INT_lsb(data[p], data[p+1]);
         p += 2;
 
         //load cells
@@ -313,10 +313,10 @@ public class WOXSpriteFile extends MaMSprite
         {
             List<Integer> cellList = new ArrayList<>();
 
-            int cellOffset1 = BYTES2INT(data[p], data[p+1]);
+            int cellOffset1 = BYTES2INT_lsb(data[p], data[p+1]);
             p += 2;
 
-            int cellOffset2 = BYTES2INT(data[p], data[p+1]);
+            int cellOffset2 = BYTES2INT_lsb(data[p], data[p+1]);
             p += 2;
 
             if((cellOffset1 == 0) && (cellOffset2 == 0))

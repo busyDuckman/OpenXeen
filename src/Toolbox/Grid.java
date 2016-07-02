@@ -13,8 +13,7 @@ import java.util.function.Supplier;
 /**
  * Created by duckman on 15/05/2016.
  */
-public class Grid<T>
-{
+public class Grid<T> implements IReadonlyGrid<T> {
     int numXValues, numYValues;
     T[] values;  // T[y*numXValues+x]
 
@@ -40,29 +39,35 @@ public class Grid<T>
         }
     }
 
+    @Override
     public T get(int x, int y)
     {
         return values[y*numXValues + x];
     }
 
+    @Override
     public boolean isValidLocation(int x, int y)
     {
         return (x >=0) && (x < numXValues) && (y >= 0) && (y < numYValues);
     }
 
+    @Override
     public T get(Point pos)
     {
         return values[pos.y*numXValues + pos.x];
     }
 
+    @Override
     public int getWidth() {
         return numXValues;
     }
 
+    @Override
     public int getHeight() {
         return numYValues;
     }
 
+    @Override
     public int size()
     {
         return numXValues * numYValues;

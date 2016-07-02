@@ -23,20 +23,54 @@ public class BinaryHelpers
     }
 
 
-    public static int BYTES2INT(byte a, byte b)
+    /**
+     * Assemble bytes into an integer, using LSB (dos/pc) byte order
+     */
+    public static int BYTES2INT_lsb(byte a, byte b)
     {
         return (INT(b) << 8) + INT(a);
     }
 
-    public static int BYTES2INT(byte a, byte b, byte c)
+    /**
+     * Assemble bytes into an integer, using LSB (dos/pc) byte order
+     */
+    public static int BYTES2INT_lsb(byte a, byte b, byte c)
     {
         return (INT(c) << 16) + (INT(b) << 8) + INT(a);
     }
 
-    public static int BYTES2INT(byte a, byte b, byte c, byte d)
+    /**
+     * Assemble bytes into an integer, using LSB (dos/pc) byte order
+     */
+    public static int BYTES2INT_lsb(byte a, byte b, byte c, byte d)
     {
         return (INT(d) << 24) + (INT(c) << 16) + (INT(b) << 8) + INT(a);
     }
+
+    /**
+     * Assemble bytes into an integer, using MSB (network/java) byte order
+     */
+    public static int BYTES2INT_msb(byte a, byte b)
+    {
+        return (INT(a) << 8) + INT(b);
+    }
+
+    /**
+     * Assemble bytes into an integer, using MSB (network/java) byte order
+     */
+    public static int BYTES2INT_msb(byte a, byte b, byte c)
+    {
+        return (INT(a) << 16) + (INT(b) << 8) + INT(c);
+    }
+
+    /**
+     * Assemble bytes into an integer, using MSB (network/java) byte order
+     */
+    public static int BYTES2INT_msb(byte a, byte b, byte c, byte d)
+    {
+        return (INT(a) << 24) + (INT(b) << 16) + (INT(c) << 8) + INT(d);
+    }
+
 
     public static void DebugDumpBinary(byte[] data, String filename)
     {
@@ -135,35 +169,54 @@ public class BinaryHelpers
 
     public enum BinaryDataTypes
     {
-        BYTE      (1, false),
-        S_BYTE    (1, true),
-        WORD      (2, false),
-        S_WORD    (2, true),
-        INT24     (3, false),
-        S_INT24   (3, true),
-        DWORD     (4, false),
-        S_DWORD   (4, true);
+        BYTE      (1, false, true),
+        S_BYTE    (1, true,  true),
+        WORD      (2, false, true),
+        S_WORD    (2, true,  true),
+        INT24     (3, false, true),
+        S_INT24   (3, true,  true),
+        DWORD     (4, false, true),
+        S_DWORD   (4, true,  true),
+
+        S_BYTE_LSB  (1, true,  false),
+        WORD_LSB    (2, false, false),
+        S_WORD_LSB  (2, true,  false),
+        INT24_LSB   (3, false, false),
+        S_INT24_LSB (3, true,  false),
+        DWORD_LSB   (4, false, false),
+        S_DWORD_LSB (4, true,  false);
         //Not done because it creates headaches.
         //INT64     (8, false),
         //S_INT64   (8, true);
 
         int bytes;
         boolean signed;
+        boolean msb;
 
-        BinaryDataTypes(int bytes, boolean signed) {
+        BinaryDataTypes(int bytes, boolean signed, boolean msb) {
             this.bytes = bytes;
             this.signed = signed;
+            this.msb = msb;
         }
 
         public long read(ByteArrayInputStream bis)
         {
             long val = 0;
-            for(int i=0; i<bytes; i++)
+            if(msb)
             {
-                //edian
-//                val <<= 8;
-//                val = val | (bis.read() & 0xff);
-                val = val | ((bis.read() & 0xff)<<(i*8));
+                for(int i=0; i<bytes; i++)
+                {
+                    val <<= 8;
+                    val = val | (bis.read() & 0xff);
+
+                }
+            }
+            else
+            {
+                for(int i=0; i<bytes; i++)
+                {
+                    val = val | ((bis.read() & 0xff)<<(i*8));
+                }
             }
 
             if(signed)
@@ -187,10 +240,25 @@ public class BinaryHelpers
         }
     }
 
+    public static void readWORDsLSB(ByteArrayInputStream bis, int[] dest, int length, int offset)
+    {
+        for(int i=0; i<length; i++)
+        {
+            dest[i+offset] = (int) BinaryDataTypes.WORD_LSB.read(bis);
+        }
+    }
+
     public static int[] readWORDs(ByteArrayInputStream bis, int length)
     {
         int[] data = new int[length];
         readWORDs(bis, data, length, 0);
+        return data;
+    }
+
+    public static int[] readWORDsLSB(ByteArrayInputStream bis, int length)
+    {
+        int[] data = new int[length];
+        readWORDsLSB(bis, data, length, 0);
         return data;
     }
 
@@ -202,10 +270,25 @@ public class BinaryHelpers
         }
     }
 
+    public static void readDWORDsLSB(ByteArrayInputStream bis, long[] dest, int length, int offset)
+    {
+        for(int i=0; i<length; i++)
+        {
+            dest[i+offset] = BinaryDataTypes.DWORD_LSB.read(bis);
+        }
+    }
+
     public static long[] readDWORDs(ByteArrayInputStream bis, int length)
     {
         long[] data = new long[length];
         readDWORDs(bis, data, length, 0);
+        return data;
+    }
+
+    public static long[] readDWORDsLSB(ByteArrayInputStream bis, int length)
+    {
+        long[] data = new long[length];
+        readDWORDsLSB(bis, data, length, 0);
         return data;
     }
 

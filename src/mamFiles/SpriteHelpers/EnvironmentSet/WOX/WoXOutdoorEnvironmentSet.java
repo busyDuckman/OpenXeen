@@ -13,12 +13,22 @@ import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMOutdoorEnvironmentSet
 {
 
+    //as per xeen wikia
+//    private static final String[] surfaceNameLut = new String[] {
+//            null, "DIRT.SRF", "GRASS.SRF", "SNOW.SRF",
+//            "SWAMP.SRF", "LAVA.SRF", "DESERT.SRF", "ROAD.SRF",
+//            "WATER.SRF", "TFLR.SRF", "SKY.SRF", "CROAD.SRF",
+//            "SEWER.SRF", "CLOUD.SRF", "SCORTCH.SRF",
+//            "SPACE.SRF"};
+
+    //hacked the order a bit, to ry and get it to work
     private static final String[] surfaceNameLut = new String[] {
             null, "DIRT.SRF", "GRASS.SRF", "SNOW.SRF",
             "SWAMP.SRF", "LAVA.SRF", "DESERT.SRF", "ROAD.SRF",
             "WATER.SRF", "TFLR.SRF", "SKY.SRF", "CROAD.SRF",
-            "SEWER.SRF", "CLOUD.SRF", "SCORTCH.SRF",
+            "SCORTCH.SRF", "CLOUD.SRF", "SEWER.SRF",
             "SPACE.SRF"};
+    //DWATER.SRF ?
 
     private final MaMSurface[] surfaces;
 
@@ -63,7 +73,7 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
 
     @Override
     public MaMSurface getSurface(int surfaceIndex) throws CCFileFormatException {
-        return surfaces[(surfaceIndex+21)%surfaces.length];
+        return surfaces[(surfaceIndex)%surfaces.length];
     }
 
     @Override

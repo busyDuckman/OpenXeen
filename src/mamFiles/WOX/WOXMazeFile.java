@@ -54,12 +54,12 @@ public class WOXMazeFile extends MaMMazeFile
 
             //interpret mapData
         int[] mapData = new int[mapSize]; //file data is in DWORD[]
-        BinaryHelpers.readWORDs(bisMapData, mapData, mapSize, 0);
+        BinaryHelpers.readWORDsLSB(bisMapData, mapData, mapSize, 0);
 
         int[] mapFlags = new int[mapSize];
         BinaryHelpers.readBYTEs(bisMapData, mapFlags, mapSize, 0);
 
-       this.mazeID = (int)BinaryHelpers.BinaryDataTypes.WORD.read(bisMapData);
+       this.mazeID = (int)BinaryHelpers.BinaryDataTypes.WORD_LSB.read(bisMapData);
 
         /*
         * "SurrMazes":
@@ -71,10 +71,10 @@ public class WOXMazeFile extends MaMMazeFile
 
         //0 indicates no map
         this.joiningMaps = new int[4];
-        joiningMaps[Direction.UP.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD.read(bisMapData);
-        joiningMaps[Direction.RIGHT.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD.read(bisMapData);
-        joiningMaps[Direction.DOWN.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD.read(bisMapData);
-        joiningMaps[Direction.LEFT.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD.read(bisMapData);
+        joiningMaps[Direction.UP.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD_LSB.read(bisMapData);
+        joiningMaps[Direction.RIGHT.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD_LSB.read(bisMapData);
+        joiningMaps[Direction.DOWN.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD_LSB.read(bisMapData);
+        joiningMaps[Direction.LEFT.ordinal()] = (int)BinaryHelpers.BinaryDataTypes.WORD_LSB.read(bisMapData);
 
 
         /*
@@ -83,7 +83,7 @@ public class WOXMazeFile extends MaMMazeFile
         */
 
         //First round of flags
-        int flags = (int)BinaryHelpers.BinaryDataTypes.WORD.read(bisMapData);
+        int flags = (int)BinaryHelpers.BinaryDataTypes.WORD_LSB.read(bisMapData);
 
         if((flags & (1<<6)) != 0) cantCastList.add(SpellManager.normaliseSpellName("Etheralize"));
         if((flags & (1<<8)) != 0) cantCastList.add(SpellManager.normaliseSpellName("Town Portal"));
@@ -104,7 +104,7 @@ public class WOXMazeFile extends MaMMazeFile
         }
 
         //Second round of flags
-        flags = (int)BinaryHelpers.BinaryDataTypes.WORD.read(bisMapData);
+        flags = (int)BinaryHelpers.BinaryDataTypes.WORD_LSB.read(bisMapData);
         isDark = (flags & (1 << 14)) != 0;
         isOutdoors = (flags & (1 << 15)) != 0;
 

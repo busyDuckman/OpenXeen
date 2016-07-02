@@ -4,14 +4,19 @@ import Game.MaMGame;
 import Rendering.ISceneComposition;
 import Rendering.MaM2DInsertionOrderComposition;
 import Rendering.RenderablePos;
+import Toolbox.Direction;
 import Toolbox.FileHelpers;
+import Toolbox.PointHelper;
+import Toolbox.Tag;
 import mamFiles.*;
-import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 import mamFiles.WOX.WOXccFileReader;
+
+import java.awt.*;
+import java.util.*;
 
 /**
  * Created by duckman on 5/06/2016.
@@ -99,6 +104,10 @@ public class WoXWorld extends MaMWorld
         ccFileAnimations = WOXccFileReader.open(FileHelpers.join(ccPath, variant.getIntroCCFileName()));
         outdoorEnvironmentSets = new WoXOutdoorEnvironmentSet[] { new WoXOutdoorEnvironmentSet(variant, ccFile) };
         indoorEnvironmentSets = WoXIndoorEnvironmentSet.getEnvironmentSets(variant, ccFile);
+
+        //prepare the world (done here, because ccFileCur is not ready in the parent constructor
+        loadMaps();
+        loadMazeViews();
 }
 
     @Override
@@ -187,7 +196,7 @@ public class WoXWorld extends MaMWorld
                     name = ccFile.getText(getAreaNameFile(i)).getText();
                 }
 
-                MazeFiles.put(i, ccFileCur.getMapFile(mazeName, this, i));
+                mazeFiles.put(i, ccFileCur.getMapFile(mazeName, this, i));
 
                 //reset miss count
                 missCount = 0;
@@ -199,6 +208,67 @@ public class WoXWorld extends MaMWorld
         }
     }
 
+    @Override
+    public void loadMazeViews() throws CCFileFormatException {
+        //TODO: Quick hack to just load the Xeen over-world
+        mazeViews.put("xeen", growMazeViewFromMaze(mazeFiles.get(1)));
+    }
+
+    private MaMMazeView growMazeViewFromMaze(MaMMazeFile mazeFile) {
+        //build a mapping of points to mazes
+        Map<Point, MaMMazeFile> mazeLut = traverseMaps(mazeFile);
+
+        //TODO: Get bounds from mazeLut
+        MaMMazeView mazeView = new MaMMazeView(16, 16, 6, 4,
+                                    P -> mazeLut.getOrDefault(P, null),
+                                    P -> null,
+                                    P-> null);
+
+        return mazeView;
+    }
+
+    private Map<Point, MaMMazeFile> traverseMaps(MaMMazeFile mazeFile) {
+        Map<Point, MaMMazeFile> mazeLut = new HashMap<>();
+        //a stack and checklist, to manage a node traversal
+        Stack<Tag<Point, MaMMazeFile>> todoSet = new Stack<>();
+        Set<Point> doneSet = new HashSet<>();
+        todoSet.push(new Tag<>(new Point(0, 0), mazeFile));
+
+        //traverse nodes
+        while(!todoSet.isEmpty())
+        {
+            Tag<Point, MaMMazeFile> map = todoSet.pop();
+            int id = map.getTag().getMazeID();
+            if(!doneSet.contains(map.getKey()))
+            {
+                doneSet.add(map.getKey());
+
+                MaMMazeFile maze = this.mazeFiles.getOrDefault(id, null);
+                if(maze != null)
+                {
+                    //add maze to collection
+                    mazeLut.put(map.getKey(), map.getTag());
+
+                    //explore the 4 adjoining notes
+                    for(Direction dir : Direction.values())
+                    {
+                        Point nextPos = PointHelper.navigate(map.getKey(), dir, 1);
+                        int nextID = maze.getJoiningMaps()[dir.ordinal()];
+                        if(nextID >= 0)
+                        {
+                            MaMMazeFile nextMaze = this.mazeFiles.getOrDefault(nextID, null);
+                            if(nextMaze != null)
+                            {
+                                todoSet.push(new Tag<>(nextPos, nextMaze));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return mazeLut;
+    }
 
     //------------------------------------------------------------------------------------------------------------------
     // Map names etc

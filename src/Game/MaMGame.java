@@ -1,5 +1,6 @@
 package Game;
 
+import Game.Map.MaMMazeView;
 import Game.Map.MaMTile;
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
@@ -77,8 +78,11 @@ public class MaMGame implements IMaMGame
     protected void loadWorld(MaMCCFileReader ccFile) throws CCFileFormatException
     {
         world = new WoXWorld(this, ccFile);
-        world.loadMaps();
-        world.setCurrentMap(1);
+        //world.loadMaps();
+
+        //world.setCurrentMap(1);
+        world.setMazeView("xeen"); //todo: real code
+
 
         // load sprites
         //------------------
@@ -229,7 +233,7 @@ public class MaMGame implements IMaMGame
 
 
             //render the current view
-            Grid<MaMTile> map = world.getCurrentMaze().getMap();
+            IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
             Point viewNormal = partyDir.getVector();
             Point viewNormalOrth = partyDir.turnRight().getVector();
             for(int vsY=0; vsY<10; vsY++)
@@ -283,27 +287,33 @@ public class MaMGame implements IMaMGame
     @Override
     public MaM2DMapComposition renderMap(int mapX, int mapY, int mapWidth, int mapHeight)
     {
-        MaMMazeFile maze = this.world.getCurrentMaze();
+        MaMMazeView mazeView= this.world.getCurrentMazeView();
         MaM2DMapComposition scene = new MaM2DMapComposition();
-        if(maze != null)
+        if(mazeView != null)
         {
             int i=0;
             for(int x=0; x<mapWidth; x++)
             {
                 for(int y=0; y<mapHeight; y++)
                 {
+                    MaMMazeFile maze = mazeView.getMazeFileForPoint(x, y);
+
                     //world space x and y
                     int wsX = x + mapX;
                     int wsY = y + mapY;
 
                     //tile info
-                    Grid<MaMTile> grid = maze.getMap();
-                    MaMTile t = grid.get(wsX, wsY);
+                    //Grid<MaMTile> grid = maze.getMap();
+                    MaMTile t = mazeView.get(wsX, wsY);
+                    if(t==null)
+                    {
+                        continue;
+                    }
 
                     RenderablePos tilePos = new RenderablePos(x*8, y*8, 1.0, RenderablePos.ScalePosition.TopLeft, 0);
 
                     //ground
-                    int groundTile = t.getIndexBase() + 5;
+                    int groundTile = t.getIndexBase();
                     IRenderableGameObject tileSprite = maze.getEnvironmentSet().getMapTile(groundTile);
                     scene.addRenderable(tilePos, tileSprite);
 
@@ -311,10 +321,11 @@ public class MaMGame implements IMaMGame
                     {
                         //environ
                         tilePos = tilePos.above();
-                        int environIndex = t.getIndexMiddle()+1;
+                        int environIndex = t.getIndexMiddle();
                         IRenderableGameObject environSprite = ((IMaMOutdoorEnvironmentSet)maze.getEnvironmentSet())
                                                                 .getMapEnviron(environIndex);
-                        if(environIndex != 4)
+
+                        if(environIndex != 0)
                         {
                             scene.addRenderable(tilePos, environSprite);
                         }
@@ -322,9 +333,9 @@ public class MaMGame implements IMaMGame
 
                     //objects
                     tilePos = tilePos.above();
-                    int objectIndex = t.getIndexTop()+3;
+                    int objectIndex = t.getIndexTop();
                     IRenderableGameObject overlaySprite = maze.getEnvironmentSet().getMapObject(objectIndex);
-                    if(objectIndex != 8)
+                    if(objectIndex != 0)
                     {
                         scene.addRenderable(tilePos, overlaySprite);
                     }
@@ -354,11 +365,12 @@ public class MaMGame implements IMaMGame
     public MaM2DMapComposition renderWizardEyeView(int width, int height) {
         int x = partyPos.x - (width  / 2);
         int y = partyPos.y - (height / 2);
-        Grid<MaMTile> map = world.getCurrentMaze().getMap();
+        //Grid<MaMTile> map = world.getCurrentMaze().getMap();
+        IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
 
         //clamp x and y so we are not rendering off the map.
-        x = Math.min(map.getWidth()-1-width, Math.max(x, 0));
-        y = Math.min(map.getHeight()-1-height, Math.max(y, 0));
+        x = Math.min(map.getWidth()-width, Math.max(x, 0));
+        y = Math.min(map.getHeight()-height, Math.max(y, 0));
         return renderMap(x, y, width, height);
     }
 
