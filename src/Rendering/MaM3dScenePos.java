@@ -5,8 +5,8 @@ package Rendering;
  */
 public enum MaM3dScenePos
 {
-    TopHalfOfsky (0x0000, 0, 8, 8, 0, 0x0000, 0),
-    BottomHalfOfsky (0x0000, 1, 8, 25, 0, 0x0000, 0),
+    TopHalfOfsky (0x0000, 0, 8, 8, 1, 0x0000, 0),
+    BottomHalfOfsky (0x0000, 1, 8, 25, 1, 0x0000, 0),
     Ground (0x0000, 0, 8, 67, 0, 0x0000, 1),
     SurfaceTile4StepsForward3Left (0x0000, 0, 8, 67, 0, 0x0000),
     SurfaceTile4StepsForward2Left (0x0000, 0, 38, 67, 0, 0x0000),

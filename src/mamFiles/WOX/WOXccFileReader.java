@@ -261,6 +261,11 @@ public class WOXccFileReader extends MaMCCFileReader
     }
 
     @Override
+    protected MaMThing __getThing(int id, MaMPallet pal) throws CCFileFormatException {
+        return new WoXThing(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
+    }
+
+    @Override
     protected MaMMazeFile __getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException {
         return new WOXMazeFile(mazeID, MAMFile.generateKeyFromCCFile(id, this), world);
     }

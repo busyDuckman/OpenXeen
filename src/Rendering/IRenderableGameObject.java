@@ -1,16 +1,17 @@
 package Rendering;
 
+import Toolbox.Direction;
 import Toolbox.IHasProperties;
 import Toolbox.ImageHelpers;
+import com.sun.istack.internal.NotNull;
 import mamFiles.CCFileFormatException;
 import mamFiles.IHasProxy;
 import mamFiles.MAMFile;
 import mamFiles.MaMSprite;
-import mamFiles.WOX.WOXSpriteFile;
-import org.joda.time.DateTime;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 
@@ -48,6 +49,10 @@ public interface IRenderableGameObject
         return new ImageWrapper(image);
     }
 
+    /**
+     * This is intended for rough text display (for debug purposes etc)
+     * NOT suitable for game menus/signs/text etc.
+     */
     static IRenderableGameObject fromText(String s, Color col, int width, int height)
     {
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
@@ -139,6 +144,10 @@ public interface IRenderableGameObject
         }
     }
 
+    /**
+     * Sets the alpha values for every frame.
+     * Assumes all frames are the same size.
+     */
     default IRenderableGameObject applyMask(byte[] mask)
     {
         BufferedImage[] sourceImages = getRenderedFrames();
@@ -156,6 +165,9 @@ public interface IRenderableGameObject
 
     }
 
+    /**
+     * Handy tool to manipulate image alpha values.
+     */
     default IRenderableGameObject applyAlphaTransform(int level,  ImageHelpers.AlphaTransforms transform)
     {
         BufferedImage[] sourceImages = getRenderedFrames();
@@ -167,8 +179,66 @@ public interface IRenderableGameObject
         String key = MAMFile.generateUniqueKey(name);
         return new MaMSprite(name, key, destImages);
     }
+
+    /**
+     * Flip about vertical axis.
+     */
+    default IRenderableGameObject mirror()
+    {
+        BufferedImage[] sourceImages = getRenderedFrames();
+        BufferedImage[] destImages= new BufferedImage[sourceImages.length];
+
+        for (int i = 0; i < destImages.length; i++) {
+            AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+            tx.translate(0, -sourceImages[i].getHeight(null));
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            destImages[i] = op.filter(sourceImages[i], null);
+        }
+        String name = (this instanceof MAMFile) ? ("mirrored_"+((MAMFile)this).getName()) : "via mirror()";
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, destImages);
+    }
+
+    /**
+     * Sometimes simple sprites need to be upgraded act like one of the more powerful
+     * versions. This is backward to the normal way of doing things, but it is done
+     * to enable the modding engine to work in a graceful manor. Especially in respect
+     * to upgrading sprites.
+     */
+    default IRelativeToLocationSprite asIRelativeToLocationSprite()
+    {
+        return new RelativeLocationWrapper(this);
+    }
 }
 
+/**
+ * Sometimes simple sprites need to be upgraded act like one of the more powerful
+ * versions. This is backward to the normal way of doing things, but it is done
+ * to enable the modding engine to work in a graceful manor. Especially in respect
+ * to upgrading sprites.
+ */
+final class RelativeLocationWrapper implements IRelativeToLocationSprite
+{
+    private final IRenderableGameObject rgo;
+
+    public RelativeLocationWrapper(IRenderableGameObject rgo) {
+        this.rgo = rgo;
+    }
+
+    @Override
+    public IRenderableGameObject getView(@NotNull Point mapPosRelative, Direction viewDir) {
+        return rgo;
+    }
+
+    @Override
+    public AnimationSettings getAnimationSettings() {
+        return rgo.getAnimationSettings();
+    }
+}
+
+/**
+ * Used by IRenderableGameObject::fromImage(...)
+ */
 final class ImageWrapper implements IRenderableGameObject
 {
     private final BufferedImage image;

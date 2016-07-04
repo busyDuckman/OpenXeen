@@ -211,7 +211,7 @@ public class WOXMazeFile extends MaMMazeFile
                 boolean seen = BinaryHelpers.byte2Bits(seenTiles[bitIndex])[bitMod];
                 boolean visited = BinaryHelpers.byte2Bits(visitedTiles[bitIndex])[bitMod];
 
-                MaMTile tile = createTile(mapData[index], mapFlags[index]);
+                MaMTile tile = createTile(mapData[index], mapFlags[index], floorLut, wallLut);
                 tile.setSeen(seen);
                 tile.setVisited(visited);
                 //translate the iBase
@@ -235,9 +235,9 @@ public class WOXMazeFile extends MaMMazeFile
         }
     }
 
-    private MaMTile createTile(int data, int flags) {
-        int base = data & 0x0f;
-        int middle = (data>>4) & 0x0f;
+    private MaMTile createTile(int data, int flags, int[] floorLut, int[] wallLut) {
+        int base = floorLut[data & 0x0f];
+        int middle = wallLut[(data>>4) & 0x0f];
         int top = (data>>8) & 0x0f;
         int overlay = (data>>12) & 0x0f;
 

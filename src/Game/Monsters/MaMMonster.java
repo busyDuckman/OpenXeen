@@ -1,5 +1,8 @@
 package Game.Monsters;
 
+import Game.IAttackable;
+import Game.IGameEntity;
+import Game.IUpdateable;
 import Game.MaMGame;
 import Game.Map.MaMWorld;
 import Rendering.AnimationSettings;
@@ -69,4 +72,6 @@ public class MaMMonster implements IRenderableGameObject
     public AnimationSettings getAnimationSettings() {
         return null;
     }
+
+
 }

@@ -138,6 +138,10 @@ public class RenderablePos
         return new RenderablePos(xPos, yPos, scale, scalePos, depth-1, hackMe);
     }
 
+    public RenderablePos atDepth(int newDepth) {
+        return new RenderablePos(xPos, yPos, scale, scalePos, newDepth, hackMe);
+    }
+
     public RenderablePos translate(int x, int y) {
         return new RenderablePos(xPos+x, yPos+y, scale, scalePos, depth-1, hackMe);
     }
@@ -195,13 +199,12 @@ public class RenderablePos
 
     public Rectangle getImageBounds(int width, int height)
     {
-        return  new Rectangle(getxPos(), getyPos(), width, height);
+        //this was not scaled before
+        //TODO: use scalePos
+        return  new Rectangle(getxPos(), getyPos(), (int)(width*scale), (int)(height*scale));
 
-        //old code
-        //return  new Rectangle(xPos, yPos, width, height);
-
-        //even older code
-        //return this.scalePos.scaleRectangle(new Rectangle(xPos, yPos, width, height), scale);
+        //old version
+        //return  new Rectangle(getxPos(), getyPos(), width, height);
     }
 
     public Rectangle getImageBoundsAfterOffset(int x, int y, double width, double height) {

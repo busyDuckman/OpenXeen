@@ -2,12 +2,15 @@ package mamFiles.SpriteHelpers.EnvironmentSet.WOX;
 
 import Game.Map.WoXWorld;
 import Rendering.IRenderableGameObject;
+import Rendering.RenderablePos;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMCCFileReader;
 import mamFiles.MaMSprite;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 /**
  * Created by duckman on 15/06/2016.
@@ -21,9 +24,15 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
     protected MaMSprite groundSprite;
     protected MaMSprite basicMapTileSet; //has the basics, lava, mountains, fountains, huts towns etc.
 
+    protected WoXWorld.WoxVariant variant;
+    protected MaMCCFileReader ccFile;
+
     IRenderableGameObject[] basicMapObjects = new IRenderableGameObject[basicMapTableSize];
     IRenderableGameObject[] basicMapEnvrion = new IRenderableGameObject[basicMapTableSize];
     IRenderableGameObject[] basicMapGround  = new IRenderableGameObject[basicMapTableSize];
+
+    //Map<Point, RenderablePos> ThingPositionLut
+
     /**
      * Loads a set of environment sprites.
      *
@@ -39,6 +48,9 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
     public WoXEnvironmentSet(WoXWorld.WoxVariant variant,
                              String environmentKey,
                              MaMCCFileReader ccFile) throws CCFileFormatException {
+
+        this.ccFile = ccFile;
+        this.variant = variant;
 
         if(environmentKey != null)
         {

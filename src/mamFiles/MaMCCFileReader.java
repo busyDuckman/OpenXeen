@@ -108,6 +108,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     protected abstract MaMSprite __getSprite(int id, MaMPallet pal) throws CCFileFormatException;
     protected abstract MaMPallet __getPallet(int id) throws CCFileFormatException;
     protected abstract MaMSurface __getSurface(int id, MaMPallet pal) throws CCFileFormatException;
+    protected abstract MaMThing __getThing(int id, MaMPallet pal) throws CCFileFormatException;
     protected MaMRawImage __getRawImage(int id, MaMPallet pal) throws CCFileFormatException
     {
         return new MaMRawImage(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
@@ -151,6 +152,11 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     public MaMSurface getSurface(int id, MaMPallet pal) throws CCFileFormatException
     {
         return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getSurface);
+    }
+
+    public MaMThing getThing(int id, MaMPallet pal) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getThing);
     }
 
     public MaMRawImage getRawImage(int id, MaMPallet pal) throws CCFileFormatException
@@ -201,7 +207,6 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                 case "TWN":
                 case "SWL":
                 case "PIC":
-                case "OBJ":
                 case "ICN":
                 case "FWL":
                 case "FAC":
@@ -221,6 +226,8 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                     return getVoc(id);
                 case "RAW":
                     return getRawImage(id);
+                case "OBJ":
+                    return getThing(id);
                 case"":
                     switch (fileNameNoExt)
                     {
@@ -255,6 +262,11 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     public MaMSurface getSurface(int id) throws CCFileFormatException
     {
         return getSurface(id, getPalletForFile(id));
+    }
+
+    public MaMThing getThing(int id) throws CCFileFormatException
+    {
+        return getThing(id, getPalletForFile(id));
     }
 
     public MaMRawImage getRawImage(int id) throws CCFileFormatException
@@ -294,6 +306,18 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         try
         {
             return getSurface(hashFileName(fileName));
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
+        }
+    }
+
+    public MaMThing getThing(String fileName) throws CCFileFormatException
+    {
+        try
+        {
+            return getThing(hashFileName(fileName));
         }
         catch (CCFileFormatException ex)
         {
@@ -347,6 +371,18 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         try
         {
             return getSurface(hashFileName(fileName), pal);
+        }
+        catch (CCFileFormatException ex)
+        {
+            throw CCFileFormatException.wrapWithFilename(ex, fileName);
+        }
+    }
+
+    public MaMThing getThing(String fileName, MaMPallet pal) throws CCFileFormatException
+    {
+        try
+        {
+            return getThing(hashFileName(fileName), pal);
         }
         catch (CCFileFormatException ex)
         {

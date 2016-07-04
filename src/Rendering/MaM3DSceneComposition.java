@@ -6,6 +6,7 @@ import javafx.util.Pair;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMSprite;
 import mamFiles.MaMSurface;
+import mamFiles.SpriteHelpers.RenderPosHelper;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -55,15 +56,18 @@ public class MaM3DSceneComposition implements ISceneComposition {
     }
 
     public synchronized void setGround(IRenderableGameObject ground) throws MaMGameException {
-        addRenderable(MaM3dScenePos.Ground.getRenderablePosition(), ground);
+        int depth = RenderPosHelper.getGlobalHelper().getDepth(RenderPosHelper.RenderableType.GROUND, 0);
+        addRenderable(MaM3dScenePos.Ground.getRenderablePosition().atDepth(depth), ground);
     }
 
     public synchronized void setSky(IRenderableGameObject sky) throws MaMGameException {
+        int depth = RenderPosHelper.getGlobalHelper().getDepth(RenderPosHelper.RenderableType.SKY, 0);
+
         IRenderableGameObject skyTop = IRenderableGameObject.fromImage(sky.getImage(0));
         IRenderableGameObject skyBottom = IRenderableGameObject.fromImage(sky.getImage(1));
 
-        addRenderable(MaM3dScenePos.TopHalfOfsky.getRenderablePosition(), skyTop);
-        addRenderable(MaM3dScenePos.BottomHalfOfsky.getRenderablePosition(), skyBottom);
+        addRenderable(MaM3dScenePos.TopHalfOfsky.getRenderablePosition().atDepth(depth), skyTop);
+        addRenderable(MaM3dScenePos.BottomHalfOfsky.getRenderablePosition().atDepth(depth), skyBottom);
     }
 
     public synchronized void addSurface(Point relativePos, MaMSurface surface) throws MaMGameException {
