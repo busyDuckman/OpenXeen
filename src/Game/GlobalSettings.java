@@ -36,4 +36,8 @@ public enum GlobalSettings
     public boolean isHUDDisabled() {
         return disableHUD;
     }
+
+    public boolean discoverFileNames() {
+        return true;
+    }
 }

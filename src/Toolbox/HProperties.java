@@ -1,6 +1,8 @@
 package Toolbox;
 
+import java.awt.*;
 import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * Created by duckman on 13/06/2016.
@@ -23,6 +25,9 @@ public class HProperties extends Properties
     final HProperties parent;
     final static String seperator = "\\";
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Constructors
+    //------------------------------------------------------------------------------------------------------------------
     public HProperties() {
         super();
         name = null;
@@ -35,6 +40,9 @@ public class HProperties extends Properties
         this.parent = parent;
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Getting and setting of properties and sections
+    //------------------------------------------------------------------------------------------------------------------
     public HProperties push(String subName)
     {
         if((subName != null) && (!subName.trim().isEmpty()))
@@ -64,9 +72,58 @@ public class HProperties extends Properties
         return super.setProperty(fullName(key), value);
     }
 
-    boolean isRoot() {return parent == null;}
+    //------------------------------------------------------------------------------------------------------------------
+    // Data collection helpers
+    //------------------------------------------------------------------------------------------------------------------
+    public  <T> void setArray(String key, T[] items, Function<T, String> toString)
+    {
+        setProperty(getCountKey(key), ""+items.length);
+        for (int i = 0; i < items.length; i++) {
+            T item = items[i];
+            String indexKey = getNthKey(key, i);
+            String value = toString.apply(item);
+            setProperty(indexKey, value);
+        }
+    }
 
-    String getFullName()
+    public  <T> T[] getArray(String key, Function<String, T> parse, Function<Integer, T[]> javaStupidArrayHack)
+    {
+        int len = Integer.parseInt(getProperty(getCountKey(key)));
+
+        T[] items = javaStupidArrayHack.apply(len);
+        for (int i = 0; i < items.length; i++) {
+            String indexKey = getNthKey(key, i);
+            String value = getProperty(indexKey, null);
+            items[i] = parse.apply(value);
+        }
+
+        return items;
+    }
+
+
+    private String getCountKey(String key) {
+        return key.trim() + "_COUNT";
+    }
+
+    private String getNthKey(String key, int i) {
+        // pad with 0's to keep ordering in text file
+        // start with _N so that _COUNT is first
+        String num = ""+i;
+        if(num.length() < 4)
+        {
+            num = "0000" + num;
+            num = num.substring(num.length() - 4);
+        }
+        return key.trim() + "_N" + num;
+    }
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Misc
+    //------------------------------------------------------------------------------------------------------------------
+    protected boolean isRoot() {return parent == null;}
+
+    protected String getFullName()
     {
         return (parent == null) ? name : (parent.getFullName() + seperator + name);
     }

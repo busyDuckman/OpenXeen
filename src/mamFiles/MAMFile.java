@@ -1,5 +1,6 @@
 package mamFiles;
 
+import Rendering.IRenderableGameObject;
 import Toolbox.HProperties;
 import Toolbox.IHasProperties;
 

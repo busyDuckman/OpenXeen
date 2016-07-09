@@ -1,6 +1,10 @@
 package GameMechanics.Adventurers;
 
+import Game.Attacks.IAttack;
+import Game.IAttackable;
+import Game.IUpdateable;
 import Game.MaMActions;
+import Game.Map.MaMWorld;
 import GameMechanics.Equipment.*;
 import GameMechanics.Inventory;
 import GameMechanics.Stat;
@@ -16,7 +20,7 @@ import java.util.List;
  *
  *
  */
-public class Adventurer
+public class Adventurer implements IUpdateable, IAttackable
 {
 
     //As a reference http://xeen.wikia.com/wiki/CharacterStruct
@@ -135,14 +139,14 @@ public class Adventurer
      *  -adjust sickness etc
      *  -regen spell points
      */
-    void updateChar()
-    {
+    @Override
+    public void update(MaMWorld world) {
 
     }
 
-    public void copThis()
-    {
-    }
+    @Override
+    public void copThis(IAttack attack) {
 
+    }
 
 }

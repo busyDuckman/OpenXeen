@@ -2,8 +2,10 @@ package mamFiles;
 
 import Rendering.AnimationSettings;
 import Rendering.IRenderableGameObject;
+import Toolbox.Direction;
 import Toolbox.HProperties;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -15,7 +17,7 @@ import java.awt.image.BufferedImage;
  * This surface class is kept abstract. WoXSurface deals with paint by area
  * surfaces, I also envision perspective transform surfaces being a possibility.
  */
-public abstract class MaMSurface extends MAMFile implements Rendering.IRelativeToLocationSprite
+public abstract class MaMSurface extends MAMFile implements Rendering.IRelativeToLocationOverlay
 {
     protected final static int[] viewWidthLut = {3,5,7,7};
     protected final static int[] ySumLut = {0,3,8,15};
@@ -34,6 +36,9 @@ public abstract class MaMSurface extends MAMFile implements Rendering.IRelativeT
     }
 
     protected abstract BufferedImage compileToOneImage(MaMSprite mamStyleSprite);
+
+
+
 
 //    @Override
 //    public BufferedImage getImage(Point mapPosRelative, int frame)
@@ -96,5 +101,9 @@ public abstract class MaMSurface extends MAMFile implements Rendering.IRelativeT
         groundSurface.asIHasPropertiesObject().getProperties(p);
         p = p.pop();
         return super.getProperties(p);
+    }
+
+    public IRenderableGameObject getSurfaceOverlay(Point point) {
+        return this.getSurfaceOverlay(point, Direction.UP);
     }
 }

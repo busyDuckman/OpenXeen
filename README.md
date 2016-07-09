@@ -12,6 +12,10 @@ It is not yet playable, **Check back around the end of 2016 If you want to see a
 Resources:
   - Wiki: [here](https://github.com/busyDuckman/OpenXeen/wiki)
   - Development Blog: [here](https://github.com/busyDuckman/OpenXeen/wiki/A-Development-BLOG-(in-screenshots))
+  - State of openXeen [features](https://github.com/busyDuckman/OpenXeen/wiki/Features)
+  - Interested in [contributing](https://github.com/busyDuckman/OpenXeen/wiki/Contributing)
+  - Xeen development related [links](https://github.com/busyDuckman/OpenXeen/wiki/Xeen-related-links)
+  - My [blog](http://busyducks.com/)
 
 Unfortunately, MaM is not abandonware - you (still) need to purchase a copy to play the full version of WOX legally.
 This mod aims to bundle the shareware version, but I recommend finding a full CD (talkie) version on ebay.

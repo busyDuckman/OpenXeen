@@ -14,10 +14,12 @@ import Rendering.*;
 import Toolbox.*;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
+import mamFiles.SpriteHelpers.RenderPosHelper;
 import mamFiles.WOX.WOXSurface;
 import mamFiles.WOX.WOXccFileReader;
 import org.joda.time.DateTime;
 import static Toolbox.PointHelper.*;
+import static mamFiles.SpriteHelpers.RenderPosHelper.RenderableType;
 
 import java.awt.*;
 import java.util.*;
@@ -215,22 +217,7 @@ public class MaMGame implements IMaMGame
             //view.addMonster(new Point(100,0), mon);
 
             view.setGround(world.getOutdoorEnvironmentSet(0).getGround());
-            //.getSprite("CAVE.GND"));
             view.setSky(world.getOutdoorEnvironmentSet(0).getSky());
-
-            //MaMSurface surf = world.getCcFile().getSurface("DESERT.SRF");
-
-//            surf = world.getCcFile().getSurface("LAVA.SRF");
-//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), ((WOXSurface)surf).getSurfaceOverlay(null));
-//
-//
-//            surf = world.getCcFile().getSurface("TFLR.SRF");
-//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,0)));
-//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,1)));
-//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,2)));
-//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,3)));
-//            view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surf.getSurfaceOverlay(new Point(0,4)));
-
 
             //render the current view
             IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
@@ -240,6 +227,8 @@ public class MaMGame implements IMaMGame
             {
                 for(int vsX=-9; vsX<9; vsX++)
                 {
+                    Point vsPos = new Point(vsX, vsY);
+
                     //vsY steps forward
                     Point fwd = new Point(vsY * viewNormal.x, vsY * viewNormal.y);
 
@@ -250,7 +239,7 @@ public class MaMGame implements IMaMGame
                     int xPos = partyPos.x + fwd.x + right.x;
                     int yPos = partyPos.y + fwd.y + right.y;
 
-                    //render item at xPos, yPos  to xsX, vsY
+                    //render tile at xPos, yPos  to xsX, vsY
                     if(map.isValidLocation(xPos, yPos))
                     {
                         MaMTile tile =  map.get(xPos, yPos);
@@ -260,13 +249,25 @@ public class MaMGame implements IMaMGame
                         if(surf != null)
                         {
 
-                            IRenderableGameObject surfaceLayer = surf.getSurfaceOverlay(new Point(vsX, vsY));
+                            IRenderableGameObject surfaceLayer = surf.getSurfaceOverlay(vsPos);
 
                             if(surfaceLayer != null)
                             {
                                 // surfaceLayer is null if not renderable on screen, as the view sweep
-                                // we make is deliberately too large so this is normal.
-                                view.addRenderable(new RenderablePos(8, 67, 1.0, 3), surfaceLayer);
+                                // is deliberately too large,  this is normal.
+                                int surfaceDepth = RenderPosHelper.getGlobalHelper().getDepth(RenderableType.SURFACE, vsY);
+                                view.addRenderable(new RenderablePos(8, 67, 1.0, surfaceDepth), surfaceLayer);
+                            }
+                        }
+
+                        int environNum = tile.getIndexMiddle();
+                        IRenderableGameObject envobject = world.getOutdoorEnvironmentSet(0).getEnviron(environNum, 1);
+                        if(envobject != null)
+                        {
+                            RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorEnvPos(vsPos);
+                            if(spPos != null)
+                            {
+                                view.addRenderable(spPos, envobject);
                             }
                         }
                     }
@@ -303,9 +304,8 @@ public class MaMGame implements IMaMGame
                     int wsY = y + mapY;
 
                     //tile info
-                    //Grid<MaMTile> grid = maze.getMap();
-                    MaMTile t = mazeView.get(wsX, wsY);
-                    if(t==null)
+                    MaMTile tile = mazeView.get(wsX, wsY);
+                    if(tile==null)
                     {
                         continue;
                     }
@@ -313,7 +313,7 @@ public class MaMGame implements IMaMGame
                     RenderablePos tilePos = new RenderablePos(x*8, y*8, 1.0, RenderablePos.ScalePosition.TopLeft, 0);
 
                     //ground
-                    int groundTile = t.getIndexBase();
+                    int groundTile = tile.getIndexBase();
                     IRenderableGameObject tileSprite = maze.getEnvironmentSet().getMapTile(groundTile);
                     scene.addRenderable(tilePos, tileSprite);
 
@@ -321,7 +321,7 @@ public class MaMGame implements IMaMGame
                     {
                         //environ
                         tilePos = tilePos.above();
-                        int environIndex = t.getIndexMiddle();
+                        int environIndex = tile.getIndexMiddle();
                         IRenderableGameObject environSprite = ((IMaMOutdoorEnvironmentSet)maze.getEnvironmentSet())
                                                                 .getMapEnviron(environIndex);
 
@@ -333,7 +333,7 @@ public class MaMGame implements IMaMGame
 
                     //objects
                     tilePos = tilePos.above();
-                    int objectIndex = t.getIndexTop();
+                    int objectIndex = tile.getIndexTop();
                     IRenderableGameObject overlaySprite = maze.getEnvironmentSet().getMapObject(objectIndex);
                     if(objectIndex != 0)
                     {
@@ -350,7 +350,7 @@ public class MaMGame implements IMaMGame
                     if(GlobalSettings.INSTANCE.debugMode())
                     {
                         tilePos = tilePos.above();
-                        //scene.addRenderable(tilePos, IRenderableGameObject.fromText("" + objectIndex, Color.BLUE, 8, 8));
+                        //scene.addRenderable(tilePos, IRenderableGameObject.fromText("" + groundTile, Color.BLUE, 8, 8));
 
                     }
                     i++;
@@ -365,7 +365,6 @@ public class MaMGame implements IMaMGame
     public MaM2DMapComposition renderWizardEyeView(int width, int height) {
         int x = partyPos.x - (width  / 2);
         int y = partyPos.y - (height / 2);
-        //Grid<MaMTile> map = world.getCurrentMaze().getMap();
         IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
 
         //clamp x and y so we are not rendering off the map.

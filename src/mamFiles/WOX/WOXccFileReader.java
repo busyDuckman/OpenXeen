@@ -5,6 +5,7 @@ import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
 import Toolbox.BinaryHelpers;
 import Toolbox.FileHelpers;
+import Toolbox.Tag;
 import mamFiles.*;
 
 import java.io.FileNotFoundException;
@@ -12,9 +13,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static Toolbox.BinaryHelpers.*;
 
@@ -35,7 +39,7 @@ public class WOXccFileReader extends MaMCCFileReader
         CLOUDS_CC ("MM4.PAL", WoXWorld.WoxVariant.CLOUDS),
         CLOUDS_DAT (null, WoXWorld.WoxVariant.CLOUDS),
         CLOUDS_SAV (null, WoXWorld.WoxVariant.CLOUDS),
-        UNKNOWN (null, WoXWorld.WoxVariant.UNKNOWN);
+        UNKNOWN ("MM3.PAL", WoXWorld.WoxVariant.UNKNOWN);
 
         String defaultPallate;
         WoXWorld.WoxVariant woxVariant;
@@ -106,6 +110,11 @@ public class WOXccFileReader extends MaMCCFileReader
             //parse known files
             ccFile.loadKnownFiles(filePath);
 
+            if (GlobalSettings.INSTANCE.discoverFileNames())
+            {
+                doFileDiscovery(ccFile);
+            }
+
             //generate local copies
             if(GlobalSettings.INSTANCE.rebuildProxies())
             {
@@ -130,6 +139,28 @@ public class WOXccFileReader extends MaMCCFileReader
             return null;
         }
 
+    }
+
+    protected static void doFileDiscovery(WOXccFileReader ccFile) {
+        //unknown id's
+        int[] unknownIDs = Arrays.stream(ccFile.tocEntries)
+                .filter(E -> !ccFile.knownFileNames.containsKey(E.ID))
+                .mapToInt(E -> E.ID)
+                .toArray();
+
+        //find possible file names
+        Map<Integer, List<String>> names = discoverNames(unknownIDs, ccFile::hashFileName);
+
+        //display and store results
+        for (Map.Entry<Integer, List<String>> entry : names.entrySet()) {
+            System.out.println("Matched id: " + entry.getKey() +", " + entry.getValue().size() + " match(es).");
+            for (String possibleName : entry.getValue()) {
+                System.out.println("\t" + entry.getKey() + ", " + possibleName);
+            }
+
+            //put most likely name in known file list
+            ccFile.knownFileNames.put(entry.getKey(), entry.getValue().get(0));
+        }
     }
 
     protected static WoXCCVariant getVariant(String path)
@@ -195,6 +226,10 @@ public class WOXccFileReader extends MaMCCFileReader
             {
                 throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " points to position beyond end of cc file.");
             }
+            if((toc.offset+toc.length) > fileSize)
+            {
+                throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " goes beyond end of cc file.");
+            }
 
             tocEntries[i] = toc;
         }
@@ -233,13 +268,16 @@ public class WOXccFileReader extends MaMCCFileReader
     @Override
     protected void decrypt(byte[] data)
     {
-        if(variant == WoXCCVariant.DARK_CUR)
+        switch (variant)
         {
-            return;
-        }
-        for (int i = 0; i < data.length; i++)
-        {
-            data[i] = (byte)((data[i] ^ 0x35) & 0xff);
+            case DARK_CUR:
+            case UNKNOWN:
+                break;
+            default:
+                for (int i = 0; i < data.length; i++)
+                {
+                    data[i] = (byte)((data[i] ^ 0x35) & 0xff);
+                }
         }
     }
 
@@ -261,6 +299,11 @@ public class WOXccFileReader extends MaMCCFileReader
     }
 
     @Override
+    protected MaMThing __getThing(int id, MaMPallet pal) throws CCFileFormatException {
+        return new WoXThing(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
+    }
+
+    @Override
     protected MaMMazeFile __getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException {
         return new WOXMazeFile(mazeID, MAMFile.generateKeyFromCCFile(id, this), world);
     }
@@ -277,7 +320,7 @@ public class WOXccFileReader extends MaMCCFileReader
         }
         catch (Exception ex)
         {
-            if(!inForceDiscovery())
+            if(!inForceDiscoveryMode())
             {
                 System.out.println("Problem getting pallate, using standard.");
             }

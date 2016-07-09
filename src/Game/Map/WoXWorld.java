@@ -112,7 +112,15 @@ public class WoXWorld extends MaMWorld
 
     @Override
     protected MaMPallet getDefaultPallate() throws CCFileFormatException {
-        return ccFileWox().getPallet(ccFileWox().getVariant().getDefaultPallate());
+        try
+        {
+            return ccFileWox().getPallet(ccFileWox().getVariant().getDefaultPallate());
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Problem getting default pallate [getDefaultPallate()], using standard.");
+            return MaMPallet.getDefaultMaMPallate();
+        }
     }
 
     public WOXccFileReader getCCFileCur() {
