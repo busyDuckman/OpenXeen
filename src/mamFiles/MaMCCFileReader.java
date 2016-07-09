@@ -4,12 +4,15 @@ import Game.Map.MaMWorld;
 import Game.Monsters.MaMMonster;
 import Toolbox.FileHelpers;
 import Toolbox.IValidatable;
+import com.sun.xml.internal.ws.util.StringUtils;
 import mamFiles.WOX.WOXSpriteFile;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Created by duckman on 3/05/2016.
@@ -556,6 +559,8 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
 
     public void loadKnownFiles(String filePath)
     {
+        knownFileNames = new HashMap<>();
+
         //find a matcching csv and pars out the file names
         Path path = Paths.get(filePath + ".csv");
         if(FileHelpers.fileExists(path))
@@ -566,7 +571,6 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                                     .filter(s -> s != null)
                                     .toArray(size -> new String[size]);
 
-            knownFileNames = new HashMap<>();
             Arrays.stream(fileNameList).forEach(f -> knownFileNames.put(hashFileName(f), f));
 
 
@@ -628,9 +632,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                     mamFile = forceDiscovery(id, fileName, mamFile);
                 }
 
-
                 //-------------------------------
-
                 //get file name for proxy
                 String proxyFileName = getProxyFilePath(fileName, mamFile);
 
@@ -787,12 +789,64 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         return "!!!" + fileName + "@" + this.name + "!!![error reading file]";
     }
 
-    protected boolean inForceDiscovery()
+    /**
+     * Returns true if we are in forceDiscoveryMode
+     * Used to supress un-necessary warnings etc.
+     */
+    protected boolean inForceDiscoveryMode()
     {
         //TODO: Nasty hack
         return Arrays.stream(Thread.currentThread()
                 .getStackTrace())
                 .map(StackTraceElement::getMethodName)
                 .anyMatch(S -> S.contains("forceDiscovery"));
+    }
+
+    /**
+     * find a workable name for a given file.
+     */
+    public static Map<Integer, List<String>> discoverNames(int[] idList, Function<String, Integer> hash) {
+        //setup dictionaries
+        final String[] extensions = new String[] {"", "0BJ", "AD", "ADM", "ADS", "MUS", "SND", "ATT", "BIN", "BRD", "BUF", "DAT", "DRV", "EG2", "END", "FAC", "FNT", "FRM", "FWL", "GND", "HED", "ICN", "INT", "M", "MID", "MON", "NUL", "OBJ", "OUT", "PAL", "PIC", "RAW", "SKY", "SRF", "SWL", "TIL", "TWN", "TXT", "VGA", "VOC", "WAL", "XEN", "ZOM"};
+        final String[] names = new String[] {"", "CREDITS", "FILE", "NOTES", "K", "CLOUDS", "DARKPIC", "XEENPIC", "TIMER", "FSCFI", "MAZE", "MAZEX", "CHOOSE", "DETECTMN", "KLUDGE", "TITLEA", "TITLEC", "TITLED", "TITLEE", "TITLEF", "TITLEG", "TITLEH", "TITLEI", "CAVERNA", "CSTLREV", "DAYDESRT", "DNGON", "NEWBRIGH", "OUTNGHT", "TOWNDAY", "TWNNITEA", "TWNNITEB", "TWNWLK", "TITLEB", "WORLD", "CLOUD", "CROAD", "DESERT", "DIRT", "DWATER", "LAVA", "ROAD", "SCORTCH", "SEWER", "SNOW", "SPACE", "SWAMP", "TFLR", "SSCFI", "SCFI", "AAZEX", "DARKMIRR", "DARKX", "XEENMIRR", "AIRMON", "ALIEN", "BARBARCH", "BRANCH", "CENTI", "CLERIC", "COME", "DISINT", "DRAGMUM", "EARTHMON", "ELECT", "ENTER", "EYEBALL", "GDLUCK", "GIANT", "GO", "GOBLIN", "GOIN", "GREMLIN", "GREMLINK", "GTLOST", "HELP", "HOWDID", "HYDRA", "IGUANA", "INSECT", "KEY", "KNIGHT", "LAFF", "LICH", "MUMMY", "NEEDKEY", "OK", "PARROT", "PASS", "PRTYGD", "RAT", "SABER", "SAND", "SCREECH", "SEE", "SKULL", "SPIT", "THANKS", "THIEF", "TROLL", "VAMP", "VULTURE", "WOLF", "YOUTRN", "DMOUNT", "DSNOTREE", "files", "GRASS", "MAE", "SPELLS", "null", "EG_files", "INT_files", "CUBE", "HANDS", "SCL", "SCM", "SCN", "STAFF", "DISK", "DISKA", "DISKB", "DISKC", "DISKD", "DISKE", "SCXA", "SCXB", "SCA", "SCB", "SCC", "SCD", "SCE", "SCF", "SCG", "SCH", "SCI", "SCJ", "SCK", "CLAW", "DARKLORD", "FIZZLE", "GOON", "PYRATOP", "TITLE", "WFIRE", "WIZARD", "WIZMTH", "NWBLKSMT", "OUTDAY", "SF", "WHITE", "BALL", "BIRD", "DROP", "EGPRT", "EG", "END", "FIREMAIN", "FLY", "FOURA", "MAINBACK", "NWC", "PYRAMID", "SC", "SCENE-B", "SCENE-", "SCENE", "SKYMAIN", "TABLMAIN", "TWRSKY", "ADMIT", "ALAMAR", "CLICK", "COMET", "CORAK", "DOOR", "DREAMS", "ELLINGER", "EXPLOSIO", "FAIL", "FIGHT", "GASCOMPR", "IDO", "NORDO", "NOWRE", "PADSPELL", "PHAROHC", "PHAROHD", "PHAROHE", "PHAROHW", "PHAROHT", "PHAROH", "PHAROHA", "PHAROHB", "QUEEN", "QUEENHIS", "READY", "RUMBLE", "THUD", "VINE", "WHAT", "WINDSTOR", "YES", "FNT", "FILE_", "QNOTES", "SPECIAL", "SPLDESC", "VIEWTEXT", "FECP", "BIGSKY", "CASB", "DARKLRD", "ENDTEXT", "KINGCORD", "MIRRBACK", "PEOPLE", "ROOM", "CHAR", "DSE", "FACE", "FRAME", "PREC", "VORT", "FCAVE", "FCSTL", "FDUNG", "FTOWN", "FTOWR", "AWARD", "BLESS", "BORDER", "BUY", "CAST", "CHARPOW", "CHOICE", "COMBAT", "CONFIRM", "CPANEL", "ELEMENT", "EQUIP", "ESC", "GLOBAL", "HPBARS", "ITEMS", "LLOYDS", "MAIN", "MOUSE", "QUEST", "RESTOREX", "SCROLL", "SPELLFX", "START", "TRAIN", "VIEW", "BANK", "BIGTHEME", "CANTHEME", "CASTLE", "CAVERN", "DUNGEON", "GROUNDS", "INN", "MMTHEME", "OUTDOORS", "SMITH", "TAVERN", "TEMPLE", "WATER", "ENDGAME", "MIRROR", "MM", "MME", "BACK", "BLANK", "CREATE", "JVC", "LATER", "LOGOBAK", "MIROR-S", "THRONE", "NIGHT", "SKY", "SCAVE", "SCSTL", "SDUNG", "STOWN", "STOWR", "CAVE", "CSTL", "DUNG", "OUTDOOR", "TOWN", "TOWR", "BLCK", "BNKR", "GILD", "TMPL", "TRNG", "TVRN", "AAZE", "BOX", "DEATH", "DICE", "FREAP", "GOLMBACK", "GROUP", "GROUPO", "HAND", "INTRO", "LAKE", "LOGO", "MARB", "STARS", "TOWER", "WIZTOWER", "WIZTWER", "AHH", "BANG", "BANKER", "BARKL", "BAT", "BEAM", "BEGGER", "BLEAGH", "BLOB", "BOLTELEC", "BONG", "BOOM", "BOW", "COINA", "CRASHA", "CRODOA", "CRODOB", "CRODOC", "CRODO", "DARK", "DARKLAFF", "DRAGON", "DWARF", "ELECBOLT", "ELECSPEL", "ELECTRIC", "EXPLODE", "FIRE", "FX", "FXA", "GARGRWL", "GAZONG", "GHOUL", "GLEEN", "GOLEM", "GOODBYE", "GUILD", "GULP", "HARPY", "HELLO", "HISS", "HIT", "HUAH", "IAMKING", "INSECTS", "KING", "LAFFD", "MAYWE", "MEANGRO&", "MISS", "MONSTERA", "MONSTERB", "NOISE", "NULL", "NYAAHH", "OGRE", "OOH", "ORC", "PHANTOM", "PHOTON", "POP", "POW", "PUNCHOOH", "REAPER", "RIBBIT", "ROC", "SCORPION", "SCREAM", "SIKTROLL", "SKELETON", "SLIME", "SLIMEBOS", "SNAKEMAN", "SPELL", "SPHINX", "SPLASH", "SPRITE", "STONEGOL", "SWIPE", "THANKYOU", "TIGER", "TIGER&", "TRAININ", "TRAINING", "TREE", "UNNH", "WEB", "WHAA-KEE", "WHADDAYO", "WHERETO", "WHIP", "WHOOSH", "WINDBLOW", "XEEN", "XEENLAFF", "YA", "YAA", "ZOMBIE", "ZONGA", "DEDLTREE", "DTREE", "LAVAMNT", "LTREE", "MOUNT", "PALM", "SNOMNT", "SNOTREE", "ADMUS", "ADSND", "BLASTMUS", "BLASTSND", "CANMUS", "COVSND", "CPSTRUCT", "IBMMUS", "IBMSND", "NULLMUS", "NULLSND", "PROMUS", "PROSND", "ROLMUS", "SOURCE", "SPECMUS", "SPECSND"};
+
+        //TODO: sort dictionaries by their likelihood, so that matches come out in a sensible order
+
+        final List<String> numbers = new ArrayList<>();
+        numbers.add("");
+        for(int i=0; i<2; i++)
+        {
+            numbers.add(""+i);
+            numbers.add("0"+i);
+            if(i<100) {
+                numbers.add("00"+i);
+            }
+        }
+
+        //setup a fastish' int hash mane
+        //Set<Integer> = new HashSet
+        final Map<Integer, List<String>> idMap = new HashMap<>(idList.length);
+        Arrays.stream(idList).forEach(I -> idMap.put(I, new ArrayList<>()));
+
+        //brute force
+        for (String name : names) {
+            for (String extension : extensions) {
+                numbers.parallelStream()
+                        .map(N -> name+N+"."+extension)
+                        .filter(S -> S.length() <= 12)
+                        .filter(S -> idMap.containsKey(hash.apply(S)))
+                        .forEach(S -> idMap.get(hash.apply(S)).add(S));
+            }
+        }
+
+        //remove entries with no match
+        final Map<Integer, List<String>> idMap2 = new HashMap<>();
+        idMap.entrySet()
+                .stream()
+                .filter(E -> E.getValue().size() > 0)
+                .forEach(N -> idMap2.put(N.getKey(), N.getValue()));
+
+        //done
+        return idMap2;
     }
 }

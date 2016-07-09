@@ -23,6 +23,7 @@ public class Main
             //Create game
             //game = new MaMGame("xeen.cc");
             game = new MaMGame("dark.cc");
+            //game = new MaMGame("mm3.cc");
 
             //Create a renderer for the game (renderer is embedded in a JPanel)
             MaMPanel window = new MaMPanel(game);

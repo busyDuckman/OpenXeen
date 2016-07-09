@@ -1,6 +1,9 @@
 package mamFiles.SpriteHelpers;
 
 import Rendering.RenderablePos;
+import Toolbox.HProperties;
+import Toolbox.IHasProperties;
+import Toolbox.ParseHelpers;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -19,7 +22,7 @@ import java.util.Map;
  *
  * Start with the base for distance away and then add the item distnce modifier
  */
-public class RenderPosHelper
+public class RenderPosHelper implements IHasProperties
 {
     private static RenderPosHelper globalHelper = new RenderPosHelper();
 
@@ -246,5 +249,23 @@ public class RenderPosHelper
             return outdoorEnvironmentPlacements[index];
         }
         return null;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // IHasProperties
+    //------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public boolean getProperties(HProperties p)
+    {
+        surfacePositions = p.getArray("surfacePositions", ParseHelpers::parsePointOrNull, Point[]::new);
+        return true;
+    }
+
+    @Override
+    public boolean setProperties(HProperties p)
+    {
+        p.setArray("surfacePositions", surfacePositions, ParseHelpers::pointToString);
+        return true;
     }
 }

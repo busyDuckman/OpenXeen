@@ -5,5 +5,15 @@ package Toolbox;
  */
 public class Misc
 {
-
+    /**
+     * I like
+     *   name = ifNull(someFunctionCall(), "bob")
+     * not
+     *    name = someFunctionCall();
+     *    name = (name != null) ? name : "bob";
+     */
+    public static <T> T ifNull(T what, T ifNull)
+    {
+        return (what == null) ? ifNull : what;
+    }
 }
