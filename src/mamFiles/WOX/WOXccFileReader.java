@@ -1,26 +1,15 @@
 package mamFiles.WOX;
 
-import Game.GlobalSettings;
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
-import Toolbox.BinaryHelpers;
 import Toolbox.FileHelpers;
-import Toolbox.Tag;
 import mamFiles.*;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static Toolbox.BinaryHelpers.*;
 
 /**
  * Created by duckman on 7/05/2016.
@@ -82,85 +71,10 @@ public class WOXccFileReader extends MaMCCFileReader
 
         //create cc file reader.
         WOXccFileReader ccFile = new WOXccFileReader(name, getVariant(filePath));
-        try
-        {
-            //Open the file stream
-            ccFile.fileStream = new RandomAccessFile(filePath, "r");
-            RandomAccessFile fs = ccFile.fileStream;
-            int fileSize = (int)fs.getChannel().size();
 
-            //read and validate number of files
-            ccFile.numberOfFiles = fs.read() | (fs.read() << 8);
-            if(ccFile.numberOfFiles < 0)
-            {
-                throw CCFileFormatException.fromBadHeader(ccFile, "Invalid number of files in cc file (" + ccFile.numberOfFiles + ")");
-            }
+        ccFile.parseTocAndLoadFiles();
 
-            //read and decrypt file header
-            int tocLen = ccFile.numberOfFiles * 8;
-            byte[] rawToc = new byte[tocLen];
-            int readLen = fs.read(rawToc, 0, tocLen);
-            if(readLen != tocLen)
-            {
-                throw CCFileFormatException.fromBadReadLength(ccFile, readLen, tocLen);
-            }
-            ccFile.seekDataBegin = tocLen + 2;
-            ccFile.createTocFromEncryptedHeader(rawToc, ccFile.numberOfFiles, fileSize);
-
-            //parse known files
-            ccFile.loadKnownFiles(filePath);
-
-            if (GlobalSettings.INSTANCE.discoverFileNames())
-            {
-                doFileDiscovery(ccFile);
-            }
-
-            //generate local copies
-            if(GlobalSettings.INSTANCE.rebuildProxies())
-            {
-                ccFile.makeProxiesOfAllEntries();
-            }
-
-            //done
-            return ccFile;
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-            ccFile.close();
-            return null;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            ccFile.close();
-            return null;
-        } catch (CCFileFormatException e) {
-            e.printStackTrace();
-            ccFile.close();
-            return null;
-        }
-
-    }
-
-    protected static void doFileDiscovery(WOXccFileReader ccFile) {
-        //unknown id's
-        int[] unknownIDs = Arrays.stream(ccFile.tocEntries)
-                .filter(E -> !ccFile.knownFileNames.containsKey(E.ID))
-                .mapToInt(E -> E.ID)
-                .toArray();
-
-        //find possible file names
-        Map<Integer, List<String>> names = discoverNames(unknownIDs, ccFile::hashFileName);
-
-        //display and store results
-        for (Map.Entry<Integer, List<String>> entry : names.entrySet()) {
-            System.out.println("Matched id: " + entry.getKey() +", " + entry.getValue().size() + " match(es).");
-            for (String possibleName : entry.getValue()) {
-                System.out.println("\t" + entry.getKey() + ", " + possibleName);
-            }
-
-            //put most likely name in known file list
-            ccFile.knownFileNames.put(entry.getKey(), entry.getValue().get(0));
-        }
+        return ccFile;
     }
 
     protected static WoXCCVariant getVariant(String path)
@@ -178,8 +92,8 @@ public class WOXccFileReader extends MaMCCFileReader
 
         WoXCCVariant var = patterns.entrySet().stream()
                 .filter(P -> Pattern.compile(P.getKey(), Pattern.CASE_INSENSITIVE)
-                                    .matcher(FileHelpers.getFileName(path))
-                                    .matches())
+                        .matcher(FileHelpers.getFileName(path))
+                        .matches())
                 .map(Map.Entry::getValue)
                 .findFirst()
                 .orElse(WoXCCVariant.UNKNOWN);
@@ -187,126 +101,54 @@ public class WOXccFileReader extends MaMCCFileReader
         return var;
     }
 
-    protected void createTocFromEncryptedHeader(byte[] rawToc, int numberOfFiles, int fileSize) throws CCFileFormatException
-    {
-        tocEntries = new CCFileTocEntry[numberOfFiles];
-
-        //decrypt
-        int ah = 0xac;
-        for (int i = 0; i < rawToc.length; i++)
-        {
-            int r = rawToc[i] & 0xff;
-
-            //rawToc[i] = UnsignedBytes.saturatedCast(((r << 2 | r >> 6) + ah) & 0xff);
-            //rawToc[i] = (byte)(((rawToc[i] << 2 | rawToc[i] >> 6) + ah) & 0xff);
-            int lsl2 = (r << 2) & 0xff;
-
-            rawToc[i] = (byte)(((lsl2 | (r >> 6)) + ah) & 0xff);
-            ah += 0x67;
-        }
-
-
-        BinaryHelpers.DebugDumpBinary(rawToc, "Headers.last");
-
-        //parse
-        for(int i=0; i<numberOfFiles; i++)
-        {
-            CCFileTocEntry toc = new CCFileTocEntry();
-            int offset = i * 8;
-            toc.ID = BYTES2INT_lsb(rawToc[offset], rawToc[offset + 1]);
-            toc.offset = BYTES2INT_lsb(rawToc[offset + 2], rawToc[offset + 3], rawToc[offset + 4]);
-            toc.length = BYTES2INT_lsb(rawToc[offset+5], rawToc[offset + 6]);
-            toc.padding = rawToc[offset+7];
-
-            if(!toc.isValid())
-            {
-                throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " is invalid (" + toc.toString() + ")");
-            }
-            if(toc.offset > fileSize)
-            {
-                throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " points to position beyond end of cc file.");
-            }
-            if((toc.offset+toc.length) > fileSize)
-            {
-                throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " goes beyond end of cc file.");
-            }
-
-            tocEntries[i] = toc;
-        }
-    }
-
     @Override
-    protected int hashFileName(String name)
-    {
-        return _hashFileName(name);
-    }
-
-    static int _hashFileName(String name)
-    {
-        return _hashFileName(name.toCharArray());
-    }
-
-    static int _hashFileName(char[] name)
-    {
-        int i, h;
-
-        if( name.length < 1 ) return( -1 );
-
-        for( i = 1, h = name[0] ; i < name.length ; h += name[i++] )
-        {
-            // Rotate the bits in 'h' right 7 places
-            // In assembly it would be: ror h, 7
-            // 01234567 89ABCDEF -> 9ABCDEF0 12345678
-            // 0x007F = 00000000 01111111
-            // 0xFF80 = 11111111 10000000
-            h = (( h & 0x007F ) << 9) | (( h & 0xFF80 ) >> 7);
-        }
-
-        return( h );
-    }
-
-    @Override
-    protected void decrypt(byte[] data)
+    protected byte[] extractFileFromRawCCData(byte[] data)
     {
         switch (variant)
         {
             case DARK_CUR:
             case UNKNOWN:
-                break;
+                return data;
             default:
+                byte[] decrypt = new byte[data.length];
                 for (int i = 0; i < data.length; i++)
                 {
-                    data[i] = (byte)((data[i] ^ 0x35) & 0xff);
+                    decrypt[i] = (byte)((data[i] ^ 0x35) & 0xff);
                 }
+                return decrypt;
         }
     }
 
     @Override
-    protected MaMSprite __getSprite(int id, MaMPallet pal) throws CCFileFormatException
-    {
-        return new WOXSpriteFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
+    protected MaMSprite decodeSprite(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
+        return new WOXSpriteFile(name, key, data, pal);
     }
 
     @Override
-    protected MaMPallet __getPallet(int id) throws CCFileFormatException
-    {
-        return new WOXPallet(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
+    protected MaMPallet decodePallet(String name, String key, byte[] data) throws CCFileFormatException {
+        return new WOXPallet(name, key, data);
     }
 
     @Override
-    protected MaMSurface __getSurface(int id, MaMPallet pal) throws CCFileFormatException {
-        return new WOXSurface(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
+    protected MaMSurface decodeSurface(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
+        return new WOXSurface(name, key, data, pal);
     }
 
     @Override
-    protected MaMThing __getThing(int id, MaMPallet pal) throws CCFileFormatException {
-        return new WoXThing(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
+    protected MaMThing decodeThing(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
+        return new WoXThing(name, key, data, pal);
     }
 
     @Override
-    protected MaMMazeFile __getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException {
-        return new WOXMazeFile(mazeID, MAMFile.generateKeyFromCCFile(id, this), world);
+    protected MaMMazeFile decodeMapFile(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException {
+        return new WOXMazeFile(mazeID, key, world);
     }
+
+
+//    @Override
+//    protected MaMMazeFile __getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException {
+//        return new WOXMazeFile(mazeID, MAMFile.generateKeyFromCCFile(id, this), world);
+//    }
 
     //-------------------------------------------------------------------------------------------------
     // Pallet helpers

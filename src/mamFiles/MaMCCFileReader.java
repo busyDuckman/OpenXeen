@@ -1,18 +1,20 @@
 package mamFiles;
 
+import Game.GlobalSettings;
 import Game.Map.MaMWorld;
 import Game.Monsters.MaMMonster;
+import Toolbox.BinaryHelpers;
 import Toolbox.FileHelpers;
 import Toolbox.IValidatable;
-import com.sun.xml.internal.ws.util.StringUtils;
-import mamFiles.WOX.WOXSpriteFile;
+//import mamFiles.WOX.WOXSpriteFile;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
+
+import static Toolbox.BinaryHelpers.BYTES2INT_lsb;
 
 /**
  * Created by duckman on 3/05/2016.
@@ -61,7 +63,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                 byte[] data = new byte[length];
                 ccFile.fileStream.seek(offset);
                 ccFile.fileStream.read(data, 0, length);
-                ccFile.decrypt(data);
+                data = ccFile.extractFileFromRawCCData(data);
                 return data;
             }
             catch (IOException e)
@@ -97,94 +99,249 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     }
 
     //-------------------------------------------------------------------------------------------------
+    // Abstract members
+    //-------------------------------------------------------------------------------------------------
+
+    /**
+     * This method takes the raw bytes from the CC file entry and returns bytes
+     * that represent the file to be loaded.
+     * Typical operations:
+     *   - Decrypt data
+     *   - Decompress data
+     *   - Do nothing
+     * @param data byte[] as loaded from the cc file, of the exact length of the stored data.
+     */
+    protected abstract byte[] extractFileFromRawCCData(byte[] data) throws CCFileFormatException;
+
+    /**
+     * Keep ing track of the correct palate is a pinta.
+     * All resolution re correct palate comes back to this method.
+     */
+    public abstract MaMPallet getPalletForFile(int id) throws CCFileFormatException;
+
+    // -----------------------------------------------
+    // Decoding of files into game assets.
+    //
+
+    protected abstract MaMSprite   decodeSprite(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException;
+    protected abstract MaMPallet   decodePallet(String name, String key, byte[] data) throws CCFileFormatException;
+    protected abstract MaMSurface  decodeSurface(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException;
+    protected abstract MaMThing    decodeThing(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException;
+    protected abstract MaMMazeFile decodeMapFile(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException;
+
+    protected MaMRawImage decodeRawImage(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
+        return new MaMRawImage(name, key, data, pal);
+    }
+
+    protected MaMTextFile decodeText(String name, String key, byte[] data) throws CCFileFormatException {
+        return new MaMTextFile(name, key, data);
+    }
+
+    protected MAMVocFile decodeVoc(String name, String key, byte[] data) throws CCFileFormatException {
+        return new MAMVocFile(name, key, data);
+    }
+
+    protected MaMBinaryFile decodeBinaryFile(String name, String key, byte[] data) throws CCFileFormatException {
+        return new MaMBinaryFile(name, key, data);
+    }
+
+    //-------------------------------------------------------------------------------------------------
     // hash and decrypt
     //-------------------------------------------------------------------------------------------------
-    protected abstract int hashFileName(String name);
-    protected abstract void decrypt(byte[] data);
-
-    //-------------------------------------------------------------------------------------------------
-    // Actual file loading
-    //-------------------------------------------------------------------------------------------------
-    // A) THESE ARE THE ONLY FUNCTIONS TO EXTRACT FROM CC FILES.
-    // B) THEY ARE ONLY CALLED FROM A CACHE MISS
-
-    protected abstract MaMSprite __getSprite(int id, MaMPallet pal) throws CCFileFormatException;
-    protected abstract MaMPallet __getPallet(int id) throws CCFileFormatException;
-    protected abstract MaMSurface __getSurface(int id, MaMPallet pal) throws CCFileFormatException;
-    protected abstract MaMThing __getThing(int id, MaMPallet pal) throws CCFileFormatException;
-    protected MaMRawImage __getRawImage(int id, MaMPallet pal) throws CCFileFormatException
+    protected int hashFileName(String name)
     {
-        return new MaMRawImage(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id), pal);
-    }
-    protected abstract MaMMazeFile __getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException;
+        char[] _name = name.toCharArray();
+        int i, h;
 
-    protected MaMTextFile __getText(int id) throws CCFileFormatException
-    { return new MaMTextFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id)); }
+        if( _name.length < 1 ) return( -1 );
 
-    protected MAMVocFile __getVoc(int id) throws CCFileFormatException
-    {
-        return new MAMVocFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
+        for( i = 1, h = _name[0] ; i < _name.length ; h += _name[i++] )
+        {
+            // Rotate the bits in 'h' right 7 places
+            // In assembly it would be: ror h, 7
+            // 01234567 89ABCDEF -> 9ABCDEF0 12345678
+            // 0x007F = 00000000 01111111
+            // 0xFF80 = 11111111 10000000
+            h = (( h & 0x007F ) << 9) | (( h & 0xFF80 ) >> 7);
+        }
+
+        return( h );
     }
 
-    protected MaMBinaryFile __getMaMBinaryFile(int id) throws CCFileFormatException
+    //-------------------------------------------------------------------------------------------------
+    // TOC and files
+    //-------------------------------------------------------------------------------------------------
+    protected void parseTocAndLoadFiles()
     {
-        return new MaMBinaryFile(getNameForID(id), MAMFile.generateKeyFromCCFile(id, this), getFileRaw(id));
+        try
+        {
+            //Open the file stream
+            fileStream = new RandomAccessFile(filePath, "r");
+            RandomAccessFile fs = fileStream;
+            int fileSize = (int)fs.getChannel().size();
+
+            //read and validate number of files
+            numberOfFiles = fs.read() | (fs.read() << 8);
+            if(numberOfFiles < 0)
+            {
+                throw CCFileFormatException.fromBadHeader(this, "Invalid number of files in cc file (" + numberOfFiles + ")");
+            }
+
+            //read and decrypt file header
+            int tocLen = numberOfFiles * 8;
+            byte[] rawToc = new byte[tocLen];
+            int readLen = fs.read(rawToc, 0, tocLen);
+            if(readLen != tocLen)
+            {
+                throw CCFileFormatException.fromBadReadLength(this, readLen, tocLen);
+            }
+            seekDataBegin = tocLen + 2;
+            createTocFromEncryptedHeader(rawToc, this.numberOfFiles, fileSize);
+
+            //parse known files
+            loadKnownFiles(filePath);
+
+            if (GlobalSettings.INSTANCE.discoverFileNames())
+            {
+                doFileDiscovery(this);
+            }
+
+            //generate local copies
+            if(GlobalSettings.INSTANCE.rebuildProxies())
+            {
+                makeProxiesOfAllEntries();
+            }
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+            close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            close();
+        } catch (CCFileFormatException e) {
+            e.printStackTrace();
+            close();
+        }
     }
 
+    protected static void doFileDiscovery(MaMCCFileReader ccFile) {
+        //unknown id's
+        int[] unknownIDs = Arrays.stream(ccFile.tocEntries)
+                .filter(E -> !ccFile.knownFileNames.containsKey(E.ID))
+                .mapToInt(E -> E.ID)
+                .toArray();
 
-    //-------------------------------------------------------------------------------------------------
-    // Pallet helpers
-    //-------------------------------------------------------------------------------------------------
-    public abstract MaMPallet getPalletForFile(int id) throws CCFileFormatException;
+        //find possible file names
+        Map<Integer, List<String>> names = discoverNames(unknownIDs, ccFile::hashFileName);
+
+        //display and store results
+        for (Map.Entry<Integer, List<String>> entry : names.entrySet()) {
+            System.out.println("Matched id: " + entry.getKey() +", " + entry.getValue().size() + " match(es).");
+            for (String possibleName : entry.getValue()) {
+                System.out.println("\t" + entry.getKey() + ", " + possibleName);
+            }
+
+            //put most likely name in known file list
+            ccFile.knownFileNames.put(entry.getKey(), entry.getValue().get(0));
+        }
+    }
+
+    protected void createTocFromEncryptedHeader(byte[] rawToc, int numberOfFiles, int fileSize) throws CCFileFormatException
+    {
+        tocEntries = new CCFileTocEntry[numberOfFiles];
+
+        //decrypt
+        int ah = 0xac;
+        for (int i = 0; i < rawToc.length; i++)
+        {
+            int r = rawToc[i] & 0xff;
+
+            //rawToc[i] = UnsignedBytes.saturatedCast(((r << 2 | r >> 6) + ah) & 0xff);
+            //rawToc[i] = (byte)(((rawToc[i] << 2 | rawToc[i] >> 6) + ah) & 0xff);
+            int lsl2 = (r << 2) & 0xff;
+
+            rawToc[i] = (byte)(((lsl2 | (r >> 6)) + ah) & 0xff);
+            ah += 0x67;
+        }
+
+
+        BinaryHelpers.DebugDumpBinary(rawToc, "Headers.last");
+
+        //parse
+        for(int i=0; i<numberOfFiles; i++)
+        {
+            CCFileTocEntry toc = new CCFileTocEntry();
+            int offset = i * 8;
+            toc.ID = BYTES2INT_lsb(rawToc[offset], rawToc[offset + 1]);
+            toc.offset = BYTES2INT_lsb(rawToc[offset + 2], rawToc[offset + 3], rawToc[offset + 4]);
+            toc.length = BYTES2INT_lsb(rawToc[offset+5], rawToc[offset + 6]);
+            toc.padding = rawToc[offset+7];
+
+            if(!toc.isValid())
+            {
+                throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " is invalid (" + toc.toString() + ")");
+            }
+            if(toc.offset > fileSize)
+            {
+                throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " points to position beyond end of cc file.");
+            }
+            if((toc.offset+toc.length) > fileSize)
+            {
+                throw CCFileFormatException.fromBadHeader(this, "Toc entry " + i + " goes beyond end of cc file.");
+            }
+
+            tocEntries[i] = toc;
+        }
+    }
 
     //-------------------------------------------------------------------------------------------------
     // Cached file objects
     //-------------------------------------------------------------------------------------------------
-
-
     public MaMSprite getSprite(int id, MaMPallet pal) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getSprite);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::decodeSprite);
     }
 
     public MaMPallet getPallet(int id) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getPallet);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::decodePallet);
     }
 
     public MaMSurface getSurface(int id, MaMPallet pal) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getSurface);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::decodeSurface);
     }
 
     public MaMThing getThing(int id, MaMPallet pal) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getThing);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::decodeThing);
     }
 
     public MaMRawImage getRawImage(int id, MaMPallet pal) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::__getRawImage);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::decodeRawImage);
     }
 
     public MaMMazeFile getMapFile(int id, MaMWorld world, int mazeID) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, (I) -> this.__getMapFile(I, world, mazeID));
+        //return CCFileCache.INSTANCE.cachedGetFile(this, id, (I) -> this.decodeMapFile(I, world, mazeID));
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, world, mazeID, this::decodeMapFile);
     }
 
     public MaMTextFile getText(int id) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getText);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::decodeText);
     }
 
     public MAMVocFile getVoc(int id) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getVoc);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::decodeVoc);
     }
 
     public MaMBinaryFile getMaMBinaryFile(int id) throws CCFileFormatException
     {
-        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::__getMaMBinaryFile);
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::decodeBinaryFile);
     }
 
 
@@ -673,13 +830,39 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
             //sprite
             try
             {
-                MaMSprite sprite = new WOXSpriteFile("SPRITE_FOR_"+fileName,
-                                                    MAMFile.generateKeyFromCCFile(id, this),
-                                                    getFileRaw(id),
-                                                    getPalletForFile(id));
+                MaMSprite sprite = decodeSprite("SPRITE_FOR_"+fileName,
+                                            MAMFile.generateKeyFromCCFile(id, this),
+                                            getFileRaw(id),
+                                            getPalletForFile(id));
+
+//                MaMSprite sprite = new WOXSpriteFile("SPRITE_FOR_"+fileName,
+//                                                    MAMFile.generateKeyFromCCFile(id, this),
+//                                                    getFileRaw(id),
+//                                                    getPalletForFile(id));
                 //if we are here, we parsed a sprite
                 System.out.println(describeFile(fileName) + " was a computer sprite alright.");
                 return sprite;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            //pal file
+            try
+            {
+                byte[] rawData = getFileRaw(id);
+                if(rawData.length == ((256 * 3)+4))
+                {
+                    MaMPallet pal = new MaMPallet("PAL_FOR_"+fileName,
+                            MAMFile.generateKeyFromCCFile(id, this),
+                            rawData,
+                            256,
+                            2);
+
+                    //if we are here, we parsed a sprite
+                    System.out.println(describeFile(fileName) + " was a pallate.");
+                    return pal;
+                }
             }
             catch (Exception ex)
             {

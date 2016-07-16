@@ -56,18 +56,25 @@ public class MaM3DSceneComposition implements ISceneComposition {
     }
 
     public synchronized void setGround(IRenderableGameObject ground) throws MaMGameException {
-        int depth = RenderPosHelper.getGlobalHelper().getDepth(RenderPosHelper.RenderableType.GROUND, 0);
-        addRenderable(MaM3dScenePos.Ground.getRenderablePosition().atDepth(depth), ground);
+        if(ground != null)
+        {
+            int depth = RenderPosHelper.getGlobalHelper().getDepth(RenderPosHelper.RenderableType.GROUND, 0);
+            addRenderable(MaM3dScenePos.Ground.getRenderablePosition().atDepth(depth), ground);
+        }
     }
 
-    public synchronized void setSky(IRenderableGameObject sky) throws MaMGameException {
-        int depth = RenderPosHelper.getGlobalHelper().getDepth(RenderPosHelper.RenderableType.SKY, 0);
+    public synchronized void setSky(IRenderableGameObject sky) throws MaMGameException
+    {
+        if(sky != null)
+        {
+            int depth = RenderPosHelper.getGlobalHelper().getDepth(RenderPosHelper.RenderableType.SKY, 0);
 
-        IRenderableGameObject skyTop = IRenderableGameObject.fromImage(sky.getImage(0));
-        IRenderableGameObject skyBottom = IRenderableGameObject.fromImage(sky.getImage(1));
+            IRenderableGameObject skyTop = IRenderableGameObject.fromImage(sky.getImage(0));
+            IRenderableGameObject skyBottom = IRenderableGameObject.fromImage(sky.getImage(1));
 
-        addRenderable(MaM3dScenePos.TopHalfOfsky.getRenderablePosition().atDepth(depth), skyTop);
-        addRenderable(MaM3dScenePos.BottomHalfOfsky.getRenderablePosition().atDepth(depth), skyBottom);
+            addRenderable(MaM3dScenePos.TopHalfOfsky.getRenderablePosition().atDepth(depth), skyTop);
+            addRenderable(MaM3dScenePos.BottomHalfOfsky.getRenderablePosition().atDepth(depth), skyBottom);
+        }
     }
 
     public synchronized void addSurface(Point relativePos, MaMSurface surface) throws MaMGameException {

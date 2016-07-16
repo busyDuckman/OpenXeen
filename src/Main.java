@@ -1,6 +1,8 @@
 import Game.MaMGame;
 import Rendering.SimpleCanvas.MaMPanel;
+import mamFiles.CCFileCache;
 import mamFiles.CCFileFormatException;
+import mamFiles.IOT.IoTccFileReader;
 import mamFiles.MaMSprite;
 
 import javax.swing.*;
@@ -22,8 +24,10 @@ public class Main
             Random rand = new Random(System.currentTimeMillis());
             //Create game
             //game = new MaMGame("xeen.cc");
-            game = new MaMGame("dark.cc");
-            //game = new MaMGame("mm3.cc");
+            //game = new MaMGame("dark.cc");
+            //CCFileCache.INSTANCE.setEnabled(false);
+            game = new MaMGame(IoTccFileReader.open("mm3.cc"));
+
 
             //Create a renderer for the game (renderer is embedded in a JPanel)
             MaMPanel window = new MaMPanel(game);

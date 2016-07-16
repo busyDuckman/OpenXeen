@@ -8,8 +8,9 @@ public enum GlobalSettings
     INSTANCE;
 
     boolean debugMode = true;
-    boolean rebuildProxies = false;
+    boolean rebuildProxies = true;
     private boolean disableHUD = false;
+    private boolean discoverFileNames = false;
 
     public boolean debugMode() {
         return debugMode;
@@ -38,6 +39,6 @@ public enum GlobalSettings
     }
 
     public boolean discoverFileNames() {
-        return true;
+        return discoverFileNames;
     }
 }

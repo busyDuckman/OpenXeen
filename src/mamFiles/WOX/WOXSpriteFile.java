@@ -19,7 +19,7 @@ import static Toolbox.BinaryHelpers.*;
 public class WOXSpriteFile extends MaMSprite
 {
 
-    protected static class Cell extends Rectangle
+    protected class Cell extends Rectangle
     {
         byte[] rgbData;
 
@@ -273,7 +273,6 @@ public class WOXSpriteFile extends MaMSprite
                 cells.get(offset).renderToFrame(frames[i], data, offset, this);
             }
         }
-
     }
 
     protected FrameInfo sizeFrame(Map<Integer, Cell> cells, List<Integer> cellOffsetsInThisFrame) throws CCFileFormatException {
