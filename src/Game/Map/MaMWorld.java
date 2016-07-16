@@ -107,7 +107,10 @@ public abstract class MaMWorld implements AutoCloseable
     @Override
     public void close() throws Exception {
         this.ccFile.close();
-        this.ccFileAnimations.close();
+        if((ccFileAnimations != null) && (ccFileAnimations != ccFile))
+        {
+            this.ccFileAnimations.close();
+        }
     }
 
 //    public void setMazeView(int mapID)

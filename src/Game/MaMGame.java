@@ -1,9 +1,6 @@
 package Game;
 
-import Game.Map.MaMMazeView;
-import Game.Map.MaMTile;
-import Game.Map.MaMWorld;
-import Game.Map.WoXWorld;
+import Game.Map.*;
 import Game.Monsters.MaMMonster;
 import GameMechanics.Adventurers.Adventurer;
 import GameMechanics.Adventurers.CharClass;
@@ -13,6 +10,7 @@ import GameMechanics.Magic.PartyEnchantments.IPartyEnchantment;
 import Rendering.*;
 import Toolbox.*;
 import mamFiles.*;
+import mamFiles.IOT.IoTccFileReader;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 import mamFiles.SpriteHelpers.RenderPosHelper;
 import mamFiles.WOX.WOXSurface;
@@ -79,11 +77,22 @@ public class MaMGame implements IMaMGame
     //-------------------------------------------------------------------------------------------------
     protected void loadWorld(MaMCCFileReader ccFile) throws CCFileFormatException
     {
-        world = new WoXWorld(this, ccFile);
+        if(ccFile instanceof WOXccFileReader)
+        {
+            world = new WoXWorld(this, ccFile);
+        }
+        else if (ccFile instanceof IoTccFileReader)
+        {
+            world = new IoTWorld(this, ccFile);
+        }
+        else
+        {
+        }
+
         //world.loadMaps();
 
         //world.setCurrentMap(1);
-        world.setMazeView("xeen"); //todo: real code
+        world.setMazeView("xeen"); //TODO: real code
 
 
         // load sprites
@@ -213,7 +222,10 @@ public class MaMGame implements IMaMGame
 
         try
         {
-            MaMMonster mon = world.getMonsters()[testMonsterID%world.getMonsters().length];
+
+            MaMMonster mon = (world.getMonsters().length > 0) ?
+                    world.getMonsters()[testMonsterID%world.getMonsters().length]
+                    : null;
             //view.addMonster(new Point(100,0), mon);
 
             view.setGround(world.getOutdoorEnvironmentSet(0).getGround());
@@ -221,57 +233,61 @@ public class MaMGame implements IMaMGame
 
             //render the current view
             IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
-            Point viewNormal = partyDir.getVector();
-            Point viewNormalOrth = partyDir.turnRight().getVector();
-            for(int vsY=0; vsY<10; vsY++)
+
+            if(map != null)
             {
-                for(int vsX=-9; vsX<9; vsX++)
+                Point viewNormal = partyDir.getVector();
+                Point viewNormalOrth = partyDir.turnRight().getVector();
+                for(int vsY=0; vsY<10; vsY++)
                 {
-                    Point vsPos = new Point(vsX, vsY);
-
-                    //vsY steps forward
-                    Point fwd = new Point(vsY * viewNormal.x, vsY * viewNormal.y);
-
-                    //vsX steps right
-                    Point right = new Point(vsX * viewNormalOrth.x, vsX * viewNormalOrth.y);
-
-                    //get world position
-                    int xPos = partyPos.x + fwd.x + right.x;
-                    int yPos = partyPos.y + fwd.y + right.y;
-
-                    //render tile at xPos, yPos  to xsX, vsY
-                    if(map.isValidLocation(xPos, yPos))
+                    for(int vsX=-9; vsX<9; vsX++)
                     {
-                        MaMTile tile =  map.get(xPos, yPos);
-                        int surfaceNum = tile.getIndexBase();
-                        MaMSurface surf = world.getOutdoorEnvironmentSet(0).getSurface(surfaceNum);
+                        Point vsPos = new Point(vsX, vsY);
 
-                        if(surf != null)
+                        //vsY steps forward
+                        Point fwd = new Point(vsY * viewNormal.x, vsY * viewNormal.y);
+
+                        //vsX steps right
+                        Point right = new Point(vsX * viewNormalOrth.x, vsX * viewNormalOrth.y);
+
+                        //get world position
+                        int xPos = partyPos.x + fwd.x + right.x;
+                        int yPos = partyPos.y + fwd.y + right.y;
+
+                        //render tile at xPos, yPos  to xsX, vsY
+                        if(map.isValidLocation(xPos, yPos))
                         {
+                            MaMTile tile =  map.get(xPos, yPos);
+                            int surfaceNum = tile.getIndexBase();
+                            MaMSurface surf = world.getOutdoorEnvironmentSet(0).getSurface(surfaceNum);
 
-                            IRenderableGameObject surfaceLayer = surf.getSurfaceOverlay(vsPos);
-
-                            if(surfaceLayer != null)
+                            if(surf != null)
                             {
-                                // surfaceLayer is null if not renderable on screen, as the view sweep
-                                // is deliberately too large,  this is normal.
-                                int surfaceDepth = RenderPosHelper.getGlobalHelper().getDepth(RenderableType.SURFACE, vsY);
-                                view.addRenderable(new RenderablePos(8, 67, 1.0, surfaceDepth), surfaceLayer);
+
+                                IRenderableGameObject surfaceLayer = surf.getSurfaceOverlay(vsPos);
+
+                                if(surfaceLayer != null)
+                                {
+                                    // surfaceLayer is null if not renderable on screen, as the view sweep
+                                    // is deliberately too large,  this is normal.
+                                    int surfaceDepth = RenderPosHelper.getGlobalHelper().getDepth(RenderableType.SURFACE, vsY);
+                                    view.addRenderable(new RenderablePos(8, 67, 1.0, surfaceDepth), surfaceLayer);
+                                }
+                            }
+
+                            int environNum = tile.getIndexMiddle();
+                            IRenderableGameObject envobject = world.getOutdoorEnvironmentSet(0).getEnviron(environNum, 1);
+                            if(envobject != null)
+                            {
+                                RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorEnvPos(vsPos);
+                                if(spPos != null)
+                                {
+                                    view.addRenderable(spPos, envobject);
+                                }
                             }
                         }
 
-                        int environNum = tile.getIndexMiddle();
-                        IRenderableGameObject envobject = world.getOutdoorEnvironmentSet(0).getEnviron(environNum, 1);
-                        if(envobject != null)
-                        {
-                            RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorEnvPos(vsPos);
-                            if(spPos != null)
-                            {
-                                view.addRenderable(spPos, envobject);
-                            }
-                        }
                     }
-
                 }
             }
 
@@ -367,10 +383,17 @@ public class MaMGame implements IMaMGame
         int y = partyPos.y - (height / 2);
         IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
 
-        //clamp x and y so we are not rendering off the map.
-        x = Math.min(map.getWidth()-width, Math.max(x, 0));
-        y = Math.min(map.getHeight()-height, Math.max(y, 0));
-        return renderMap(x, y, width, height);
+        if(map != null)
+        {
+            //clamp x and y so we are not rendering off the map.
+            x = Math.min(map.getWidth()-width, Math.max(x, 0));
+            y = Math.min(map.getHeight()-height, Math.max(y, 0));
+            return renderMap(x, y, width, height);
+        }
+        else
+        {
+            return new MaM2DMapComposition();
+        }
     }
 
     @Override
@@ -410,13 +433,16 @@ public class MaMGame implements IMaMGame
                 scene.addRenderable(pos, faces[i]);
 
                 //hp bar
-                IRenderableGameObject hpBar = world.getCcFile()
+                if(!(world instanceof IoTWorld))
+                {
+                    IRenderableGameObject hpBar = world.getCcFile()
                                                    .getSpriteOrNull("HPBARS.ICN")
                                                    .subSetOfFrames("HP bar", i%4, 1);
 
-                int hpWidth = hpBar.getImage(0).getWidth();
-                int hpIndent = (faceSlotSize - hpWidth) / 2;
-                scene.addRenderable(pos.translate(hpIndent-faceIndent, 32).above(), hpBar);
+                    int hpWidth = hpBar.getImage(0).getWidth();
+                    int hpIndent = (faceSlotSize - hpWidth) / 2;
+                    scene.addRenderable(pos.translate(hpIndent-faceIndent, 32).above(), hpBar);
+                }
 
             }
             catch (CCFileFormatException e)

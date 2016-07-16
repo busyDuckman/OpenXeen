@@ -1,5 +1,6 @@
 package mamFiles;
 
+import Game.Map.MaMWorld;
 import Toolbox.LRUCache;
 
 /**
@@ -18,16 +19,19 @@ public enum CCFileCache {
     //TODO: Base on MB, not number of files
     private LRUCache<String, MAMFile> fileCache = new LRUCache<>(512);
 
-
-
     @FunctionalInterface
-    public interface FuncGetMaMFile<R extends MAMFile> {
-        R apply(int key) throws CCFileFormatException;
+    public interface FuncDecodeMaMFile<R extends MAMFile> {
+        R apply(String name, String key, byte[] data) throws CCFileFormatException;
     }
 
     @FunctionalInterface
-    public interface FuncGetMaMFile2<R extends MAMFile, T extends MAMFile> {
-        R apply(int key, T with) throws CCFileFormatException;
+    public interface FuncDecodeMaMFileWith<R extends MAMFile, T> {
+        R apply(String name, String key, byte[] data, T with) throws CCFileFormatException;
+    }
+
+    @FunctionalInterface
+    public interface FuncDecodeMaMMaze<R extends MaMMazeFile> {
+        R apply(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException;
     }
 
     @FunctionalInterface
@@ -35,28 +39,52 @@ public enum CCFileCache {
         R apply() throws CCFileFormatException;
     }
 
-    public final <T extends MAMFile> T cachedGetFile(MaMCCFileReader reader,
-                                                     int id,
-                                                     FuncGetMaMFile<T> getFunc)
-            throws CCFileFormatException
-    {
-        return cachedGetFile(MAMFile.generateKeyFromCCFile(id, reader), () -> getFunc.apply(id));
+    private boolean enabled;
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
-    public final <T extends MAMFile, W extends MAMFile> T cachedGetFile(MaMCCFileReader reader,
-                                                                        int id,
-                                                                        W with,
-                                                                        FuncGetMaMFile2<T, W> getFunc)
+    public final <T extends MAMFile> T cachedGetFile(MaMCCFileReader reader,
+                                                     int id,
+                                                     FuncDecodeMaMFile<T> getFunc)
             throws CCFileFormatException
     {
-        return cachedGetFile(MAMFile.generateKeyFromJoin(MAMFile.generateKeyFromCCFile(id, reader), with),
-                            () -> getFunc.apply(id, with));
+        String key = MAMFile.generateKeyFromCCFile(id, reader);
+        return cachedGetFile(key, () -> getFunc.apply(reader.getNameForID(id), key, reader.getFileRaw(id)));
+    }
+
+    public final <T extends MAMFile, W> T cachedGetFile(MaMCCFileReader reader,
+                                                                        int id,
+                                                                        W with,
+                                                                        FuncDecodeMaMFileWith<T, W> getFunc)
+            throws CCFileFormatException
+    {
+        String key = MAMFile.generateKeyFromCCFile(id, reader);
+        return cachedGetFile(key, () -> getFunc.apply(reader.getNameForID(id), key, reader.getFileRaw(id), with));
+    }
+
+    public final <T extends MaMMazeFile> T cachedGetFile(MaMCCFileReader reader,
+                                                        int id,
+                                                        MaMWorld world,
+                                                        int mazeID,
+                                                        FuncDecodeMaMMaze<T> getFunc)
+            throws CCFileFormatException
+    {
+        String key = MAMFile.generateKeyFromCCFile(id, reader);
+        return cachedGetFile(key, () -> getFunc.apply(reader.getNameForID(id), key, reader.getFileRaw(id), world, mazeID));
     }
 
     public final <T extends MAMFile> T cachedGetFile(String key,
                                                         GetMaMFile<T> getFunc)
                                             throws CCFileFormatException
     {
+        //bypass cache mode
+        if(!enabled)
+        {
+            return getFunc.apply();
+        }
+
         MAMFile file = fileCache.getOrDefault(key, null);
         if(file == null)
         {
