@@ -36,20 +36,20 @@ public abstract class MaMWorld implements AutoCloseable
     protected MaMCCFileReader ccFile;
     protected MaMCCFileReader ccFileAnimations;
 
-    protected MaMPallet currentPallate;
+    //protected MaMPallet currentPallate;
 
     public MaMWorld(MaMGame game, MaMCCFileReader ccFileReader) throws CCFileFormatException
     {
         this.ccFile = ccFileReader;
         this.game = game;
-        currentPallate = getDefaultPallate();
+        //currentPallate = getDefaultPallate();
         monsters = ccFile.loadMonsters(this);
         mazeFiles = new HashMap<>();
         mazeViews = new HashMap<>();
         currentMazeView = null;
     }
 
-    protected abstract MaMPallet getDefaultPallate() throws CCFileFormatException;
+    //protected abstract MaMPallet getDefaultPallate() throws CCFileFormatException;
 
     public MaMGame getGame() {
         return game;
@@ -87,9 +87,9 @@ public abstract class MaMWorld implements AutoCloseable
         return ccFileAnimations;
     }
 
-    public MaMPallet getCurrentPallate() {
-        return currentPallate;
-    }
+//    public MaMPallet getCurrentPallate() {
+//        return currentPallate;
+//    }
 
     public abstract IMaMIndoorEnvironmentSet getIndoorEnvironmentSet(int index);
     public abstract IMaMOutdoorEnvironmentSet getOutdoorEnvironmentSet(int index);

@@ -110,18 +110,18 @@ public class WoXWorld extends MaMWorld
         loadMazeViews();
 }
 
-    @Override
-    protected MaMPallet getDefaultPallate() throws CCFileFormatException {
-        try
-        {
-            return ccFileWox().getPallet(ccFileWox().getVariant().getDefaultPallate());
-        }
-        catch (Exception ex)
-        {
-            System.out.println("Problem getting default pallate [getDefaultPallate()], using standard.");
-            return MaMPallet.getDefaultMaMPallate();
-        }
-    }
+//    @Override
+//    protected MaMPallet getDefaultPallate() throws CCFileFormatException {
+//        try
+//        {
+//            return ccFileWox().getPallet(ccFileWox().getVariant().getDefaultPallate());
+//        }
+//        catch (Exception ex)
+//        {
+//            System.out.println("Problem getting default pallate [getDefaultPallate()], using standard.");
+//            return MaMPallet.getDefaultMaMPallate();
+//        }
+//    }
 
     public WOXccFileReader getCCFileCur() {
         return ccFileCur;
