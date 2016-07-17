@@ -31,8 +31,8 @@ public class MaMMonster implements IRenderableGameObject
     }
 
     public MaMMonster(String name, int id, MaMWorld world, String idleAnimationFile, String attackAnimationFile ) throws CCFileFormatException {
-        this.idleAnimation = world.getCcFile().getSprite(idleAnimationFile, world.getCurrentPallate());
-        this.attackAnimation = world.getCcFile().getSprite(attackAnimationFile, world.getCurrentPallate());
+        this.idleAnimation = world.getCcFile().getSprite(idleAnimationFile);
+        this.attackAnimation = world.getCcFile().getSprite(attackAnimationFile);
         this.id = id;
         Name = name;
     }

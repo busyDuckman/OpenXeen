@@ -18,6 +18,8 @@ import mamFiles.SpriteHelpers.EnvironmentSet.IOT.IoTOutdoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 
+import java.awt.*;
+
 /**
  * Created by duckman on 14/07/2016.
  */
@@ -40,10 +42,12 @@ public class IoTWorld extends MaMWorld
 
     }
 
-    @Override
-    protected MaMPallet getDefaultPallate() throws CCFileFormatException {
-        return MaMPallet.getDefaultMaMPallate();
-    }
+//    @Override
+//    protected MaMPallet getDefaultPallate() throws CCFileFormatException
+//    {
+//
+//        //return MaMPallet.getDefaultMaMPallate();
+//    }
 
     @Override
     public void loadMaps() throws CCFileFormatException {

@@ -125,7 +125,8 @@ public class HProperties extends Properties
 
     protected String getFullName()
     {
-        return (parent == null) ? name : (parent.getFullName() + seperator + name);
+        String _name = (name == null) ? "" : name;
+        return (parent == null) ? _name : (parent.getFullName() + seperator + _name);
     }
 
     protected String fullName(String property)

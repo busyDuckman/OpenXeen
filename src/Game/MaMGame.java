@@ -185,9 +185,9 @@ public class MaMGame implements IMaMGame
         return world;
     }
 
-    public MaMPallet getCurrentPallate() {
-        return world.getCurrentPallate();
-    }
+//    public MaMPallet getCurrentPallate() {
+//        return world.getCurrentPallate();
+//    }
 
     @Override
     public double getDangerLevel() {

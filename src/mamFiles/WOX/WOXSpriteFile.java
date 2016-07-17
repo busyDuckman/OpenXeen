@@ -50,7 +50,7 @@ public class WOXSpriteFile extends MaMSprite
         @Override
         public String toString() { return "Cell{#bytes=" + rgbData.length + '}'; }
 
-        void putPixel(int x, int y, int colorIndex, FrameInfo frame, MaMSprite sprite)
+        public void putPixel(int x, int y, int colorIndex, FrameInfo frame, MaMSprite sprite)
         {
             if(sprite == null)
             {
@@ -77,124 +77,124 @@ public class WOXSpriteFile extends MaMSprite
             //colorData[(y*width+x)*4+2] = (byte)( (pallet != null) ? pallet.getColor(colorIndex).getRed()   : colorIndex );
         }
 
-        //based on code at http://xeen.wikia.com/wiki/Sprite_File_Format#Pattern_Command
-        public void renderToFrame(FrameInfo frame, byte[] data, int offset, MaMSprite sprite)
-        {
-            //computationally, treat all these are dwords
-            int i, dp = offset;                          // Pointer within data stream
-            int xPos, yPos;                         // The position within the color raster
-            int lineLength, byteCount;              // total bytes/bytes read in this scan line
-            int opcode, cmd, len, opr1, opr2;       // Used to decode the drawing commands
-            int xOffset, yOffset, width, height;    // Cell position and size
-
-            // The pattern steps used in the pattern command
-            int patternSteps[] = { 0, 1, 1, 1, 2, 2, 3, 3, 0, -1, -1, -1, -2, -2, -3, -3 };
-
-            // Read the position and size of the cell from the data stream
-            xOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
-            dp += 2;
-            width = BYTES2INT_lsb(data[dp], data[dp+1]);
-            dp += 2;
-            yOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
-            dp += 2;
-            height = BYTES2INT_lsb(data[dp], data[dp+1]);
-            dp += 2;
-
-
-            // Fill the color raster with the transparent color
-            //TODO: width-xOffset etc would seem the way... what is going on?
-            for( i = 0 ; i < ( xOffset + width ) * ( yOffset + height ) ; i++ )
-            {
-                //frame.data[0] =0;
-                //*((DWORD *)(&colorData[i * 4])) = transparent;
-            }
-
-            for( yPos = yOffset, byteCount = 0 ; yPos < height + yOffset ; yPos++, byteCount = 0 )
-            {
-                // The number of bytes in this scan line
-                lineLength = INT(data[dp++]);
-
-                if( lineLength > 0 )
-                {
-                    // Skip the transparent color at the beginning of the scan line
-                    xPos = INT(data[dp++]) + xOffset; byteCount++;
-
-                    while( byteCount < lineLength )
-                    {
-                        // The next byte is an opcode that determines what
-                        // operators are to follow and how to interpret them.
-                        opcode = INT(data[dp++]); byteCount++;
-
-                        // Decode the opcode
-                        len = opcode & 0x1F;
-                        cmd = ( opcode & 0xE0 ) >> 5;
-
-                        switch( cmd )
-                        {
-                            case 0:   // The following len + 1 bytes are stored as indexes into the color table.
-                            case 1:   // The following len + 33 bytes are stored as indexes into the color table.
-                                for( i = 0 ; i < opcode + 1 ; i++, xPos++ )
-                                {
-                                    opr1 = INT(data[dp++]); byteCount++;
-                                    putPixel( xPos, yPos, opr1, frame, sprite);
-                                }
-                                break;
-
-                            case 2:   // The following byte is an index into the color table, draw it len + 3 times.
-                                opr1 = INT(data[dp++]); byteCount++;
-                                for( i = 0 ; i < len + 3 ; i++, xPos++ )
-                                {
-                                    putPixel( xPos, yPos, opr1, frame, sprite);
-                                }
-                                break;
-
-                            case 3:   // Stream copy command.
-                                opr1 = BYTES2INT_lsb(data[dp], data[dp+1]);//  *((WORD *)&cellData[dp]);
-                                dp += 2; byteCount += 2;
-                                for( i = 0 ; i < len + 4 ; i++, xPos++ )
-                                {
-                                    opr2 = INT(data[dp-opr1+i]);
-                                    putPixel( xPos, yPos, opr2, frame, sprite);
-                                }
-                                break;
-
-                            case 4:   // The following two bytes are indexes into the color table, draw the pair len + 2 times.
-                                opr1 = INT(data[dp++]); byteCount++;
-                                opr2 = INT(data[dp++]); byteCount++;
-                                for( i = 0 ; i < len + 2 ; i++, xPos += 2 )
-                                {
-                                    putPixel( xPos+0, yPos, opr1, frame, sprite);
-                                    putPixel( xPos+1, yPos, opr2, frame, sprite);
-                                }
-                                break;
-
-                            case 5:   // Skip len + 1 pixels filling them with the transparent color.
-                                xPos += len + 1;
-                                break;
-
-                            case 6:   // Pattern command.
-                            case 7:
-                                // The pattern command has a different opcode format
-                                len = opcode & 0x07;
-                                cmd = ( opcode >> 2 ) & 0x0E;
-
-                                opr1 = INT(data[dp++]); byteCount++;
-                                for( i = 0 ; i < len + 3 ; i++, xPos++ )
-                                {
-                                    putPixel( xPos, yPos, opr1, frame, sprite);
-                                    opr1 += patternSteps[cmd + ( i % 2 )];
-                                }
-                                break;
-                        }
-                    }
-                }
-                else
-                {
-                    // Skip the specified number of scan lines
-                    yPos += INT(data[dp++]);
-                }
-            }
-        }
+//        //based on code at http://xeen.wikia.com/wiki/Sprite_File_Format#Pattern_Command
+//        public void renderToFrame(FrameInfo frame, byte[] data, int offset, MaMSprite sprite)
+//        {
+//            //computationally, treat all these are dwords
+//            int i, dp = offset;                          // Pointer within data stream
+//            int xPos, yPos;                         // The position within the color raster
+//            int lineLength, byteCount;              // total bytes/bytes read in this scan line
+//            int opcode, cmd, len, opr1, opr2;       // Used to decode the drawing commands
+//            int xOffset, yOffset, width, height;    // Cell position and size
+//
+//            // The pattern steps used in the pattern command
+//            int patternSteps[] = { 0, 1, 1, 1, 2, 2, 3, 3, 0, -1, -1, -1, -2, -2, -3, -3 };
+//
+//            // Read the position and size of the cell from the data stream
+//            xOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
+//            dp += 2;
+//            width = BYTES2INT_lsb(data[dp], data[dp+1]);
+//            dp += 2;
+//            yOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
+//            dp += 2;
+//            height = BYTES2INT_lsb(data[dp], data[dp+1]);
+//            dp += 2;
+//
+//
+//            // Fill the color raster with the transparent color
+//            //TODO: width-xOffset etc would seem the way... what is going on?
+//            for( i = 0 ; i < ( xOffset + width ) * ( yOffset + height ) ; i++ )
+//            {
+//                //frame.data[0] =0;
+//                //*((DWORD *)(&colorData[i * 4])) = transparent;
+//            }
+//
+//            for( yPos = yOffset, byteCount = 0 ; yPos < height + yOffset ; yPos++, byteCount = 0 )
+//            {
+//                // The number of bytes in this scan line
+//                lineLength = INT(data[dp++]);
+//
+//                if( lineLength > 0 )
+//                {
+//                    // Skip the transparent color at the beginning of the scan line
+//                    xPos = INT(data[dp++]) + xOffset; byteCount++;
+//
+//                    while( byteCount < lineLength )
+//                    {
+//                        // The next byte is an opcode that determines what
+//                        // operators are to follow and how to interpret them.
+//                        opcode = INT(data[dp++]); byteCount++;
+//
+//                        // Decode the opcode
+//                        len = opcode & 0x1F;
+//                        cmd = ( opcode & 0xE0 ) >> 5;
+//
+//                        switch( cmd )
+//                        {
+//                            case 0:   // The following len + 1 bytes are stored as indexes into the color table.
+//                            case 1:   // The following len + 33 bytes are stored as indexes into the color table.
+//                                for( i = 0 ; i < opcode + 1 ; i++, xPos++ )
+//                                {
+//                                    opr1 = INT(data[dp++]); byteCount++;
+//                                    putPixel( xPos, yPos, opr1, frame, sprite);
+//                                }
+//                                break;
+//
+//                            case 2:   // The following byte is an index into the color table, draw it len + 3 times.
+//                                opr1 = INT(data[dp++]); byteCount++;
+//                                for( i = 0 ; i < len + 3 ; i++, xPos++ )
+//                                {
+//                                    putPixel( xPos, yPos, opr1, frame, sprite);
+//                                }
+//                                break;
+//
+//                            case 3:   // Stream copy command.
+//                                opr1 = BYTES2INT_lsb(data[dp], data[dp+1]);//  *((WORD *)&cellData[dp]);
+//                                dp += 2; byteCount += 2;
+//                                for( i = 0 ; i < len + 4 ; i++, xPos++ )
+//                                {
+//                                    opr2 = INT(data[dp-opr1+i]);
+//                                    putPixel( xPos, yPos, opr2, frame, sprite);
+//                                }
+//                                break;
+//
+//                            case 4:   // The following two bytes are indexes into the color table, draw the pair len + 2 times.
+//                                opr1 = INT(data[dp++]); byteCount++;
+//                                opr2 = INT(data[dp++]); byteCount++;
+//                                for( i = 0 ; i < len + 2 ; i++, xPos += 2 )
+//                                {
+//                                    putPixel( xPos+0, yPos, opr1, frame, sprite);
+//                                    putPixel( xPos+1, yPos, opr2, frame, sprite);
+//                                }
+//                                break;
+//
+//                            case 5:   // Skip len + 1 pixels filling them with the transparent color.
+//                                xPos += len + 1;
+//                                break;
+//
+//                            case 6:   // Pattern command.
+//                            case 7:
+//                                // The pattern command has a different opcode format
+//                                len = opcode & 0x07;
+//                                cmd = ( opcode >> 2 ) & 0x0E;
+//
+//                                opr1 = INT(data[dp++]); byteCount++;
+//                                for( i = 0 ; i < len + 3 ; i++, xPos++ )
+//                                {
+//                                    putPixel( xPos, yPos, opr1, frame, sprite);
+//                                    opr1 += patternSteps[cmd + ( i % 2 )];
+//                                }
+//                                break;
+//                        }
+//                    }
+//                }
+//                else
+//                {
+//                    // Skip the specified number of scan lines
+//                    yPos += INT(data[dp++]);
+//                }
+//            }
+//        }
 
     }
 
@@ -270,7 +270,7 @@ public class WOXSpriteFile extends MaMSprite
             {
                 int offset = cellOffsetsInThisFrame.get(c);
                 //System.out.println("Rendering celli="+i+" c="+c+" offset="+offset+"");
-                cells.get(offset).renderToFrame(frames[i], data, offset, this);
+                renderToFrame(cells.get(offset), frames[i], data, offset, this);
             }
         }
     }
@@ -343,6 +343,125 @@ public class WOXSpriteFile extends MaMSprite
                 cells.put(offset, c);
             }
             cellList.add(offset);
+        }
+    }
+
+    //based on code at http://xeen.wikia.com/wiki/Sprite_File_Format#Pattern_Command
+    protected void renderToFrame(Cell cell, FrameInfo frame, byte[] data, int offset, MaMSprite sprite)
+    {
+        //computationally, treat all these are dwords
+        int i, dp = offset;                          // Pointer within data stream
+        int xPos, yPos;                         // The position within the color raster
+        int lineLength, byteCount;              // total bytes/bytes read in this scan line
+        int opcode, cmd, len, opr1, opr2;       // Used to decode the drawing commands
+        int xOffset, yOffset, width, height;    // Cell position and size
+
+        // The pattern steps used in the pattern command
+        int patternSteps[] = { 0, 1, 1, 1, 2, 2, 3, 3, 0, -1, -1, -1, -2, -2, -3, -3 };
+
+        // Read the position and size of the cell from the data stream
+        xOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
+        dp += 2;
+        width = BYTES2INT_lsb(data[dp], data[dp+1]);
+        dp += 2;
+        yOffset = BYTES2INT_lsb(data[dp], data[dp+1]);
+        dp += 2;
+        height = BYTES2INT_lsb(data[dp], data[dp+1]);
+        dp += 2;
+
+
+        // Fill the color raster with the transparent color
+        //TODO: width-xOffset etc would seem the way... what is going on?
+        for( i = 0 ; i < ( xOffset + width ) * ( yOffset + height ) ; i++ )
+        {
+            //frame.data[0] =0;
+            //*((DWORD *)(&colorData[i * 4])) = transparent;
+        }
+
+        for( yPos = yOffset, byteCount = 0 ; yPos < height + yOffset ; yPos++, byteCount = 0 )
+        {
+            // The number of bytes in this scan line
+            lineLength = INT(data[dp++]);
+
+            if( lineLength > 0 )
+            {
+                // Skip the transparent color at the beginning of the scan line
+                xPos = INT(data[dp++]) + xOffset; byteCount++;
+
+                while( byteCount < lineLength )
+                {
+                    // The next byte is an opcode that determines what
+                    // operators are to follow and how to interpret them.
+                    opcode = INT(data[dp++]); byteCount++;
+
+                    // Decode the opcode
+                    len = opcode & 0x1F;
+                    cmd = ( opcode & 0xE0 ) >>> 5;
+
+                    switch( cmd )
+                    {
+                        case 0:   // The following len + 1 bytes are stored as indexes into the color table.
+                        case 1:   // The following len + 33 bytes are stored as indexes into the color table.
+                            for( i = 0 ; i < opcode + 1 ; i++, xPos++ )
+                            {
+                                opr1 = INT(data[dp++]); byteCount++;
+                                cell.putPixel( xPos, yPos, opr1, frame, sprite);
+                            }
+                            break;
+
+                        case 2:   // The following byte is an index into the color table, draw it len + 3 times.
+                            opr1 = INT(data[dp++]); byteCount++;
+                            for( i = 0 ; i < len + 3 ; i++, xPos++ )
+                            {
+                                cell.putPixel( xPos, yPos, opr1, frame, sprite);
+                            }
+                            break;
+
+                        case 3:   // Stream copy command.
+                            opr1 = BYTES2INT_lsb(data[dp], data[dp+1]);//  *((WORD *)&cellData[dp]);
+                            dp += 2; byteCount += 2;
+                            for( i = 0 ; i < len + 4 ; i++, xPos++ )
+                            {
+                                opr2 = INT(data[dp-opr1+i]);
+                                cell.putPixel( xPos, yPos, opr2, frame, sprite);
+                            }
+                            break;
+
+                        case 4:   // The following two bytes are indexes into the color table, draw the pair len + 2 times.
+                            opr1 = INT(data[dp++]); byteCount++;
+                            opr2 = INT(data[dp++]); byteCount++;
+                            for( i = 0 ; i < len + 2 ; i++, xPos += 2 )
+                            {
+                                cell.putPixel( xPos+0, yPos, opr1, frame, sprite);
+                                cell.putPixel( xPos+1, yPos, opr2, frame, sprite);
+                            }
+                            break;
+
+                        case 5:   // Skip len + 1 pixels filling them with the transparent color.
+                            xPos += len + 1;
+                            break;
+
+                        case 6:   // Pattern command.
+                        case 7:
+                            // The pattern command has a different opcode format
+                            len = opcode & 0x07;
+                            cmd = ( opcode >>> 2 ) & 0x0E;
+
+                            opr1 = INT(data[dp++]); byteCount++;
+                            for( i = 0 ; i < len + 3 ; i++, xPos++ )
+                            {
+                                cell.putPixel( xPos, yPos, opr1, frame, sprite);
+                                opr1 += patternSteps[cmd + ( i % 2 )];
+                            }
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                // Skip the specified number of scan lines
+                yPos += INT(data[dp++]);
+            }
         }
     }
 
