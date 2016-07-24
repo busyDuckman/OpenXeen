@@ -3,7 +3,11 @@ package Rendering.SimpleCanvas;
 import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.MaMActions;
+import Game.Map.IoTWorld;
 import Rendering.RenderablePos;
+import Toolbox.HackMe;
+import mamFiles.CCFileCache;
+import mamFiles.WOX.WOXSpriteFile;
 import net.miginfocom.swing.MigLayout;
 import org.joda.time.DateTime;
 
@@ -197,18 +201,85 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
             //hack render pos offset
             case KeyEvent.VK_I:
-                RenderablePos.decYHack();
+                //Flush the cache, because I use this to hack away at file format tweaks as well
+                CCFileCache.INSTANCE.flush();
+                //RenderablePos.decYHack();
+                HackMe.GlobalInstance.moveToPreviousHack();
                 break;
             case KeyEvent.VK_J:
-                RenderablePos.decXHack();
+                CCFileCache.INSTANCE.flush();
+                //RenderablePos.decXHack();
+                HackMe.GlobalInstance.decCurrentHack();
                 break;
             case KeyEvent.VK_K:
-                RenderablePos.incYHack();
+                CCFileCache.INSTANCE.flush();
+                //RenderablePos.incYHack();
+                HackMe.GlobalInstance.moveToNextHack();
                 break;
             case KeyEvent.VK_L:
-                RenderablePos.incXHack();
+                CCFileCache.INSTANCE.flush();
+                //RenderablePos.incXHack();
+                HackMe.GlobalInstance.incCurrentHack();
                 break;
+            case KeyEvent.VK_P:
+                CCFileCache.INSTANCE.flush();
+                HackMe.GlobalInstance.reset();
+                break;
+            case KeyEvent.VK_O:
+                CCFileCache.INSTANCE.flush();
+                HackMe.GlobalInstance.reportAll();
+                break;
+            case KeyEvent.VK_PAGE_UP:
+                IoTWorld.currentTestSprite++;
+                System.out.println("Test sprite = " + IoTWorld.knownSprites[IoTWorld.currentTestSprite]);
+                CCFileCache.INSTANCE.flush();
+                break;
+            case KeyEvent.VK_PAGE_DOWN:
+                IoTWorld.currentTestSprite--;
+                System.out.println("Test sprite = " + IoTWorld.knownSprites[IoTWorld.currentTestSprite]);
+                CCFileCache.INSTANCE.flush();
+                break;
+            case KeyEvent.VK_END:
+                IoTWorld.currentTestSpriteFrame++;
+                System.out.println("Test sprite frame = " + IoTWorld.currentTestSpriteFrame);
+                CCFileCache.INSTANCE.flush();
+                break;
+            case KeyEvent.VK_HOME:
+                IoTWorld.currentTestSpriteFrame = -1;
+                System.out.println("Test sprite animated" + IoTWorld.currentTestSpriteFrame);
+                CCFileCache.INSTANCE.flush();
+                break;
+
+            case KeyEvent.VK_0:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD0 is purple");
+                break;
+            case KeyEvent.VK_1:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD1 is purple");
+                break;
+            case KeyEvent.VK_2:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD2 is purple");
+                break;
+            case KeyEvent.VK_3:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD3 is purple");
+                break;
+            case KeyEvent.VK_4:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD4 is purple");
+                break;
+            case KeyEvent.VK_5:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD5 is purple");
+                break;
+            case KeyEvent.VK_6:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD6 is purple");
+                break;
+            case KeyEvent.VK_7:
+                WOXSpriteFile.opcodePurpleHack.toggleHack("CMD7 is purple");
+                break;
+
+
+
         }
+
+
     }
 
     @Override

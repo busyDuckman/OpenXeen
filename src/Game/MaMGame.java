@@ -110,7 +110,7 @@ public class MaMGame implements IMaMGame
     {
         party = new ArrayList<>();
         party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, new CharClass(), 1));
-        partyPos = new Point(4, 4);
+        partyPos = new Point(20, 51);
         partyDir = Direction.UP;
     }
 
@@ -280,9 +280,17 @@ public class MaMGame implements IMaMGame
                             if(envobject != null)
                             {
                                 RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorEnvPos(vsPos);
+                                int frame = RenderPosHelper.getGlobalHelper().getOutdoorEnvFrame(vsPos);
                                 if(spPos != null)
                                 {
-                                    view.addRenderable(spPos, envobject);
+                                    RenderablePos deFutzed = deFutz(spPos);
+
+                                    //that whole left/right side of screen frame thing
+                                    String name = (envobject instanceof MaMSprite) ? ((MaMSprite)envobject).getName() : "?";
+                                    view.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
+                                    view.addRenderable(deFutzed.above().translate(0, 0),
+                                            //IRenderableGameObject.fromText("<"+environNum+">" + name + ".", Color.white, 172,16));
+                                    IRenderableGameObject.fromText(""+environNum, Color.white, 172,16));
                                 }
                             }
                         }
@@ -298,6 +306,13 @@ public class MaMGame implements IMaMGame
         }
 
         return view;
+    }
+
+    private RenderablePos deFutz(RenderablePos spPos)
+    {
+        int middle = (RenderPosHelper.screenSize.width/2) + 8;
+        //return spPos.translate(middle-25, 0);//.scaleLocationOnly(1,-1).translate(0, 100);
+        return spPos;
     }
 
 

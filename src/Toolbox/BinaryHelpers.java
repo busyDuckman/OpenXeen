@@ -1,5 +1,7 @@
 package Toolbox;
 
+import javafx.beans.binding.StringBinding;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
@@ -161,6 +163,35 @@ public class BinaryHelpers
             bits[i] = (value & 1) != 0;
             value >>>= 1;
         }
+    }
+
+    public static String hexEditorView(byte[] data, int pos, int len)
+    {
+        if(data == null)
+        {
+            return "";
+        }
+        pos = Math.max(pos, 0);
+        len = Math.max(len, 0);
+
+        StringBuilder sb = new StringBuilder();
+        for(int q=0, i=pos; q<len; q++, i++)
+        {
+            if(i < data.length)
+            {
+                sb.append(String.format("%02X", (0xFF & data[i])));
+            }
+            else
+            {
+                sb.append("  "); //add spaces(to ensure memory dumps look good.
+            }
+
+            if(q<(len-1))
+            {
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
     }
 
     //------------------------------------------------------------------------------------------------------------------

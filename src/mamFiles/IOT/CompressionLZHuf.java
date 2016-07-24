@@ -123,7 +123,7 @@ public class CompressionLZHuf
                         int tmpWord;
                         if((inBufPos < 0) || ((inBufPos+1) >= inBuf.length))
                         {
-                            System.out.println("LZH broke again - check alpha");
+                            debug("LZH broke again - check alpha");
                             tmpWord = BinaryHelpers.BYTES2INT_lsb(inBuf[inBufPos], (byte)0);
                         }
                         else
@@ -138,7 +138,7 @@ public class CompressionLZHuf
                     c += bit;
                     if((c < 0) || (c >= son.length))
                     {
-                        System.out.println("LZH broke again - check bravo");
+                        debug("LZH broke again - check bravo");
                     }
                     c = son[c];
                 }
@@ -241,7 +241,7 @@ public class CompressionLZHuf
                         int tmpWord;
                         if((inBufPos < 0) || ((inBufPos+1) >= inBuf.length))
                         {
-                            System.out.println("LZH broke again - check delta");
+                            debug("LZH broke again - check delta");
                             tmpWord = BinaryHelpers.BYTES2INT_lsb(inBuf[inBufPos], (byte)0);
                         }
                         else
@@ -279,7 +279,7 @@ public class CompressionLZHuf
                         int tmpWord;
                         if((inBufPos < 0) || ((inBufPos+1) >= inBuf.length))
                         {
-                            System.out.println("LZH broke again - check echo");
+                            debug("LZH broke again - check echo");
                             tmpWord = BinaryHelpers.BYTES2INT_lsb(inBuf[inBufPos], (byte)0);
                         }
                         else
@@ -326,6 +326,10 @@ public class CompressionLZHuf
 //        }
 //        return finalData;
         return outBuf;
+    }
+
+    private static void debug(String s) {
+        //System.out.println(s);
     }
 
     /**

@@ -24,6 +24,7 @@ import java.util.Map;
  */
 public class RenderPosHelper implements IHasProperties
 {
+    public static final Dimension screenSize = new Dimension(216, 132);
     private static RenderPosHelper globalHelper = new RenderPosHelper();
 
     public static RenderPosHelper getGlobalHelper() {
@@ -44,6 +45,7 @@ public class RenderPosHelper implements IHasProperties
      */
     protected Point[] surfacePositions;
     protected RenderablePos[] outdoorEnvironmentPlacements;
+    protected int[] outdoorEnvironmentFrames;
 
     protected static Map<Point, Integer> relativePos2TileNumTable;
 
@@ -52,7 +54,7 @@ public class RenderPosHelper implements IHasProperties
     {
         setupRelativePosToTileNumTable();
         setupSurfacePositions();
-        setupOutdoorEnvironmentPlacements();
+        setupOutdoorEnvironmentPlacementsAndFrmes();
     }
 
     public enum RenderableType {
@@ -171,8 +173,22 @@ public class RenderPosHelper implements IHasProperties
                 new Point(134,67)};
     }
 
-    private void setupOutdoorEnvironmentPlacements()
+    private void setupOutdoorEnvironmentPlacementsAndFrmes()
     {
+        // Frames
+        // 3 3 5 7 9
+
+        // assumes 0 1 2 = edge, middle, far edge
+        //         3 4 5 = mirrored frames of the above
+        outdoorEnvironmentFrames = new int[] {
+                0, 1, 3,
+                0, 1, 3,
+                2, 4,1,4, 5,
+                2, 1,4,1,4,1, 5,
+                2, 4,1,4,1,4,1,4, 5
+        };
+
+        //Placements
         int[] levels = new int[5];
         for (int i = 0; i < levels.length; i++) {
             levels[i] = getDepth(RenderableType.OBJ_ENV, i);
@@ -181,35 +197,39 @@ public class RenderPosHelper implements IHasProperties
 
         outdoorEnvironmentPlacements = new RenderablePos[]
         {
-        new RenderablePos(-112, 30,  1.0,   sPos, levels[0]),      //Outdoor object 1 steps forward, 1 step left
-        new RenderablePos( 98,  30,  1.0,   sPos, levels[0]),      //Outdoor object 1 steps forward, 1 step right
-        new RenderablePos(-7,   30,  1.0,   sPos, levels[0]),      //Outdoor object directly 2 steps forward
-
-        new RenderablePos(-112, 30,  1/2.0,   sPos, levels[1]),    //Outdoor object 1 steps forward, 1 step left
-        new RenderablePos( 98,  30,  1/2.0,   sPos, levels[1]),    //Outdoor object 1 steps forward, 1 step right
-        new RenderablePos(-7,   30,  1/2.0,   sPos, levels[1]),    //Outdoor object directly 2 steps forward
-
+//        new RenderablePos(-112, 30,  MaMScaleLut(0),   sPos, levels[0]),      //Outdoor object 1 steps forward, 1 step left
+//        new RenderablePos( 98,  30,  MaMScaleLut(0),   sPos, levels[0]),      //Outdoor object 1 steps forward, 1 step right
+//        new RenderablePos(-7,   30,  MaMScaleLut(0),   sPos, levels[0]),      //Outdoor object directly 2 steps forward
         null,
-        new RenderablePos(-112, 30,  1/7.0,   sPos, levels[2]),    //Outdoor object 2 steps forward, 1 step left
-        new RenderablePos( 98,  30,  1/7.0,   sPos, levels[2]),    //Outdoor object 2 steps forward, 1 step right
-        new RenderablePos(-7,   30,  1/7.0,   sPos, levels[2]),    //Outdoor object directly 2 steps forward
+        new RenderablePos(0, 0,  MaMScaleLut(-9),   sPos, levels[0]),
         null,
 
+        new RenderablePos(-112, 30,  MaMScaleLut(0),   sPos, levels[1]),    //Outdoor object 1 steps forward, 1 step left
+        new RenderablePos(-7,   30,  MaMScaleLut(0),   sPos, levels[1]),    //Outdoor object directly 2 steps forward
+        new RenderablePos( 98,  30,  MaMScaleLut(0),   sPos, levels[1]),    //Outdoor object 1 steps forward, 1 step right
+
+
         null,
-        null,
-        new RenderablePos( 57,  54,  1/12.0,  sPos, levels[3]),    //Outdoor object 3 steps forward, 1 step righ
-        new RenderablePos(-73,  54,  1/12.0,  sPos, levels[3]),    //Outdoor object 3 steps forward, 1 step left
-        new RenderablePos(-8,   54,  1/12.0,  sPos, levels[3]),    //Outdoor object directly 3 steps forward
-        null,
+        new RenderablePos(8,    24,  MaMScaleLut(7),   sPos, levels[2]),    //Outdoor object 2 steps forward, 1 step left
+        new RenderablePos(32,   24,  MaMScaleLut(7),   sPos, levels[2]),    //Outdoor object directly 2 steps forward
+        new RenderablePos(169,  24,  MaMScaleLut(7),   sPos, levels[2]),    //Outdoor object 2 steps forward, 1 step right
         null,
 
         null,
         null,
-        new RenderablePos( 64,  61,  1/14.0,  sPos, levels[4]),    //Outdoor object 4 steps forward, 2 steps right
-        new RenderablePos(-82,  61,  1/14.0,  sPos, levels[4]),    //Outdoor object 4 steps forward, 2 steps left
-        new RenderablePos( 40,  61,  1/14.0,  sPos, levels[4]),    //Outdoor object 4 steps forward, 1 step right
-        new RenderablePos(-58,  61,  1/14.0,  sPos, levels[4]),    //Outdoor object 4 steps forward, 1 step left
-        new RenderablePos(-9,   61,  1/14.0,  sPos, levels[4]),    //Outdoor object directly 4 steps forward
+        new RenderablePos( 57,  54,  MaMScaleLut(12),  sPos, levels[3]),    //Outdoor object 3 steps forward, 1 step righ
+        new RenderablePos(-73,  54,  MaMScaleLut(12),  sPos, levels[3]),    //Outdoor object 3 steps forward, 1 step left
+        new RenderablePos(-8,   54,  MaMScaleLut(12),  sPos, levels[3]),    //Outdoor object directly 3 steps forward
+        null,
+        null,
+
+        null,
+        null,
+        new RenderablePos( 64,  61,  MaMScaleLut(14),  sPos, levels[4]),    //Outdoor object 4 steps forward, 2 steps right
+        new RenderablePos(-82,  61,  MaMScaleLut(14),  sPos, levels[4]),    //Outdoor object 4 steps forward, 2 steps left
+        new RenderablePos( 40,  61,  MaMScaleLut(14),  sPos, levels[4]),    //Outdoor object 4 steps forward, 1 step right
+        new RenderablePos(-58,  61,  MaMScaleLut(14),  sPos, levels[4]),    //Outdoor object 4 steps forward, 1 step left
+        new RenderablePos(-9,   61,  MaMScaleLut(14),  sPos, levels[4]),    //Outdoor object directly 4 steps forward
         null,
         null,
         };
@@ -240,7 +260,6 @@ public class RenderPosHelper implements IHasProperties
         return null;
     }
 
-
     public RenderablePos getOutdoorEnvPos(Point relaivePos)
     {
         int index = relativePos2TileNumTable.getOrDefault(relaivePos, -1);
@@ -249,6 +268,27 @@ public class RenderPosHelper implements IHasProperties
             return outdoorEnvironmentPlacements[index];
         }
         return null;
+    }
+
+    public int getOutdoorEnvFrame(Point relativePos)
+    {
+        int index = relativePos2TileNumTable.getOrDefault(relativePos, -1);
+        if(index >= 0)
+        {
+            return outdoorEnvironmentFrames[index];
+        }
+        return 0;
+    }
+
+    /**
+     * Scale values translated to n in 16 lines skipped.
+     * I am not going to skip lines, but instead calculate an equivalent scale.
+     *
+     */
+    protected double MaMScaleLut(int scaleValue)
+    {
+        //scaleValue = Math.max(Math.min(scaleValue, 15), -256);
+        return  1.0 - (scaleValue/16.0);
     }
 
     //------------------------------------------------------------------------------------------------------------------

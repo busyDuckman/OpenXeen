@@ -1,6 +1,8 @@
 package mamFiles.IOT;
 
+import Toolbox.BinaryHelpers;
 import Toolbox.HProperties;
+import Toolbox.HackMe;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMPallet;
 import mamFiles.MaMSprite;
@@ -22,12 +24,17 @@ public class IoTSpriteFile extends WOXSpriteFile
     int[] opcodeHistogram;
     public IoTSpriteFile(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
         super(name, key, data, pal);
+
+        System.out.println("Loaded " + name + " from: ");
+        System.out.println("    " + BinaryHelpers.hexEditorView(data, 0, 16));
+        System.out.println("    " + BinaryHelpers.hexEditorView(data, 16, 16));
     }
 
 
 
     protected void renderToFrame(Cell cell, FrameInfo frame, byte[] data, int offset, MaMSprite sprite)
     {
+        HackMe HM = HackMe.GlobalInstance;
         // This method is called by the super constructor, so the
         // initialisation of opcodeHistogram is a bit hacky.
         if(opcodeHistogram == null)
@@ -88,22 +95,30 @@ public class IoTSpriteFile extends WOXSpriteFile
                     cmd = ( opcode & 0xE0 ) >>> 5;
                     opcodeHistogram[cmd]++;
 
+                    int H1_loop=0,H1_offset=0;
                     switch( cmd )
                     {
                         case 0:   //(OK) The following len + 1 bytes are stored as indexes into the color table.
                         case 1:   //(??)  The following len + 33 bytes are stored as indexes into the color table.
-                            for( i = 0 ; i < opcode + 1 ; i++, xPos++ )
+                            H1_loop = (cmd==0) ? 0 : HM.getHack("OP-1 loop extra");
+                            H1_offset = (cmd==0) ? 0 : HM.getHack("OP-1 offset");
+                            for( i = 0 ; i < opcode + 1 + H1_loop; i++, xPos++ )
                             {
-                                opr1 = INT(data[dp++]); byteCount++;
-                                cell.putPixel( xPos, yPos, opr1, frame, sprite);
+                                opr1 = INT(data[dp + H1_offset]);
+                                byteCount++;
+                                dp++;
+                                cell.putPixel( xPos, yPos, opr1, frame, sprite, cmd);
                             }
                             break;
 
                         case 2:   // The following byte is an index into the color table, draw it len + 3 times.
-                            opr1 = INT(data[dp++]); byteCount++;
-                            for( i = 0 ; i < len + 3 ; i++, xPos++ )
+
+                            opr1 = INT(data[dp + HM.getHack("OP-2 data offset")]);
+                            dp++;
+                            byteCount++;
+                            for( i = 0 ; i < (len + 3 + HM.getHack("OP-2 len adjust")); i++, xPos++ )
                             {
-                                cell.putPixel( xPos, yPos, opr1, frame, sprite);
+                                cell.putPixel( xPos, yPos, opr1, frame, sprite, cmd);
                             }
                             break;
 
@@ -113,7 +128,7 @@ public class IoTSpriteFile extends WOXSpriteFile
                             for( i = 0 ; i < len + 4 ; i++, xPos++ )
                             {
                                 opr2 = INT(data[dp-opr1+i]);
-                                cell.putPixel( xPos, yPos, opr2, frame, sprite);
+                                cell.putPixel( xPos, yPos, opr2, frame, sprite, cmd);
                             }
                             break;
 
@@ -122,25 +137,31 @@ public class IoTSpriteFile extends WOXSpriteFile
                             opr2 = INT(data[dp++]); byteCount++;
                             for( i = 0 ; i < len + 2 ; i++, xPos += 2 )
                             {
-                                cell.putPixel( xPos+0, yPos, opr1, frame, sprite);
-                                cell.putPixel( xPos+1, yPos, opr2, frame, sprite);
+                                cell.putPixel( xPos+0, yPos, opr1, frame, sprite, cmd);
+                                cell.putPixel( xPos+1, yPos, opr2, frame, sprite, cmd);
                             }
                             break;
 
                         case 5:   // (OK?) Skip len + 1 pixels filling them with the transparent color.
-                            xPos += len + 1;
+                            //hacky, just inset the transparent col for now, so the make purple thing works
+                            for( i = 0 ; i < len + 1; i++, xPos++)
+                            {
+                                cell.putPixel( xPos+0, yPos, 0, frame, sprite, cmd);
+                            }
+                            //xPos += len + 1;
                             break;
 
                         case 6:  //(OK) Pattern command.
                         case 7:  //(??)
                             // The pattern command has a different opcode format
-                            len = opcode & 0x07;
+                            len = (opcode & 0x07) + HM.getHack("OP-6  len");
+                            int oldCmd = cmd;
                             cmd = ( opcode >>> 2 ) & 0x0E;
 
                             opr1 = INT(data[dp++]); byteCount++;
                             for( i = 0 ; i < len + 3 ; i++, xPos++ )
                             {
-                                cell.putPixel( xPos, yPos, opr1, frame, sprite);
+                                cell.putPixel( xPos, yPos, opr1, frame, sprite, oldCmd);
                                 opr1 += patternSteps[cmd + ( i % 2 )];
                             }
                             break;

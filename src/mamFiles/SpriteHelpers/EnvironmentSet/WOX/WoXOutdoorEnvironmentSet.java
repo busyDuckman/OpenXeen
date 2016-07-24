@@ -38,16 +38,17 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
     private static final String[] environNameLut = new String[] {
             null,
             "MOUNT.WAL",
+            "LTREE.WAL",
             "DTREE.WAL",
-            "PALM.WAL",
+            "GRASS.WAL",
             "SNOTREE.WAL",
-            "DMOUNT.WAL",
             "DSNOTREE.WAL",
             "SNOMNT.WAL",
-            "GRASS.WAL",
             "DEDLTREE.WAL",
+            null,//"DMOUNT.WAL",
             "LAVAMNT.WAL",
-            "LTREE.WAL"
+            "PALM.WAL",
+            "DMOUNT.WAL"
 
        };
 
@@ -92,7 +93,7 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
     }
 
     @Override
-    public IRenderableGameObject getEnviron(int environIndex, int mipMapLevel) {
+    public MaMSprite getEnviron(int environIndex, int mipMapLevel) {
 //        String name =environIndex +".OBJ";
 //        name = (environIndex < 10) ? ("0" + name) : name;
 //        name = (environIndex < 100) ? ("0" + name) : name;
@@ -100,22 +101,28 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
         String name = environNameLut[environIndex%environNameLut.length];
         if(name == null)
         {
+            if(environIndex != 0)
+            {
+                System.out.println("UNKNOWN ENV OBJECT:" + environIndex);
+            }
             return null;
         }
         MaMSprite envObj = this.ccFile.getSpriteOrNull(name);
-        try {
-            envObj = (envObj != null) ? envObj.subSetOfFrames("first of ", 0, 1) : null;
-        } catch (CCFileFormatException e) {
-            e.printStackTrace();
-        }
 
         if(envObj != null)
         {
+            try {
+                envObj = envObj.appendSprite(envObj.getName() + " with mirror", envObj.mirror().asSprite());
+                CCFileFormatException.stub();
+            } catch (CCFileFormatException e) {
+                e.printStackTrace();
+            }
+
             return envObj;
         }
         if(environIndex != 0)
         {
-            return IRenderableGameObject.fromText("Missing obj: " + environIndex, Color.red, 200, 25);
+            return IRenderableGameObject.fromText("Missing obj: " + environIndex, Color.red, 200, 25).asSprite();
         }
         return null;
     }

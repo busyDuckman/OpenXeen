@@ -53,6 +53,8 @@ public class RenderablePos
     final private double scale;
     final private ScalePosition scalePos;
     final private int depth;
+    //final private int mirror;
+
 
     private static volatile int xPosHack=0;
     private static volatile int yPosHack=0;
@@ -144,6 +146,14 @@ public class RenderablePos
 
     public RenderablePos translate(int x, int y) {
         return new RenderablePos(xPos+x, yPos+y, scale, scalePos, depth-1, hackMe);
+    }
+
+    public RenderablePos scaleLocationOnly(double sx, double sy) {
+        return new RenderablePos((int)(xPos*sx), (int)(yPos*sy), scale, scalePos, depth-1, hackMe);
+    }
+
+    public RenderablePos scaleScaleOnly(double scaleFactor) {
+        return new RenderablePos(xPos, yPos, scale*scaleFactor, scalePos, depth-1, hackMe);
     }
 
     //------------------------------------------------------------------------------------------------------------------

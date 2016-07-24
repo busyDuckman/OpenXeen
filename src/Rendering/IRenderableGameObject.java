@@ -8,6 +8,7 @@ import mamFiles.CCFileFormatException;
 import mamFiles.IHasProxy;
 import mamFiles.MAMFile;
 import mamFiles.MaMSprite;
+import mamFiles.WOX.WOXSpriteFile;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -189,8 +190,9 @@ public interface IRenderableGameObject
         BufferedImage[] destImages= new BufferedImage[sourceImages.length];
 
         for (int i = 0; i < destImages.length; i++) {
-            AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-            tx.translate(0, -sourceImages[i].getHeight(null));
+            AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+            //tx.translate(0, -sourceImages[i].getHeight(null));
+            tx.translate(-sourceImages[i].getWidth(null), 0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             destImages[i] = op.filter(sourceImages[i], null);
         }
@@ -208,6 +210,12 @@ public interface IRenderableGameObject
     default IRelativeToLocationSprite asIRelativeToLocationSprite()
     {
         return new RelativeLocationWrapper(this);
+    }
+
+    default MaMSprite asSprite()
+    {
+        //TODO: AnimationSettings should be preserved
+        return (this instanceof MaMSprite) ? (MaMSprite)this : new MaMSprite("asSprite", MAMFile.generateUniqueKey("asSprite"), getRenderedFrames());
     }
 }
 

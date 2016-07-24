@@ -1,6 +1,7 @@
 package mamFiles.WOX;
 
 import Toolbox.BinaryHelpers;
+import Toolbox.HackMe;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMPallet;
 import mamFiles.MaMSprite;
@@ -18,7 +19,7 @@ import static Toolbox.BinaryHelpers.*;
  */
 public class WOXSpriteFile extends MaMSprite
 {
-
+    public static volatile HackMe opcodePurpleHack = new HackMe("Sprite OP Codes");
     protected class Cell extends Rectangle
     {
         byte[] rgbData;
@@ -38,7 +39,7 @@ public class WOXSpriteFile extends MaMSprite
             CCFileFormatException.assertFalse(width  < 0, "Cell() width  < 0");
             CCFileFormatException.assertFalse(height < 0, "Cell() height < 0");
             CCFileFormatException.assertFalse(width >= 1024, "Cell() width >= 1024");
-            CCFileFormatException.assertFalse(width >= 1024, "Cell() width >= 1024");
+            CCFileFormatException.assertFalse(height >= 1024, "Cell() height >= 1024");
             rgbData = new byte[width * height * 3];
         }
 
@@ -69,12 +70,50 @@ public class WOXSpriteFile extends MaMSprite
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                System.out.println("Bad index to Cell::putpixel " + x + ", " + y);
+                //ex.printStackTrace();
             }
 
             //colorData[(y*width+x)*4] = (byte)( (pallet != null) ? pallet.getColor(colorIndex).getBlue()  : colorIndex );
             //colorData[(y*width+x)*4+1] = (byte)( (pallet != null) ? pallet.getColor(colorIndex).getGreen() : colorIndex );
             //colorData[(y*width+x)*4+2] = (byte)( (pallet != null) ? pallet.getColor(colorIndex).getRed()   : colorIndex );
+        }
+
+        /**
+         * A debug version of putPixel. lets me set all pixels of a certain command to a certain color.
+         * Used in debugging altered versions of the sprite code (MM3 so far).
+         */
+        public void putPixel(int x, int y, int colorIndex, FrameInfo frame, MaMSprite sprite, int cmd) {
+            if(sprite == null)
+            {
+                System.out.println("WTF: sprite = null. Puppy Cheese Blanket");
+                return;
+            }
+
+            try
+            {
+                int writePos = (y*width+x)*4;
+                //argb
+                if(opcodePurpleHack.getHack("CMD"+cmd+" is purple") != 0)
+                {
+                    frame.data[writePos] =   (byte)0xff;
+                    frame.data[writePos+1] = (byte)0xff;
+                    frame.data[writePos+2] = (byte)0x00;
+                    frame.data[writePos+3] = (byte)0x90;
+                }
+                else
+                {
+                    frame.data[writePos] = (colorIndex == sprite.getTransparentIndex()) ? 0 : (byte)0xff;
+                    frame.data[writePos+1] = (byte)sprite.getPallet().getColor(colorIndex).getRed();
+                    frame.data[writePos+2] = (byte)sprite.getPallet().getColor(colorIndex).getGreen();
+                    frame.data[writePos+3] = (byte)sprite.getPallet().getColor(colorIndex).getBlue();
+                }
+            }
+            catch (Exception ex)
+            {
+                //System.out.println("Bad index to Cell::putpixel " + x + ", " + y);
+                //ex.printStackTrace();
+            }
         }
 
 //        //based on code at http://xeen.wikia.com/wiki/Sprite_File_Format#Pattern_Command
