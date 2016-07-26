@@ -110,7 +110,7 @@ public class MaMGame implements IMaMGame
     {
         party = new ArrayList<>();
         party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, new CharClass(), 1));
-        partyPos = new Point(20, 51);
+        partyPos = new Point(18, 53);
         partyDir = Direction.UP;
     }
 
@@ -234,6 +234,7 @@ public class MaMGame implements IMaMGame
             //render the current view
             IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
 
+            System.out.println("----------------------------------------------");
             if(map != null)
             {
                 Point viewNormal = partyDir.getVector();
@@ -263,7 +264,6 @@ public class MaMGame implements IMaMGame
 
                             if(surf != null)
                             {
-
                                 IRenderableGameObject surfaceLayer = surf.getSurfaceOverlay(vsPos);
 
                                 if(surfaceLayer != null)
@@ -272,6 +272,10 @@ public class MaMGame implements IMaMGame
                                     // is deliberately too large,  this is normal.
                                     int surfaceDepth = RenderPosHelper.getGlobalHelper().getDepth(RenderableType.SURFACE, vsY);
                                     view.addRenderable(new RenderablePos(8, 67, 1.0, surfaceDepth), surfaceLayer);
+                                }
+                                else
+                                {
+                                    //System.out.println("NULL surface overlay for view space :" + vsX + ", " + vsY);
                                 }
                             }
 

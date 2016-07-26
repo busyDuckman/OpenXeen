@@ -205,11 +205,11 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     public String toString() {
         return "MaMSprite{" +
                 "name=" + name +
-                ((frames != null) ? (", frames=" + Arrays.toString(frames) +
-                                     ", transparentIndex=" + transparentIndex) : "") +
                 ", width=" + width +
                 ", height=" + height +
                 ", #images = " + getRenderedFrames().length +
+                ((frames != null) ? (", frames=" + Arrays.toString(frames) +
+                ", transparentIndex=" + transparentIndex) : "") +
                 '}';
     }
 
