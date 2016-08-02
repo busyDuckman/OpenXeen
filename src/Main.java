@@ -1,11 +1,14 @@
 import Game.MaMGame;
+import Rendering.RenderablePos;
 import Rendering.SimpleCanvas.MaMPanel;
 import mamFiles.CCFileCache;
 import mamFiles.CCFileFormatException;
 import mamFiles.IOT.IoTccFileReader;
 import mamFiles.MaMSprite;
+import mamFiles.SpriteHelpers.RenderPosHelper;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Random;
 
 /**
@@ -18,15 +21,15 @@ public class Main
      */
     public static void main(String[] args)
     {
-
         MaMGame game = null;
         try {
             Random rand = new Random(System.currentTimeMillis());
             //Create game
             //game = new MaMGame("xeen.cc");
-            //game = new MaMGame("dark.cc");
+            game = new MaMGame("dark.cc");
+
             //CCFileCache.INSTANCE.setEnabled(false);
-            game = new MaMGame(IoTccFileReader.open("mm3.cc"));
+            //game = new MaMGame(IoTccFileReader.open("mm3.cc"));
 
 
             //Create a renderer for the game (renderer is embedded in a JPanel)

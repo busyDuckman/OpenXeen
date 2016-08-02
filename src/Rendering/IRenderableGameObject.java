@@ -8,11 +8,13 @@ import mamFiles.CCFileFormatException;
 import mamFiles.IHasProxy;
 import mamFiles.MAMFile;
 import mamFiles.MaMSprite;
+import mamFiles.WOX.WOXSpriteFile;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.function.Function;
 
 
 /**
@@ -189,8 +191,9 @@ public interface IRenderableGameObject
         BufferedImage[] destImages= new BufferedImage[sourceImages.length];
 
         for (int i = 0; i < destImages.length; i++) {
-            AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-            tx.translate(0, -sourceImages[i].getHeight(null));
+            AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+            //tx.translate(0, -sourceImages[i].getHeight(null));
+            tx.translate(-sourceImages[i].getWidth(null), 0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             destImages[i] = op.filter(sourceImages[i], null);
         }
@@ -208,6 +211,53 @@ public interface IRenderableGameObject
     default IRelativeToLocationSprite asIRelativeToLocationSprite()
     {
         return new RelativeLocationWrapper(this);
+    }
+
+    default MaMSprite asSprite()
+    {
+        //TODO: AnimationSettings should be preserved
+        return (this instanceof MaMSprite) ? (MaMSprite)this : new MaMSprite("asSprite", MAMFile.generateUniqueKey("asSprite"), getRenderedFrames());
+    }
+
+    default IRenderableGameObject unifyDimensions()
+    {
+        BufferedImage[] frames = this.getRenderedFrames();
+        if(frames.length == 0) {
+            return this;
+        }
+
+        //find max size, and some stats
+        int maxWidth = 0, maxHeight = 0;
+        boolean homogenous = true;
+
+        for (int i = 0; i < frames.length; i++) {
+            BufferedImage frame = frames[i];
+            int width = frame.getWidth();
+            int height = frame.getHeight();
+
+            if(i > 0) {
+                if((width != maxWidth) || (height != maxHeight)) {
+                    homogenous = false;
+                }
+            }
+
+            maxWidth = Math.max(maxWidth, width);
+            maxHeight = Math.max(maxHeight, height);
+        }
+
+        if(homogenous) {
+            return this;
+        }
+
+        BufferedImage[] newFrames = new BufferedImage[frames.length];
+        for (int i = 0; i < frames.length; i++) {
+            newFrames[i] = ImageHelpers.centreOnNewCanvas(frames[i], maxWidth, maxHeight);
+        }
+
+        //return a sprite
+        String name = (this instanceof MAMFile) ? ("unified_"+((MAMFile)this).getName()) : "via unifyDimensions()";
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, newFrames);
     }
 }
 

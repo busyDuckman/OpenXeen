@@ -3,6 +3,7 @@ package mamFiles.SpriteHelpers.EnvironmentSet.IOT;
 import Rendering.IRenderableGameObject;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMSurface;
+import mamFiles.MaMThing;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 
 /**
@@ -14,7 +15,7 @@ public abstract class IoTEnvironmentSet implements IMaMEnvironmentSet
     }
 
     @Override
-    public IRenderableGameObject getObject(int objectIndex, int mipMapLevel) {
+    public MaMThing getObject(int objectIndex) {
         return null;
     }
 

@@ -1,5 +1,7 @@
 package Rendering;
 
+import Toolbox.HackMe;
+
 import java.awt.*;
 
 /**
@@ -53,9 +55,11 @@ public class RenderablePos
     final private double scale;
     final private ScalePosition scalePos;
     final private int depth;
+    //TODO:
+    //final private boolean mirror;
 
-    private static volatile int xPosHack=0;
-    private static volatile int yPosHack=0;
+    private static final String xPosHackText = "pos x hack";
+    private static final String yPosHackText = "pos y hack";
 
     transient volatile int simpleHash = 0;
 
@@ -76,10 +80,22 @@ public class RenderablePos
         this.scalePos = scalePos;
         this.depth = depth;
         this.hackMe = hackMe;
-        if(this.hackMe) {
-            System.out.println("hacking of pos enabled");
-            System.out.println("    hack is at " + xPosHack + ", " + yPosHack);
-        }
+    }
+
+    protected RenderablePos(int xPos, int yPos, double scale, ScalePosition scalePos, int depth, boolean hackMe, int simpleHash) {
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.scale = scale;
+        this.scalePos = scalePos;
+        this.depth = depth;
+        this.hackMe = hackMe;
+        this.simpleHash = simpleHash;
+
+//        if(hackMe)
+//        {
+//            //foobar
+//            updateHash(xPos, yPos);
+//        }
     }
 
     public RenderablePos(int xPos, int yPos, double scale, int depth) {
@@ -93,6 +109,7 @@ public class RenderablePos
         this.scalePos = other.scalePos;
         this.depth = other.depth;
         hackMe = other.hackMe;
+        simpleHash = other.simpleHash;
     }
 
     public RenderablePos hackMe() {
@@ -127,23 +144,42 @@ public class RenderablePos
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "RenderablePos(" +
+                "xPos=" + xPos +
+                ", yPos=" + yPos +
+                ", scale=" + scale +
+                ", scalePos=" + scalePos +
+                ", depth=" + depth +
+                ')';
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     //
     //------------------------------------------------------------------------------------------------------------------
     public RenderablePos above() {
-        return new RenderablePos(xPos, yPos, scale, scalePos, depth+1, hackMe);
+        return new RenderablePos(xPos, yPos, scale, scalePos, depth+1, hackMe, simpleHash);
     }
 
     public RenderablePos below() {
-        return new RenderablePos(xPos, yPos, scale, scalePos, depth-1, hackMe);
+        return new RenderablePos(xPos, yPos, scale, scalePos, depth-1, hackMe, simpleHash);
     }
 
     public RenderablePos atDepth(int newDepth) {
-        return new RenderablePos(xPos, yPos, scale, scalePos, newDepth, hackMe);
+        return new RenderablePos(xPos, yPos, scale, scalePos, newDepth, hackMe, simpleHash);
     }
 
     public RenderablePos translate(int x, int y) {
-        return new RenderablePos(xPos+x, yPos+y, scale, scalePos, depth-1, hackMe);
+        return new RenderablePos(xPos+x, yPos+y, scale, scalePos, depth-1, hackMe, simpleHash);
+    }
+
+    public RenderablePos scaleLocationOnly(double sx, double sy) {
+        return new RenderablePos((int)(xPos*sx), (int)(yPos*sy), scale, scalePos, depth-1, hackMe, simpleHash);
+    }
+
+    public RenderablePos scaleScaleOnly(double scaleFactor) {
+        return new RenderablePos(xPos, yPos, scale*scaleFactor, scalePos, depth-1, hackMe, simpleHash);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -154,14 +190,9 @@ public class RenderablePos
             // Hash the hacked pos, print output if something changed.
             // Then use the output to alter the code so the sprite is in
             // the correct position.
-            int posXHack = xPos+xPosHack;
-            int posYHack = yPos+yPosHack;
-            int hash = posXHack *1000 + posYHack;
-            if(hash != simpleHash)
-            {
-                System.out.println("Renderable pos hacked to " + posXHack + ", " + posYHack);
-                simpleHash = hash;
-            }
+            int posXHack = xPos + HackMe.GlobalInstance.getHack(xPosHackText);
+            int posYHack = yPos + HackMe.GlobalInstance.getHack(yPosHackText);
+            updateHash(posXHack, posYHack);
             return posXHack;
         }
         return xPos;
@@ -172,14 +203,9 @@ public class RenderablePos
             // Hash the hacked pos, print output if something changed.
             // Then use the output to alter the code so the sprite is in
             // the correct position.
-            int posXHack = xPos+xPosHack;
-            int posYHack = yPos+yPosHack;
-            int hash = posXHack *1000 + posYHack;
-            if(hash != simpleHash)
-            {
-                System.out.println("Renderable pos hacked to " + posXHack + ", " + posYHack);
-                simpleHash = hash;
-            }
+            int posXHack = xPos + HackMe.GlobalInstance.getHack(xPosHackText);
+            int posYHack = yPos + HackMe.GlobalInstance.getHack(yPosHackText);
+            updateHash(posXHack, posYHack);
             return posYHack;
         }
         return yPos;
@@ -213,21 +239,14 @@ public class RenderablePos
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    //Hacks to nude items around
+    //Hacks to move items around
     //------------------------------------------------------------------------------------------------------------------
-    public static void incYHack() {
-        yPosHack++;
-    }
-
-    public static void decXHack() {
-        xPosHack--;
-    }
-
-    public static void decYHack() {
-        yPosHack--;
-    }
-
-    public static void incXHack() {
-        xPosHack++;
+    protected void updateHash(int posXHack, int posYHack) {
+        int hash = posXHack *1000 + posYHack;
+        if(hash != simpleHash)
+        {
+            System.out.println("Renderable pos hacked to " + posXHack + ", " + posYHack);
+            simpleHash = hash;
+        }
     }
 }

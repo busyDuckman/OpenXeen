@@ -8,7 +8,7 @@ public enum GlobalSettings
     INSTANCE;
 
     boolean debugMode = true;
-    boolean rebuildProxies = true;
+    boolean rebuildProxies = false;
     private boolean disableHUD = false;
     private boolean discoverFileNames = false;
 

@@ -139,7 +139,9 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             Rectangle bounds = renderable.getKey().getImageBoundsAfterOffset(0, 0,
                                                                 frame.getWidth(),
                                                                 frame.getHeight());
-            bounds = ISceneComposition.scaleRectangleNoTearing(bounds, scale*localScale);
+
+            double spriteScale = renderable.getKey().getScale();
+            bounds = ISceneComposition.scaleRectangleNoTearing(bounds, spriteScale*scale*localScale);
 
             g.drawImage(frame, (int)(x*scale)+bounds.x, (int)(y*scale)+bounds.y, bounds.width, bounds.height, null);
         }
@@ -172,6 +174,13 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
                 System.out.println("Sprite is corrupted?");
                 continue;
             }
+
+//            double spriteScale = renderable.getKey().getScale();
+//            if(spriteScale != 1.0)
+//            {
+//                //spriteScale *= 0.25;
+//                System.out.println("scale="+spriteScale);
+//            }
 
             Rectangle bounds = renderable.getKey().getImageBounds(frame.getWidth(), frame.getHeight());
             bounds = ISceneComposition.scaleRectangleNoTearing(bounds, scale);
