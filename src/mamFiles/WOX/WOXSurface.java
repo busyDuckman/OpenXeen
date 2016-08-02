@@ -1,8 +1,7 @@
 package mamFiles.WOX;
 
 import Catalano.Imaging.FastBitmap;
-import Catalano.Imaging.Filters.Grayscale;
-import Catalano.Imaging.Filters.Threshold;
+import Catalano.Imaging.Filters.*;
 import Rendering.*;
 import Toolbox.Direction;
 import Toolbox.ImageHelpers;
@@ -15,6 +14,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+
+import static Toolbox.BinaryHelpers.INT;
 
 /**
  * Created by duckman on 19/05/2016.
@@ -39,7 +40,7 @@ public class WOXSurface extends MaMSurface
     //------------------------------------------------------------------------------------------------------------------
     // static
     //------------------------------------------------------------------------------------------------------------------
-    //private static final int numFrames = 25;
+    private static final int numFrames = 25;
 
     /**
      * One mask per area
@@ -47,6 +48,7 @@ public class WOXSurface extends MaMSurface
     protected byte[][] spRenderMasks =null;
 
     protected IRenderableGameObject fullSurface;
+    private boolean blurMask = false;
 
     public WOXSurface(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
         this(new WOXSpriteFile(name, MAMFile.generateUniqueKey(key), data, pal), key);
@@ -96,7 +98,6 @@ public class WOXSurface extends MaMSurface
                     {
                         return fullSurface.applyMask(spRenderMasks[spIndex]);
                     }
-
                 }
             }
         }
@@ -174,7 +175,7 @@ public class WOXSurface extends MaMSurface
         MaM2DInsertionOrderComposition view = new MaM2DInsertionOrderComposition();
 
         //render all frames
-        for(int r = 0; r< RenderPosHelper.getGlobalHelper().getNumMappedPoints(); r++)
+        for(int r = 0; r < numFrames; r++)
         {
             //System.out.println("n="+n + ", i="+i);
             //if(RenderPosHelper.getGlobalHelper().surfaceVisibleFor(r))
@@ -228,8 +229,8 @@ public class WOXSurface extends MaMSurface
 
     protected byte[][] compileToMask(MaMSprite mamStyleSprite)
     {
-        byte[][] masks = new byte[25][];
-        for(int i = 0; i< 25; i++)
+        byte[][] masks = new byte[numFrames][];
+        for(int i = 0; i< numFrames; i++)
         {
             //render to view
             MaM2DInsertionOrderComposition view = new MaM2DInsertionOrderComposition();
@@ -242,6 +243,40 @@ public class WOXSurface extends MaMSurface
 
             //get alpha channel
             masks[i] = ImageHelpers.getAlphaChannel(img);
+
+
+            if(blurMask)
+            {
+                Point p = RenderPosHelper.getGlobalHelper().getSurfaceEnvPos(mapSPIndexToRPIndex(i));
+
+                //blur
+                BufferedImage gsImage = ImageHelpers.RGB2Image(masks[i], masks[i], masks[i],
+                                                                img.getWidth(), img.getHeight());
+                //Load an image
+                FastBitmap fb = new FastBitmap(gsImage);
+
+                Grayscale gs = new Grayscale();
+                gs.applyInPlace(fb);
+//                Dilatation dl = new Dilatation(5-p.y);
+//                dl.applyInPlace(fb);
+//                ConservativeSmoothing cs = new ConservativeSmoothing(5-p.y);
+//                cs.applyInPlace(fb);
+                Blur bl = new Blur();
+                bl.applyInPlace(fb);
+
+                fb.saveAsPNG("c:\\temp\\dump_"+i+".png");
+                byte[] temp = ImageHelpers.getRedChannel(fb.toBufferedImage());
+                for(int q=0;q<temp.length;q++)
+                {
+                    masks[i][q] =  (masks[i][q] == ((byte)0xff)) ? masks[i][q] : temp[q];
+                    //masks[i][q] =  (INT(masks[i][q]) >= 32) ? masks[i][q] : 0;
+                }
+
+                // Apply Bradley local
+
+            }
+
+
         }
 
         return masks;

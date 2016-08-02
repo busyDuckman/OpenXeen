@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.function.Function;
 
 
 /**
@@ -216,6 +217,47 @@ public interface IRenderableGameObject
     {
         //TODO: AnimationSettings should be preserved
         return (this instanceof MaMSprite) ? (MaMSprite)this : new MaMSprite("asSprite", MAMFile.generateUniqueKey("asSprite"), getRenderedFrames());
+    }
+
+    default IRenderableGameObject unifyDimensions()
+    {
+        BufferedImage[] frames = this.getRenderedFrames();
+        if(frames.length == 0) {
+            return this;
+        }
+
+        //find max size, and some stats
+        int maxWidth = 0, maxHeight = 0;
+        boolean homogenous = true;
+
+        for (int i = 0; i < frames.length; i++) {
+            BufferedImage frame = frames[i];
+            int width = frame.getWidth();
+            int height = frame.getHeight();
+
+            if(i > 0) {
+                if((width != maxWidth) || (height != maxHeight)) {
+                    homogenous = false;
+                }
+            }
+
+            maxWidth = Math.max(maxWidth, width);
+            maxHeight = Math.max(maxHeight, height);
+        }
+
+        if(homogenous) {
+            return this;
+        }
+
+        BufferedImage[] newFrames = new BufferedImage[frames.length];
+        for (int i = 0; i < frames.length; i++) {
+            newFrames[i] = ImageHelpers.centreOnNewCanvas(frames[i], maxWidth, maxHeight);
+        }
+
+        //return a sprite
+        String name = (this instanceof MAMFile) ? ("unified_"+((MAMFile)this).getName()) : "via unifyDimensions()";
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, newFrames);
     }
 }
 

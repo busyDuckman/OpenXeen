@@ -234,7 +234,7 @@ public class MaMGame implements IMaMGame
             //render the current view
             IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
 
-            System.out.println("----------------------------------------------");
+            //System.out.println("----------------------------------------------");
             if(map != null)
             {
                 Point viewNormal = partyDir.getVector();
@@ -287,14 +287,31 @@ public class MaMGame implements IMaMGame
                                 int frame = RenderPosHelper.getGlobalHelper().getOutdoorEnvFrame(vsPos);
                                 if(spPos != null)
                                 {
-                                    RenderablePos deFutzed = deFutz(spPos);
-
                                     //that whole left/right side of screen frame thing
                                     String name = (envobject instanceof MaMSprite) ? ((MaMSprite)envobject).getName() : "?";
-                                    view.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
-                                    view.addRenderable(deFutzed.above().translate(0, 0),
-                                            //IRenderableGameObject.fromText("<"+environNum+">" + name + ".", Color.white, 172,16));
-                                    IRenderableGameObject.fromText(""+environNum, Color.white, 172,16));
+                                    view.addRenderable(spPos, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
+                                }
+                            }
+
+
+                            // TODO: What is the overlay mask in the tile for?
+
+                            int thingNum = tile.getIndexTop();
+                            MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
+                            if(thing != null)
+                            {
+                                IRenderableGameObject rThing = thing.getView(vsPos, partyDir).unifyDimensions();
+                                RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorPos(vsPos,
+                                        thing.getRenderedFrames()[0].getWidth(),
+                                        thing.getRenderedFrames()[0].getHeight());
+                                //int frame = RenderPosHelper.getGlobalHelper().getOutdoorEnvFrame(vsPos);
+                                if(spPos != null)
+                                {
+                                    view.addRenderable(spPos, thing);
+
+                                    //that whole left/right side of screen frame thing
+                                    //String name = (envobject instanceof MaMSprite) ? ((MaMSprite)envobject).getName() : "?";
+                                    //view.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
                                 }
                             }
                         }
@@ -311,14 +328,6 @@ public class MaMGame implements IMaMGame
 
         return view;
     }
-
-    private RenderablePos deFutz(RenderablePos spPos)
-    {
-        int middle = (RenderPosHelper.screenSize.width/2) + 8;
-        //return spPos.translate(middle-25, 0);//.scaleLocationOnly(1,-1).translate(0, 100);
-        return spPos;
-    }
-
 
     @Override
     public MaM2DMapComposition renderMap(int mapX, int mapY, int mapWidth, int mapHeight)

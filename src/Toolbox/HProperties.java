@@ -72,6 +72,30 @@ public class HProperties extends Properties
         return super.setProperty(fullName(key), value);
     }
 
+    public boolean getBoolPropertyOrValue(String key, boolean onNoKey) {
+        String text = getProperty(key, null);
+        if(text == null) {
+            return onNoKey;
+        }
+        return Boolean.parseBoolean(key);
+    }
+
+    public double getDoublePropertyOrValue(String key, double onNoKey) {
+        String text = getProperty(key, null);
+        if(text == null) {
+            return onNoKey;
+        }
+        return Double.parseDouble(key);
+    }
+
+    public int getIntegerPropertyOrValue(String key, int onNoKey) {
+        String text = getProperty(key, null);
+        if(text == null) {
+            return onNoKey;
+        }
+        return Integer.parseInt(key);
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Data collection helpers
     //------------------------------------------------------------------------------------------------------------------

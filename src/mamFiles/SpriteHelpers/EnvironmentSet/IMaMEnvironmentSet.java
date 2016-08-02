@@ -3,13 +3,14 @@ package mamFiles.SpriteHelpers.EnvironmentSet;
 import Rendering.IRenderableGameObject;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMSurface;
+import mamFiles.MaMThing;
 
 /**
  * Created by duckman on 16/06/2016.
  */
 public interface IMaMEnvironmentSet
 {
-    IRenderableGameObject getObject(int objectIndex, int mipMapLevel);
+    MaMThing getObject(int objectIndex);
 
     IRenderableGameObject getSky();
     IRenderableGameObject getGround();

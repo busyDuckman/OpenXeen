@@ -64,7 +64,11 @@ public abstract class MaMThing extends MAMFile implements Rendering.IRelativeToL
                 directionalViews[3] = mamStyleSprite.subSetOfFrames("ViewOfWestSide_"  + name, 1,1);
                 break;
             default:
-                CCFileFormatException.throwFeatureNotReady("Don't know how to make that sprite directional");
+                //CCFileFormatException.throwFeatureNotReady("Don't know how to make that sprite directional");
+                directionalViews[0] = mamStyleSprite;
+                directionalViews[1] = mamStyleSprite;
+                directionalViews[2] = mamStyleSprite;
+                directionalViews[3] = mamStyleSprite;
 
         }
     }

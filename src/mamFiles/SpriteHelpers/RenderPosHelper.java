@@ -9,6 +9,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static Rendering.RenderablePos.ScalePosition.Bottom;
+
 /**
  * Created by duckman on 4/07/2016.
  *
@@ -53,6 +55,8 @@ public class RenderPosHelper implements IHasProperties
     // Static data
     //------------------------------------------------------------------------------------------------------------------
     public static final Dimension screenSize = new Dimension(216, 132);
+    public static final Dimension[] outdoorEnvObjectSize = new Dimension[]
+            { new Dimension(55, 84), new Dimension(168, 84), new Dimension(78,52) };
     private static RenderPosHelper globalHelper = new RenderPosHelper();
 
 
@@ -80,6 +84,8 @@ public class RenderPosHelper implements IHasProperties
     // Outdoor environment objects
     protected RenderablePos[] outdoorEnvironmentPlacements;
     protected int[] outdoorEnvironmentFrames;
+
+    protected Map<Point, RenderablePos> objectLocations;
 
     //------------------------------------------------------------------------------------------------------------------
     // Constructors and setup
@@ -227,6 +233,34 @@ public class RenderPosHelper implements IHasProperties
                         new RenderablePos(168,   61,  MaMScaleLut(14),  sPos, levels[4]),
                         new RenderablePos(191,   61,  MaMScaleLut(14),  sPos, levels[4]),
                 };
+
+        objectLocations = new HashMap<>();
+        objectLocations.put(new Point(0, 0), new RenderablePos(130, 130, 1.5625, Bottom, -8));
+
+        objectLocations.put(new Point(-1, 1), new RenderablePos(27, 107, 1.0, Bottom, -40));
+        objectLocations.put(new Point(0, 1), new RenderablePos(124, 107, 1.0, Bottom, -40));
+        objectLocations.put(new Point(1, 1), new RenderablePos(203, 107, 1.0, Bottom, -40));
+
+        objectLocations.put(new Point(-1, 2), new RenderablePos(35, 89, 0.6875, Bottom, -72));
+        objectLocations.put(new Point(0, 2), new RenderablePos(117, 90, 0.6875, Bottom, -72));
+        objectLocations.put(new Point(1, 2), new RenderablePos(208, 89, 0.6875, Bottom, -72));
+
+        objectLocations.put(new Point(-2, 3), new RenderablePos(11, 81, 0.375, Bottom, -104));
+        objectLocations.put(new Point(-1, 3), new RenderablePos(58, 81, 0.375, Bottom, -104));
+        objectLocations.put(new Point(0, 3), new RenderablePos(122, 81, 0.375, Bottom, -104));
+        objectLocations.put(new Point(1, 3), new RenderablePos(180, 81, 0.375, Bottom, -104));
+        objectLocations.put(new Point(2, 3), new RenderablePos(211, 81, 0.375, Bottom, -104));
+
+        objectLocations.put(new Point(-4, 4), new RenderablePos(18, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(-3, 4), new RenderablePos(41, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(-2, 4), new RenderablePos(63, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(-1, 4), new RenderablePos(86, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(0, 4), new RenderablePos(109, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(1, 4), new RenderablePos(132, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(2, 4), new RenderablePos(155, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(3, 4), new RenderablePos(178, 71, 0.125, Bottom, -136));
+        objectLocations.put(new Point(4, 4), new RenderablePos(201, 71, 0.125, Bottom, -136));
+
     }
 
 
@@ -248,6 +282,17 @@ public class RenderPosHelper implements IHasProperties
     public static void setGlobalHelper(RenderPosHelper globalHelper) {
         RenderPosHelper.globalHelper = globalHelper;
     }
+
+    public Point getRelativePosForIndex(int index)
+    {
+        for (Point point : relativePos2TileNumTable.keySet()) {
+            if(relativePos2TileNumTable.get(point) == index) {
+                return point;
+            }
+        }
+        return null;
+    }
+
 
     //------------------------------------------------------------------------------------------------------------------
     // Depth Helpers
@@ -323,6 +368,51 @@ public class RenderPosHelper implements IHasProperties
         }
         return 0;
     }
+
+    /**
+     * Any (other) item outdoors...
+     */
+    public RenderablePos getOutdoorPos(Point vsPos, int spriteWidth, int spriteHeight)
+    {
+        if(objectLocations.containsKey(vsPos))
+        {
+            RenderablePos renderPos = objectLocations.get(vsPos);
+            spriteWidth *= renderPos.getScale();
+            spriteHeight *= renderPos.getScale();
+            return renderPos.translate(-spriteWidth/2, -spriteHeight);
+        }
+
+        return null;
+    }
+
+//    public RenderablePos getOutdoorPos(Point vsPos, int spriteWidth, int spriteHeight)
+//    {
+//        RenderablePos p = getOutdoorEnvPos(vsPos);
+//        int frameNum = getOutdoorEnvFrame(vsPos);
+//
+//        //remove reversed frame indexes
+//        if(frameNum > 2) {
+//            frameNum -= 3;
+//        }
+//
+//        if((p != null) && (frameNum >=0))
+//        {
+//            //The edge environment sprites have an odd scaling that is not applicable to other objects.
+//            double regularScale = getOutdoorEnvPos(new Point(0, vsPos.y)).getScale();
+//
+//            spriteWidth *= regularScale;
+//            spriteHeight *= regularScale;
+//            //re-centre x
+//            int xAdj = (int)(((outdoorEnvObjectSize[frameNum].width * p.getScale()) - spriteWidth) / 2.0);
+//
+//            //keep y at the same spot on the ground
+//            int yAdj = (int)((outdoorEnvObjectSize[frameNum].height * p.getScale()) - spriteHeight);
+//
+//            return p.translate(xAdj, yAdj).atDepth(getDepth(RenderableType.OBJ_ITEM, vsPos.y));
+//        }
+//
+//        return null;
+//    }
 
 
     //------------------------------------------------------------------------------------------------------------------

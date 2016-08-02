@@ -65,6 +65,22 @@ public class ImageHelpers
         return imgARGB;
     }
 
+    public static BufferedImage RGB2Image(byte[] rData, byte[] gData, byte[] bData, int width, int height) {
+        BufferedImage imgARGB = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for(int y=0; y<height; y++)
+        {
+            for(int x=0; x<width; x++)
+            {
+                int pos = (x+(y*width));
+                Color c = new Color(INT(rData[pos]), INT(gData[pos]), INT(bData[pos]));
+                imgARGB.setRGB(x, y, c.getRGB());
+            }
+        }
+
+        return imgARGB;
+    }
+
     public static BufferedImage RGBA2Image(int[] data, Dimension size) {
         return RGBA2Image(data, size.width, size.height);
     }
@@ -133,7 +149,7 @@ public class ImageHelpers
     }
 
     /**
-     * Evey alpha value in the image as an array.
+     * Every alpha value in the image as an array.
      */
     public static byte[] getAlphaChannel(BufferedImage image)
     {
@@ -145,6 +161,39 @@ public class ImageHelpers
             alphachannel[i] = (byte)(c.getAlpha() & 0xff);
         }
         return alphachannel;
+    }
+
+    public static byte[] getRedChannel(BufferedImage image)
+    {
+        int[] data = image2RGBA(image);
+        byte[] channel = new byte[image.getWidth()*image.getHeight()];
+        for (int i = 0; i < data.length; i++) {
+            Color c = new Color(data[i], true);
+            channel[i] = (byte)(c.getRed() & 0xff);
+        }
+        return channel;
+    }
+
+    public static byte[] getGreenChannel(BufferedImage image)
+    {
+        int[] data = image2RGBA(image);
+        byte[] channel = new byte[image.getWidth()*image.getHeight()];
+        for (int i = 0; i < data.length; i++) {
+            Color c = new Color(data[i], true);
+            channel[i] = (byte)(c.getGreen() & 0xff);
+        }
+        return channel;
+    }
+
+    public static byte[] getBlueChannel(BufferedImage image)
+    {
+        int[] data = image2RGBA(image);
+        byte[] channel = new byte[image.getWidth()*image.getHeight()];
+        for (int i = 0; i < data.length; i++) {
+            Color c = new Color(data[i], true);
+            channel[i] = (byte)(c.getBlue() & 0xff);
+        }
+        return channel;
     }
 
     /**
@@ -254,6 +303,14 @@ public class ImageHelpers
         }
 
         return images;
+    }
+
+    public static BufferedImage centreOnNewCanvas(BufferedImage image, int width, int height) {
+        BufferedImage newImage = new BufferedImage(width, height, image.getType());
+        Graphics g = image.getGraphics();
+        g.drawImage(image, (width-image.getWidth())/2, (height-image.getHeight())/2, null);
+        g.dispose();
+        return newImage;
     }
 
     public enum AlphaTransforms

@@ -144,6 +144,17 @@ public class RenderablePos
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "RenderablePos(" +
+                "xPos=" + xPos +
+                ", yPos=" + yPos +
+                ", scale=" + scale +
+                ", scalePos=" + scalePos +
+                ", depth=" + depth +
+                ')';
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     //
     //------------------------------------------------------------------------------------------------------------------

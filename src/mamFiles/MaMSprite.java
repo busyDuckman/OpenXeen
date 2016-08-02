@@ -3,8 +3,11 @@ package mamFiles;
 import Rendering.AnimationSettings;
 import Rendering.IRenderableGameObject;
 import Toolbox.*;
+import com.sun.istack.internal.NotNull;
 
 import javax.imageio.ImageIO;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -234,6 +237,84 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
     public BufferedImage asSpriteSheet()
     {
         return ImageHelpers.joinHorizontally(this.getRenderedFrames());
+    }
+
+    /**
+     * A sprite view is a set of frames viewed in a particular order.
+     * Perhaps with some frames flipped or scaled.
+     */
+    public static class SpriteView
+    {
+        /**
+         * The frames in this view (the view may arbitrarily re-organise the animation)
+         */
+        @NotNull
+        int[] frames;
+
+        /**
+         * The transform for the current frame at frames[i]
+         */
+        @NotNull
+        ImageTransform[] transforms;
+
+        /**
+         * Number of frames in this view
+         */
+        int length;
+
+        /**
+         * This constructor suites views as stored in DARK.DAT
+         */
+        public SpriteView(int startFrame, int len, ImageTransform transform)
+        {
+            length = Math.max(len, 0);
+            frames = new int[length];
+            transforms = new ImageTransform[length];
+            for(int i=0; i<len; i++)
+            {
+                frames[i] = startFrame + i;
+                transforms[i] = transform;
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            SpriteView that = (SpriteView) o;
+
+            if (length != that.length) return false;
+            if (!Arrays.equals(frames, that.frames)) return false;
+            // Probably incorrect - comparing Object[] arrays with Arrays.equals
+            return Arrays.equals(transforms, that.transforms);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Arrays.hashCode(frames);
+            result = 31 * result + Arrays.hashCode(transforms);
+            result = 31 * result + length;
+            return result;
+        }
+
+        public MaMSprite apply(MaMSprite sprite)
+        {
+            BufferedImage[] images = new BufferedImage[length];
+            for (int i = 0; i < images.length; i++) {
+                BufferedImage img = sprite.getRenderedFrames()[frames[i]];
+                images[i] = transforms[i].apply(img);
+            }
+
+            String name = "view of " + sprite.getName();
+            return new MaMSprite(name, MAMFile.generateUniqueKey(name), images);
+        }
+    }
+
+    public MaMSprite getView(SpriteView sView)
+    {
+        return sView.apply(this);
     }
 
     //------------------------------------------------------------------------------------------------------------------
