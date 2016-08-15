@@ -12,6 +12,11 @@ public class Stat<T extends Stats>
     int temporaryLevel;
     T type;
 
+    public Stat(int baseLevel) {
+        this.baseLevel = baseLevel;
+        //type = T::new;
+    }
+
     public String describe()
     {
         return type.describe(temporaryLevel);

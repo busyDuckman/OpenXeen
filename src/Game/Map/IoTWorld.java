@@ -100,41 +100,6 @@ public class IoTWorld extends MaMWorld
     }
 
     @Override
-    public String getMazeName(int id) throws CCFileFormatException {
-        return null;
-    }
-
-    @Override
-    public String getScriptedEventsName(int id) throws CCFileFormatException {
-        return null;
-    }
-
-    @Override
-    public String getMonsterLayoutFile(int id) throws CCFileFormatException {
-        return null;
-    }
-
-    @Override
-    public String getHeadingFile(int id) throws CCFileFormatException {
-        return null;
-    }
-
-    @Override
-    public String getAreaNameFile(int id) throws CCFileFormatException {
-        return null;
-    }
-
-    @Override
-    public String getEventTextStringsFile(int id) throws CCFileFormatException {
-        return null;
-    }
-
-    @Override
-    public String getMapNameFile(int id) throws CCFileFormatException {
-        return null;
-    }
-
-    @Override
     public MaMSprite getNPCFaceOrNull(int id) {
         return null;
     }

@@ -602,7 +602,12 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
 
     public byte[] getFileRaw(String fileName) throws CCFileFormatException
     {
-        return getFileRaw(hashFileName(fileName));
+        if(fileExists(fileName)) {
+            return getFileRaw(hashFileName(fileName));
+        }
+        else {
+            throw CCFileFormatException.fromMissingFile(fileName, this);
+        }
     }
 
     public byte[] getFileRaw(int id) throws CCFileFormatException
@@ -616,7 +621,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         }
         else
         {
-            return null;
+            throw CCFileFormatException.fromMissingFile(getNameForID(id), this);
         }
     }
 

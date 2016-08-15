@@ -12,21 +12,12 @@ public abstract class Stats
         @Override protected int getDescriptionMax() {return Math.min(255, getMax());}
     }
 
-    public class Might extends StatBasic
-    {
-        @Override protected final String[] getDescriptions() { return new String[]{"Weak", "Tough", "Awesome"};}
-    }
-
-    public class Age extends StatBasic
-    {
-        @Override public int getMax() {return 120;}
-        @Override protected final String[] getDescriptions() {
-            return new String[]{"Baby, Child, Youth, Adult, Veteran, Old, Ancient"};
-        }
-    }
-
     public abstract int getMin();
     public abstract int getMax();
+
+    /**
+     * For the purposes of dividing up the description labelling.
+     */
     protected abstract int getDescriptionMax();
     protected abstract String[] getDescriptions();
     private int[] descriptionBreaks;
@@ -58,6 +49,19 @@ public abstract class Stats
         return getDescriptions()[i];
     }
 
+    public class Might extends StatBasic
+    {
+        @Override protected final String[] getDescriptions() { return new String[]{"Weak", "Tough", "Awesome"};}
+    }
+
+    public class Age extends StatBasic
+    {
+        @Override public int getMax() {return 120;}
+        @Override protected final String[] getDescriptions() {
+            return new String[]{"Baby, Child, Youth, Adult, Veteran, Old, Ancient"};
+        }
+    }
+
     public class Intelligence extends StatBasic {
             @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
     }
@@ -83,10 +87,12 @@ public abstract class Stats
     }
 
     public class Armour extends StatBasic {
+        @Override public int getMax() {return Integer.MAX_VALUE;}
         @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
     }
 
     public class Level extends StatBasic {
+        @Override public int getMax() {return Integer.MAX_VALUE;}
         @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
     }
 
@@ -115,49 +121,17 @@ public abstract class Stats
     }
 
     public class HitPoints extends StatBasic {
+        @Override public int getMax() {return Integer.MAX_VALUE;}
         @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
     }
 
     public class SpellPoints extends StatBasic {
+        @Override public int getMax() {return Integer.MAX_VALUE;}
         @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
     }
 
     public class ExperiencePoints extends StatBasic {
+        @Override public int getMax() {return Integer.MAX_VALUE;}
         @Override protected final String[] getDescriptions() { return new String[]{"", "", "", "", ""};}
     }
 }
-
-//public enum Stats
-//{
-//    MIGHT (0, 255, "Weak, Tough, Awesome"),
-//    AGE (0,100, "Baby, Child, Youth, Adult, Veteran, Old, Ancient");
-//
-//    int[] descriptionBreaks;
-//    String[] descriptions;
-//
-//    Stats(int descMin, int descMax, String descriptionList)
-//    {
-//        String[] tokens = descriptionList.split(",");
-//        for (int i = 0; i < tokens.length; i++) {
-//            descriptions[i] = tokens[i].trim();
-//            descriptionBreaks[i] = (int)(((descMax-descMin) / (double)tokens.length) * i);
-//        }
-//    }
-//
-//    public String describe(int level)
-//    {
-//        int i=0;
-//        for (;i < descriptionBreaks.length; i++) {
-//            if(descriptionBreaks[i] > level) {
-//                break;
-//            }
-//        }
-//
-//        // Get previous description break.
-//        // Should also bring i, into a valid array range for
-//        // the last description.
-//        i = Math.max(0, i-1);
-//
-//        return descriptions[i];
-//    }
-//}

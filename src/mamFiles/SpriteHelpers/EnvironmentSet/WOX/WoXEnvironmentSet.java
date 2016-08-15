@@ -3,10 +3,7 @@ package mamFiles.SpriteHelpers.EnvironmentSet.WOX;
 import Game.Map.WoXWorld;
 import Rendering.IRenderableGameObject;
 import Rendering.RenderablePos;
-import Toolbox.BinaryHelpers;
-import Toolbox.Direction;
-import Toolbox.IImageWorker;
-import Toolbox.Misc;
+import Toolbox.*;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMCCFileReader;
 import mamFiles.MaMSprite;
@@ -16,6 +13,7 @@ import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -110,6 +108,9 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
         byte[] data = ccFile.getFileRaw(file);
         ByteArrayInputStream bisConfig = new ByteArrayInputStream(data);
         Direction[] unPackOrder = new Direction[] {Direction.UP, Direction.LEFT, Direction.DOWN, Direction.RIGHT};
+        if(things == null) {
+            things = new HashMap<>();
+        }
 
         for(int i=0; i<121; i++)
         {
@@ -117,14 +118,24 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
             int[] flipFrames = BinaryHelpers.readBYTEs(bisConfig, 4);
             int[] endFrames = BinaryHelpers.readBYTEs(bisConfig, 4);
 
+            Map<Direction, MaMSprite.SpriteView> sViews = new HashMap<>();
+
             for(int d=0; d<4; d++)
             {
+                MaMSprite.SpriteView sView = new MaMSprite.SpriteView(
+                        startFrames[d],
+                        endFrames[d],
+                        (flipFrames[d] != 0) ? ImageTransform.FLIP : ImageTransform.NO_OPERATION);
+
+                sViews.put(unPackOrder[d], sView);
             }
+
+            things.put(i, sViews);
         }
 
     }
 
-    Map<Integer, Map<Direction, IImageWorker>> transroms;
+    Map<Integer, Map<Direction, MaMSprite.SpriteView>> things;
 
 
     @Override
@@ -145,6 +156,7 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
                 fileName = Misc.padZeros(objectIndex, 3)+".OBJ";
                 break;
             case CLOUDS:
+                fileName = Misc.padZeros(objectIndex, 3)+".OBJ";
                 break;
             case SWORDS:
                 break;
@@ -154,6 +166,7 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
 
         try {
             return ccFile.getThing(fileName);
+            //return ccFile.getSprite(fileName).getView(
         } catch (CCFileFormatException e) {
             e.printStackTrace();
             return null;

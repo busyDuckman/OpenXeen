@@ -141,7 +141,7 @@ public class WOXccFileReader extends MaMCCFileReader
 
     @Override
     protected MaMMazeFile decodeMapFile(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException {
-        return new WOXMazeFile(mazeID, key, world);
+        return new WOXMazeFile(mazeID, key, (WoXWorld)world);
     }
 
 

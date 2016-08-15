@@ -1,6 +1,7 @@
 package mamFiles.IOT;
 
 import Game.Map.MaMWorld;
+import Game.Map.WoXWorld;
 import Toolbox.BinaryHelpers;
 import Toolbox.FileHelpers;
 import mamFiles.*;
@@ -362,7 +363,7 @@ public class IoTccFileReader extends MaMCCFileReader
 
     @Override
     protected MaMMazeFile decodeMapFile(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException {
-        return new WOXMazeFile(mazeID, key, world);
+        return new WOXMazeFile(mazeID, key, (WoXWorld)world);
     }
 
 

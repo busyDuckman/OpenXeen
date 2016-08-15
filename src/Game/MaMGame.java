@@ -13,7 +13,6 @@ import mamFiles.*;
 import mamFiles.IOT.IoTccFileReader;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 import mamFiles.SpriteHelpers.RenderPosHelper;
-import mamFiles.WOX.WOXSurface;
 import mamFiles.WOX.WOXccFileReader;
 import org.joda.time.DateTime;
 import static Toolbox.PointHelper.*;
@@ -296,7 +295,7 @@ public class MaMGame implements IMaMGame
 
                             // TODO: What is the overlay mask in the tile for?
 
-                            int thingNum = tile.getIndexTop();
+                            int thingNum = tile.getIndexMapOverlayIcon();
                             MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
                             if(thing != null)
                             {
@@ -377,7 +376,7 @@ public class MaMGame implements IMaMGame
 
                     //objects
                     tilePos = tilePos.above();
-                    int objectIndex = tile.getIndexTop();
+                    int objectIndex = tile.getIndexMapOverlayIcon();
                     IRenderableGameObject overlaySprite = maze.getEnvironmentSet().getMapObject(objectIndex);
                     if(objectIndex != 0)
                     {

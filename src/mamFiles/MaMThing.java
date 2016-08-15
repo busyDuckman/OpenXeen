@@ -23,7 +23,7 @@ import java.awt.*;
  *   - monsters
  *   - wall decals
  */
-public abstract class MaMThing extends MAMFile implements Rendering.IRelativeToLocationSprite
+public class MaMThing extends MAMFile implements Rendering.IRelativeToLocationSprite
 {
     /**
      * Indexed by Direction::ordinal()

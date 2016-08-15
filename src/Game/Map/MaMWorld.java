@@ -96,13 +96,13 @@ public abstract class MaMWorld implements AutoCloseable
 
     public abstract ISceneComposition renderHUDForWorld();
 
-    public abstract String getMazeName(int id) throws CCFileFormatException;
-    public abstract String getScriptedEventsName(int id) throws CCFileFormatException;
-    public abstract String getMonsterLayoutFile(int id) throws CCFileFormatException;
-    public abstract String getHeadingFile(int id) throws CCFileFormatException;
-    public abstract String getAreaNameFile(int id) throws CCFileFormatException;
-    public abstract String getEventTextStringsFile(int id) throws CCFileFormatException;
-    public abstract String getMapNameFile(int id) throws CCFileFormatException;
+//    public abstract String getMazeName(int id) throws CCFileFormatException;
+//    public abstract String getScriptedEventsName(int id) throws CCFileFormatException;
+//    public abstract String getMonsterLayoutFile(int id) throws CCFileFormatException;
+//    public abstract String getHeadingFile(int id) throws CCFileFormatException;
+//    public abstract String getAreaNameFile(int id) throws CCFileFormatException;
+//    public abstract String getEventTextStringsFile(int id) throws CCFileFormatException;
+//    public abstract String getMapNameFile(int id) throws CCFileFormatException;
 
     @Override
     public void close() throws Exception {

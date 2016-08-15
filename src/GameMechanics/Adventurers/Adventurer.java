@@ -92,7 +92,6 @@ public class Adventurer implements IUpdateable, IAttackable
     Stat<Stats.Luck> luck;
     Stat<Stats.Armour> armour;
     Stat<Stats.Level> level;
-    //Stat<Stats.Leveltemp> level;
     Stat<Stats.Age> age;
     Stat<Stats.FireResist> fireResist;
     Stat<Stats.ColdResist> coldResist;

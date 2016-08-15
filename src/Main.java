@@ -1,4 +1,5 @@
 import Game.MaMGame;
+import GameMechanics.Dice;
 import Rendering.RenderablePos;
 import Rendering.SimpleCanvas.MaMPanel;
 import mamFiles.CCFileCache;
