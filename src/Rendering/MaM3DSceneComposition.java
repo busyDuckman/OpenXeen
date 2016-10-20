@@ -137,8 +137,9 @@ public class MaM3DSceneComposition implements ISceneComposition {
         return null;
     }
 
-    public synchronized void addMonster(Point relativePos, MaMMonster monster) throws MaMGameException {
-        addRenderable(MaM3dScenePos.MonsterCurrentMiddle.getRenderablePosition(), monster.getAttackAnimation());
+    public synchronized void addMonster(RenderablePos pos, MaMMonster monster) throws MaMGameException {
+        //addRenderable(MaM3dScenePos.MonsterCurrentMiddle.getRenderablePosition(), monster.getAttackAnimation());
+        addRenderable(pos, monster.getAttackAnimation());
     }
 
 

@@ -1,7 +1,6 @@
 package GameMechanics.Adventurers;
 
 import GameMechanics.Stat;
-import GameMechanics.Stats;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -23,14 +22,18 @@ public enum CharRace
     public static class RaceModifier implements IStatModifier
     {
         String name;
-        Stats modifiedStat;
         @Override public DateTime getExpireTime() { return null; }
         @Override public String getName() { return name; }
-        @Override public <T extends Stats> Stat<T> applyTo(Stat<T> stat) {
-            //if(stat.;
+
+        @Override
+        public Stat applyTo(Stat stat) {
             return null;
         }
 
+        @Override
+        public boolean affects(Stat stat) {
+            return false;
+        }
     }
 
     String name;

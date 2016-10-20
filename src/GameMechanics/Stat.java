@@ -1,32 +1,37 @@
 package GameMechanics;
 
+import Game.GlobalSettings;
 import GameMechanics.Adventurers.IStatModifier;
 
 /**
  * Created by duckman on 31/05/2016.
  * Any stat, adventurer or monster.
  */
-public class Stat<T extends Stats>
+public class Stat
 {
     int baseLevel;
     int temporaryLevel;
-    T type;
+    String key;
 
-    public Stat(int baseLevel) {
-        this.baseLevel = baseLevel;
-        //type = T::new;
+    public Stat(String key, int min, int max) {
+
+    }
+
+    public String getName()
+    {
+        return GlobalSettings.INSTANCE.getLocalText().getString(key);
     }
 
     public String describe()
     {
-        return type.describe(temporaryLevel);
-    }
+        return null;
+    } //TODO
 
     public void resetTemporyLevel() {temporaryLevel = baseLevel;}
 
     public void applyModifier(IStatModifier mod)
     {
-        Stat<T> stat = mod.applyTo(this);
+        Stat stat = mod.applyTo(this);
         this.baseLevel = stat.baseLevel;
         this.temporaryLevel = stat.temporaryLevel;
     }
@@ -39,12 +44,8 @@ public class Stat<T extends Stats>
         return temporaryLevel;
     }
 
-    public T getType() {
-        return type;
-    }
 
-    public boolean isOfType(Stats stat)
-    {
-        return stat == type;
+    public void set(int value) {
+        baseLevel = value;
     }
 }

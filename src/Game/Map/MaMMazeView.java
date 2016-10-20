@@ -36,7 +36,7 @@ import java.util.function.Function;
 public class MaMMazeView implements IReadonlyGrid<MaMTile>
 {
     /**
-     * A collection of mazes, Presumably monsters are not active in these.
+     * A collection of mazes, Presumably entities are not active in these.
      * The point is in Join space
      */
     LRUCache<Point, MaMMazeFile> recentMazes;

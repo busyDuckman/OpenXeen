@@ -1,15 +1,20 @@
 package GameMechanics.Adventurers;
 
-import Game.Attacks.IAttack;
+import GameMechanics.Attacks.IAttack;
 import Game.IAttackable;
 import Game.IUpdateable;
 import Game.MaMActions;
 import Game.Map.MaMWorld;
+import GameMechanics.Combatant;
+import GameMechanics.Dice;
 import GameMechanics.Equipment.*;
 import GameMechanics.Inventory;
 import GameMechanics.Stat;
-import GameMechanics.Stats;
+import Rendering.IRelativeToLocationSprite;
+import Rendering.IRenderableGameObject;
 
+import java.awt.*;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,7 +25,7 @@ import java.util.List;
  *
  *
  */
-public class Adventurer implements IUpdateable, IAttackable
+public class Adventurer extends Combatant implements IUpdateable, IAttackable, Iterable<Stat>
 {
 
     //As a reference http://xeen.wikia.com/wiki/CharacterStruct
@@ -83,25 +88,46 @@ public class Adventurer implements IUpdateable, IAttackable
     int birthDOY;
     int birthYear;
 
-    Stat<Stats.Might> might;
-    Stat<Stats.Intelligence> intelligence;
-    Stat<Stats.Personality> personality;
-    Stat<Stats.Endurance> endurance;
-    Stat<Stats.Speed> speed;
-    Stat<Stats.Accuracy> accuracy;
-    Stat<Stats.Luck> luck;
-    Stat<Stats.Armour> armour;
-    Stat<Stats.Level> level;
-    Stat<Stats.Age> age;
-    Stat<Stats.FireResist> fireResist;
-    Stat<Stats.ColdResist> coldResist;
-    Stat<Stats.ElecResist> elecResist;
-    Stat<Stats.PoisonResist> poisonResist;
-    Stat<Stats.EnergyResist> energyResist;
-    Stat<Stats.MagicResist> magicResist;
-    Stat<Stats.HitPoints> hitPoints;
-    Stat<Stats.SpellPoints> spellPoints;
-    Stat<Stats.ExperiencePoints> experiencePoints;
+    protected Stat age = new Stat("stat_age", 0, 120);
+    protected Stat might = new Stat("stat_might", 0, naturalStatMax);
+    protected Stat intelligence = new Stat("stat_intellect", 0, naturalStatMax);
+    protected Stat personality = new Stat("stat_personality", 0, naturalStatMax);
+    protected Stat luck = new Stat("stat_luck", 0, naturalStatMax);
+    protected Stat spellPoints = new Stat("stat_spell_points", 0, miscStatMax);
+    protected Stat experiencePoints = new Stat("stat_experience", 0, miscStatMax);
+
+
+//    @Override
+//    public Iterator<Stat> iterator() {
+//        return new Iterator<Stat>() {
+//            private int index = 0;
+//            Stat[] allStats = new Stat[] { might, intelligence, personality, endurance, speed, accuracy, luck, armour,
+//                    level, age, fireResist, coldResist, elecResist, poisonResist, energyResist,
+//                    magicResist, hitPoints, spellPoints, experiencePoints};
+//            @Override public boolean hasNext() { return index < allStats.length; }
+//            @Override public Stat next() { return allStats[index++]; }
+//        };
+//    }
+
+//    Stat<Stats.Might> might;
+//    Stat<Stats.Intelligence> intelligence;
+//    Stat<Stats.Personality> personality;
+//    Stat<Stats.Endurance> endurance;
+//    Stat<Stats.Speed> speed;
+//    Stat<Stats.Accuracy> accuracy;
+//    Stat<Stats.Luck> luck;
+//    Stat<Stats.Armour> armour;
+//    Stat<Stats.Level> level;
+//    Stat<Stats.Age> age;
+//    Stat<Stats.FireResist> fireResist;
+//    Stat<Stats.ColdResist> coldResist;
+//    Stat<Stats.ElecResist> elecResist;
+//    Stat<Stats.PoisonResist> poisonResist;
+//    Stat<Stats.EnergyResist> energyResist;
+//    Stat<Stats.MagicResist> magicResist;
+//    Stat<Stats.HitPoints> hitPoints;
+//    Stat<Stats.SpellPoints> spellPoints;
+//    Stat<Stats.ExperiencePoints> experiencePoints;
 
     List<CharSkill> skills;
     List<Award> Awards;
@@ -125,6 +151,7 @@ public class Adventurer implements IUpdateable, IAttackable
 
 
     public Adventurer(String name, CharGender sex, CharRace race, CharClass klass, int faceNum) {
+        super(faceNum, name, new Point(0,0));
         this.name = name;
         this.sex = sex;
         this.race = race;
@@ -132,12 +159,45 @@ public class Adventurer implements IUpdateable, IAttackable
         this.faceNum = faceNum;
     }
 
+    public void rollNewAdvventurer()
+    {
+        Dice.Tally tally = Dice.Tally.fromString("2:D6 + 5");
+        Dice.Tally resistTally = Dice.Tally.fromString("1:D6+1");
+        might.set(tally.roll());
+        intelligence.set(tally.roll());
+        personality.set(tally.roll());
+        endurance.set(tally.roll());
+        speed.set(tally.roll());
+        accuracy.set(tally.roll());
+        luck.set(tally.roll());
+        armour.set(tally.roll());
+        level.set(1);
+        age.set(18);
+
+        fireResist.set(resistTally.roll());
+        coldResist.set(resistTally.roll());
+        elecResist.set(resistTally.roll());
+        poisonResist.set(resistTally.roll());
+        energyResist.set(resistTally.roll());
+        magicResist.set(resistTally.roll());
+
+        hitPoints.set(tally.roll());
+        spellPoints.set(10);
+        experiencePoints.set(0);
+    }
+
+
+    @Override
+    public IRelativeToLocationSprite getSprite() {
+        return IRenderableGameObject.fromText("Player", Color.RED, 100, 100).asIRelativeToLocationSprite();
+    }
+
     /*
-     * Called evey ?
-     *  -age char
-     *  -adjust sickness etc
-     *  -regen spell points
-     */
+         * Called evey ?
+         *  -age char
+         *  -adjust sickness etc
+         *  -regen spell points
+         */
     @Override
     public void update(MaMWorld world) {
 

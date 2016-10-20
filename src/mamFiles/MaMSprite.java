@@ -269,7 +269,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         {
             length = Math.max(len, 0);
             frames = new int[length];
-            transforms = new ImageTransform[length];
+            transforms = new IImageWorker[length];
             for(int i=0; i<len; i++)
             {
                 frames[i] = startFrame + i;

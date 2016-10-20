@@ -10,6 +10,7 @@ import Toolbox.Grid;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMMazeFile;
 import mamFiles.MaMThing;
+import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
@@ -30,7 +31,7 @@ public class WOXMazeFile extends MaMMazeFile
         byte[] mapData = world.getCCFileCur().getFileRaw(world.getMazeName(mazeID));
         loadMaze(mapData, mapWidth, mapHeight, world);
 
-        byte[] monData = world.getCCFileCur().getFileRaw(world.getMazeName(mazeID));
+        byte[] monData = world.getCCFileCur().getFileRaw(world.getMonsterLayoutFile(mazeID));
         loadMonstersAndThings(monData, world);
     }
 
@@ -40,7 +41,7 @@ public class WOXMazeFile extends MaMMazeFile
         int mapSize = mapWidth * mapHeight;
         this.map = new Grid<>(mapWidth, mapHeight, P -> null);
 
-            //interpret mapData
+        //interpret mapData
         int[] mapData = new int[mapSize]; //file data is in DWORD[]
         BinaryHelpers.readWORDsLSB(bisMapData, mapData, mapSize, 0);
 
@@ -248,6 +249,8 @@ public class WOXMazeFile extends MaMMazeFile
         int mapSize = map.size();
         ByteArrayInputStream bisMapData = new ByteArrayInputStream(monData);
 
+        Direction[] dirLut = new Direction[] {Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
+
         // look up tables
         int[] objectLut = new int[16];
         BinaryHelpers.readBYTEs(bisMapData, objectLut, 16, 0);
@@ -259,10 +262,15 @@ public class WOXMazeFile extends MaMMazeFile
         int[] record = new int[] {0, 0, 0, 0};
 
         //load objects
-        do {
-            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
-            //MaMThing thing = new
-        } while(!isSentinalRecord(record));
+//        do {
+//            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
+//            int x = record[0];
+//            int y = record[1];
+//            int thingNum = objectLut[record[2]];
+//            Direction dir = dirLut[record[3]];
+//            MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
+//            world.addThing(thing, x, y, dir, null);
+//        } while(!isSentinalRecord(record));
 
 
         int[] mapFlags = new int[mapSize];

@@ -8,6 +8,7 @@ import com.sun.istack.internal.NotNull;
 import mamFiles.WOX.WOXSpriteFile;
 
 import java.awt.*;
+import java.util.Map;
 
 /**
  * Created by duckman on 3/07/2016.
@@ -30,6 +31,20 @@ public class MaMThing extends MAMFile implements Rendering.IRelativeToLocationSp
      */
     protected IRenderableGameObject[] directionalViews;
 
+    /**
+     * This constructor turns the frames of a sprite into directional views.
+     */
+    public MaMThing(MaMSprite mamStyleSprite, String key, Map<Direction, MaMSprite.SpriteView> views) throws CCFileFormatException {
+        super(mamStyleSprite.name, key);
+
+        directionalViews = new IRenderableGameObject[4];
+
+        directionalViews[Direction.LEFT.ordinal()] = views.get(Direction.LEFT).apply(mamStyleSprite);
+        directionalViews[Direction.RIGHT.ordinal()] = views.get(Direction.RIGHT).apply(mamStyleSprite);
+        directionalViews[Direction.UP.ordinal()] = views.get(Direction.UP).apply(mamStyleSprite);
+        directionalViews[Direction.DOWN.ordinal()] = views.get(Direction.DOWN).apply(mamStyleSprite);
+
+    }
     /**
      * This constructor turns the frames of a sprite into directional views.
      */

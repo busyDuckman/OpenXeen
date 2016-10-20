@@ -127,6 +127,18 @@ public class WoXWorld extends MaMWorld
         return ccFileCur;
     }
 
+    public WoxVariant getVariant() {
+        return variant;
+    }
+
+    public WoXIndoorEnvironmentSet[] getIndoorEnvironmentSets() {
+        return indoorEnvironmentSets;
+    }
+
+    public WoXOutdoorEnvironmentSet[] getOutdoorEnvironmentSets() {
+        return outdoorEnvironmentSets;
+    }
+
     @Override
     public IMaMIndoorEnvironmentSet getIndoorEnvironmentSet(int index) {
         return indoorEnvironmentSets[index];
@@ -191,7 +203,8 @@ public class WoXWorld extends MaMWorld
     public void loadMaps() throws CCFileFormatException
     {
         int missCount=0;
-        for (int i = 0; (i < 500)&&(missCount<10); i++)
+        //TODO: > 100 (500)
+        for (int i = 0; (i < 100)&&(missCount<10); i++)
         {
             String mazeName = getMazeName(i);
             if(ccFileCur.fileExists(mazeName))

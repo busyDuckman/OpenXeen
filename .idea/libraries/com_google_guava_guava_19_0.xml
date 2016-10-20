@@ -3,6 +3,7 @@
     <properties maven-id="com.google.guava:guava:19.0" />
     <CLASSES>
       <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/19.0/guava-19.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/19.0/guava-19.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

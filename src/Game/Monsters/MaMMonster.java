@@ -1,15 +1,17 @@
 package Game.Monsters;
 
 import Game.*;
-import Game.Attacks.IAttack;
+import Game.Map.WoXWorld;
+import GameMechanics.Adventurers.CharClass;
+import GameMechanics.Attacks.AttackType;
+import GameMechanics.Attacks.IAttack;
 import Game.Map.MaMWorld;
+import GameMechanics.Combatant;
 import GameMechanics.Stat;
-import GameMechanics.Stats;
 import Rendering.AnimationSettings;
 import Rendering.IMaMSprite;
 import Rendering.IRelativeToLocationSprite;
 import Rendering.IRenderableGameObject;
-import Toolbox.Direction;
 import mamFiles.CCFileFormatException;
 
 import java.awt.*;
@@ -18,56 +20,43 @@ import java.awt.image.BufferedImage;
 /**
  * Created by duckman on 15/05/2016.
  */
-public class MaMMonster extends GameEntityBase implements IGameEntity, IAttackable, IRenderableGameObject
+public class MaMMonster extends Combatant implements IGameEntity, IAttackable, IRenderableGameObject
 {
     IMaMSprite idleAnimation;
     IMaMSprite attackAnimation;
 
-
-    //number	5	The Monster ID
-    //side	DARKSIDE	The side of Xeen it appears on
-    //name	Armadillo	Monster's Name
-
-    // Party experience when defeating it
-    Stat<Stats.ExperiencePoints> experience;
-
-    //Monster's max HP
-    Stat<Stats.HitPoints> hitPoints;
-
-    //Monster's armor class (physical defence)
-    int acc;
-
-    //Monster's attack speed (determines order per round)
-    int speed;
-//al attacks
-//    numberOfAttacks	1	Number of attacks monster gets per round
-//    hatesClass	ANY	Class/race to attack first (ALL=attack entire party at once)
-//    strikes	100	The 'X' in the XdY equation
-//    dmgPerStrike	6	The 'Y' in the XdY equation
-//    attackType	Physical	Element type of attack
-//    specialAttack	Break Weapon	Special effects caused by attack
-//    hitChance	60	Base probability of attack landing
-//    rangeAttack	False	Can attack at a distance
-//    monsterType	Animal	Certain monster types are affected differently by some spells
-//    res_fire	50	Resistance to fire based attacks
-//    res_elec	0	Resistance to electricity based attacks
-//    res_cold	80	Resistance to cold based attacks
-//    res_poison	80	Resistance to poison based attacks
-//    res_energy	50	Resistance to energy based attacks
-//    res_magic	0	Resistance to magic based attacks
-//    res_physical	50	Resistance to physic
-
-
-//    field_29	0	unknown! Doesn't seem to be used anywhere
-//    gold	0	Gold dropped by monster
-//    gems	0	Gems dropped by monster
-//    itemDrop	0	probability that monster drops an item
-//    flying	False	Boolean value: monster flies or it doesn't
-//    imageNumber	5	Sprite ID (xxx.MON and xxx.ATK files)
-//    loopAnimation	True	Frames either increment and loop, or bounce start to end and back
-//    animationEffect	0	Special effects
-//    idleSound	113	Effect number played by PlayFX every 5 seconds
-//    attackVoc	unnh	xxx.VOC file played when monster attacks
+    //public int number;
+    //public WoXWorld.WoxVariant side;
+    protected String name;
+    protected int experience;
+//    public int hp;
+//    public int acc;
+//    public int speed;
+    protected int numberOfAttacks;
+    protected CharClass hatesClass;
+    protected int strikes;
+    protected int dmgPerStrike;
+    protected AttackType attackType;
+    protected AttackType specialAttack;
+    protected int hitChance;
+    protected boolean rangeAttack;
+    protected MonsterType monsterType;
+//    public int res_fire;
+//    public int res_elec;
+//    public int res_cold;
+//    public int res_poison;
+//    public int res_energy;
+//    public int res_magic;
+//    public int res_physical;
+    protected int gold;
+    protected int gems;
+    protected int itemDrop;
+    protected boolean flying;
+    protected int imageNumber;
+    protected boolean loopAnimation;
+    protected int animationEffect;
+    protected int idleSound;
+    protected String attackVoc;
 
 
     public MaMMonster(String name, int id, IMaMSprite idleAnimation, IMaMSprite attackAnimation)
@@ -131,12 +120,176 @@ public class MaMMonster extends GameEntityBase implements IGameEntity, IAttackab
 
     @Override
     public IRelativeToLocationSprite getSprite() {
-        //return IRelativeToLocationSprite.idleAnimation;
-        return null; //TODO
+        return idleAnimation.asIRelativeToLocationSprite();
+        //return IRelativeToLocationSprite. idleAnimation;
+        //return null; //TODO
     }
 
     @Override
     public void update(MaMWorld world) {
 
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+
+    public void setIdleAnimation(IMaMSprite idleAnimation) {
+        this.idleAnimation = idleAnimation;
+    }
+
+    public void setAttackAnimation(IMaMSprite attackAnimation) {
+        this.attackAnimation = attackAnimation;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public void setExperience(int experience) {
+        this.experience = experience;
+    }
+
+    public int getNumberOfAttacks() {
+        return numberOfAttacks;
+    }
+
+    public void setNumberOfAttacks(int numberOfAttacks) {
+        this.numberOfAttacks = numberOfAttacks;
+    }
+
+    public CharClass getHatesClass() {
+        return hatesClass;
+    }
+
+    public void setHatesClass(CharClass hatesClass) {
+        this.hatesClass = hatesClass;
+    }
+
+    public int getStrikes() {
+        return strikes;
+    }
+
+    public void setStrikes(int strikes) {
+        this.strikes = strikes;
+    }
+
+    public int getDmgPerStrike() {
+        return dmgPerStrike;
+    }
+
+    public void setDmgPerStrike(int dmgPerStrike) {
+        this.dmgPerStrike = dmgPerStrike;
+    }
+
+    public AttackType getAttackType() {
+        return attackType;
+    }
+
+    public void setAttackType(AttackType attackType) {
+        this.attackType = attackType;
+    }
+
+    public AttackType getSpecialAttack() {
+        return specialAttack;
+    }
+
+    public void setSpecialAttack(AttackType specialAttack) {
+        this.specialAttack = specialAttack;
+    }
+
+    public int getHitChance() {
+        return hitChance;
+    }
+
+    public void setHitChance(int hitChance) {
+        this.hitChance = hitChance;
+    }
+
+    public boolean isRangeAttack() {
+        return rangeAttack;
+    }
+
+    public void setRangeAttack(boolean rangeAttack) {
+        this.rangeAttack = rangeAttack;
+    }
+
+    public MonsterType getMonsterType() {
+        return monsterType;
+    }
+
+    public void setMonsterType(MonsterType monsterType) {
+        this.monsterType = monsterType;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
+
+    public int getGems() {
+        return gems;
+    }
+
+    public void setGems(int gems) {
+        this.gems = gems;
+    }
+
+    public int getItemDrop() {
+        return itemDrop;
+    }
+
+    public void setItemDrop(int itemDrop) {
+        this.itemDrop = itemDrop;
+    }
+
+    public boolean isFlying() {
+        return flying;
+    }
+
+    public void setFlying(boolean flying) {
+        this.flying = flying;
+    }
+
+    public int getImageNumber() {
+        return imageNumber;
+    }
+
+    public void setImageNumber(int imageNumber) {
+        this.imageNumber = imageNumber;
+    }
+
+    public boolean isLoopAnimation() {
+        return loopAnimation;
+    }
+
+    public void setLoopAnimation(boolean loopAnimation) {
+        this.loopAnimation = loopAnimation;
+    }
+
+    public int getAnimationEffect() {
+        return animationEffect;
+    }
+
+    public void setAnimationEffect(int animationEffect) {
+        this.animationEffect = animationEffect;
+    }
+
+    public int getIdleSound() {
+        return idleSound;
+    }
+
+    public void setIdleSound(int idleSound) {
+        this.idleSound = idleSound;
+    }
+
+    public String getAttackVoc() {
+        return attackVoc;
+    }
+
+    public void setAttackVoc(String attackVoc) {
+        this.attackVoc = attackVoc;
     }
 }

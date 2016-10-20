@@ -4,11 +4,9 @@ import Game.Map.WoXWorld;
 import Rendering.IRenderableGameObject;
 import Rendering.RenderablePos;
 import Toolbox.*;
-import mamFiles.CCFileFormatException;
-import mamFiles.MaMCCFileReader;
-import mamFiles.MaMSprite;
-import mamFiles.MaMThing;
+import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
+import mamFiles.WOX.WoXThing;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -36,6 +34,8 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
     IRenderableGameObject[] basicMapGround  = new IRenderableGameObject[basicMapTableSize];
 
     MaMThing[] basicThings = new MaMThing[basicMapTableSize];
+
+    Map<Integer, Map<Direction, MaMSprite.SpriteView>> things;
 
     /**
      * Loads a set of environment sprites.
@@ -81,9 +81,10 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
         switch (variant)
         {
             case DARK_SIDE:
-
+                loadObjectConfigFile("DARK.DAT");
                 break;
             case CLOUDS:
+                loadObjectConfigFile("CLOUDS.DAT");
                 break;
             case SWORDS:
                 break;
@@ -135,9 +136,6 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
 
     }
 
-    Map<Integer, Map<Direction, MaMSprite.SpriteView>> things;
-
-
     @Override
     public MaMThing getObject(int objectIndex)
     {
@@ -165,7 +163,8 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
         }
 
         try {
-            return ccFile.getThing(fileName);
+            //return ccFile.getThing(fileName);
+            return new WoXThing(ccFile.getSprite(fileName), MAMFile.generateUniqueKey(fileName));
             //return ccFile.getSprite(fileName).getView(
         } catch (CCFileFormatException e) {
             e.printStackTrace();

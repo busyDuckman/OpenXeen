@@ -1,6 +1,6 @@
 package Game;
 
-import Game.Attacks.IAttack;
+import GameMechanics.Attacks.IAttack;
 
 /**
  * Created by duckman on 3/07/2016.

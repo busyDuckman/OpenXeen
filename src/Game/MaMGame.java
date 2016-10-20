@@ -19,8 +19,10 @@ import static Toolbox.PointHelper.*;
 import static mamFiles.SpriteHelpers.RenderPosHelper.RenderableType;
 
 import java.awt.*;
+import java.io.Console;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Created by duckman on 15/05/2016.
@@ -62,13 +64,21 @@ public class MaMGame implements IMaMGame
         setupDefaultGameState();
     }
 
-    public MaMGame(String ccFilePath) throws CCFileFormatException
+    protected MaMGame(String ccFilePath) throws CCFileFormatException
     {
         MaMCCFileReader ccFile = WOXccFileReader.open(ccFilePath);
         loadWorld(ccFile);
 
         activePartyEnchantments = new ArrayList<>();
         setupDefaultGameState();
+
+
+    }
+
+    public static MaMGame fromWoXData(String ccFilePath) throws CCFileFormatException {
+        MaMCCFileReader ccFile = WOXccFileReader.open(ccFilePath);
+        MaMGame game = new MaMGame(ccFile);
+        return game;
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -108,7 +118,7 @@ public class MaMGame implements IMaMGame
     private void setupDefaultGameState()
     {
         party = new ArrayList<>();
-        party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, new CharClass(), 1));
+        party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, CharClass.Archer, 1));
         partyPos = new Point(18, 53);
         partyDir = Direction.UP;
     }
@@ -222,9 +232,9 @@ public class MaMGame implements IMaMGame
         try
         {
 
-            MaMMonster mon = (world.getMonsters().length > 0) ?
-                    world.getMonsters()[testMonsterID%world.getMonsters().length]
-                    : null;
+//            MaMMonster mon = (world.getMonsters().length > 0) ?
+//                    world.getMonsters()[testMonsterID%world.getMonsters().length]
+//                    : null;
             //view.addMonster(new Point(100,0), mon);
 
             view.setGround(world.getOutdoorEnvironmentSet(0).getGround());
@@ -253,6 +263,7 @@ public class MaMGame implements IMaMGame
                         //get world position
                         int xPos = partyPos.x + fwd.x + right.x;
                         int yPos = partyPos.y + fwd.y + right.y;
+                        Point wsPos = new Point(xPos, yPos);
 
                         //render tile at xPos, yPos  to xsX, vsY
                         if(map.isValidLocation(xPos, yPos))
@@ -313,6 +324,29 @@ public class MaMGame implements IMaMGame
                                     //view.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
                                 }
                             }
+
+                            // entities (& monsters)
+                            world.getEntities().stream()
+                                    .filter(M -> M.getLocation().equals(wsPos))
+
+                                    .forEach(M -> {
+                                        try {
+                                            if((M == null) || (M.getSprite() == null))
+                                            {
+                                                System.out.print("nope");
+                                            }
+                                            else {
+                                                RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorPos(vsPos,
+                                                        M.getSprite().getRenderedFrames()[0].getWidth() / 2,
+                                                        M.getSprite().getRenderedFrames()[0].getHeight() / 2);
+                                                if (spPos != null) {
+                                                    view.addRenderable(spPos.scaleScaleOnly(0.5).above().above(), M.getSprite());
+                                                }
+                                            }
+                                        } catch (MaMGameException e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
                         }
 
                     }

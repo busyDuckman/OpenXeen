@@ -1,5 +1,8 @@
 package Game;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created by duckman on 18/06/2016.
  */
@@ -11,6 +14,7 @@ public enum GlobalSettings
     boolean rebuildProxies = false;
     private boolean disableHUD = false;
     private boolean discoverFileNames = false;
+    private volatile ResourceBundle localText = null;
 
     public boolean debugMode() {
         return debugMode;
@@ -40,5 +44,12 @@ public enum GlobalSettings
 
     public boolean discoverFileNames() {
         return discoverFileNames;
+    }
+
+    public ResourceBundle getLocalText() {
+        if(localText == null) {
+            localText = ResourceBundle.getBundle("openXeen", Locale.ENGLISH);
+        }
+        return localText;
     }
 }
