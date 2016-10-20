@@ -1,15 +1,22 @@
 package Game.Map;
 
+import Game.IGameEntity;
+import Game.IScript;
 import Game.MaMGame;
 import Game.Monsters.MaMMonster;
 import Rendering.ISceneComposition;
+import Toolbox.Direction;
 import com.sun.istack.internal.NotNull;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Created by duckman on 15/05/2016.
@@ -23,7 +30,7 @@ import java.util.Map;
  */
 public abstract class MaMWorld implements AutoCloseable
 {
-    MaMMonster[] monsters = null;
+    //MaMMonster[] entities = null;
     MaMGame game;
 
     String worldName;
@@ -32,6 +39,7 @@ public abstract class MaMWorld implements AutoCloseable
     Map<String, MaMMazeView> mazeViews;
     MaMMazeView currentMazeView;
 
+    List<IGameEntity> entities;
 
     protected MaMCCFileReader ccFile;
     protected MaMCCFileReader ccFileAnimations;
@@ -43,10 +51,13 @@ public abstract class MaMWorld implements AutoCloseable
         this.ccFile = ccFileReader;
         this.game = game;
         //currentPallate = getDefaultPallate();
-        monsters = ccFile.loadMonsters(this);
+        //entities = ccFile.loadMonsters(this);
+
         mazeFiles = new HashMap<>();
         mazeViews = new HashMap<>();
         currentMazeView = null;
+
+        entities = new ArrayList<>();
     }
 
     //protected abstract MaMPallet getDefaultPallate() throws CCFileFormatException;
@@ -55,8 +66,8 @@ public abstract class MaMWorld implements AutoCloseable
         return game;
     }
 
-    public MaMMonster[] getMonsters() {
-        return monsters;
+    public List<IGameEntity> getEntities() {
+        return entities;
     }
 
     public String getWorldName() {
@@ -96,13 +107,13 @@ public abstract class MaMWorld implements AutoCloseable
 
     public abstract ISceneComposition renderHUDForWorld();
 
-    public abstract String getMazeName(int id) throws CCFileFormatException;
-    public abstract String getScriptedEventsName(int id) throws CCFileFormatException;
-    public abstract String getMonsterLayoutFile(int id) throws CCFileFormatException;
-    public abstract String getHeadingFile(int id) throws CCFileFormatException;
-    public abstract String getAreaNameFile(int id) throws CCFileFormatException;
-    public abstract String getEventTextStringsFile(int id) throws CCFileFormatException;
-    public abstract String getMapNameFile(int id) throws CCFileFormatException;
+//    public abstract String getMazeName(int id) throws CCFileFormatException;
+//    public abstract String getScriptedEventsName(int id) throws CCFileFormatException;
+//    public abstract String getMonsterLayoutFile(int id) throws CCFileFormatException;
+//    public abstract String getHeadingFile(int id) throws CCFileFormatException;
+//    public abstract String getAreaNameFile(int id) throws CCFileFormatException;
+//    public abstract String getEventTextStringsFile(int id) throws CCFileFormatException;
+//    public abstract String getMapNameFile(int id) throws CCFileFormatException;
 
     @Override
     public void close() throws Exception {
@@ -125,4 +136,15 @@ public abstract class MaMWorld implements AutoCloseable
 
     public abstract MaMSprite getNPCFaceOrNull(int id);
     public abstract MaMSprite getPlayerFaceOrNull(int id);
+
+    public void addMonster(MaMMonster mon, int x, int y)
+    {
+        mon.setLocation(new Point(x,y));
+        entities.add(mon);
+    }
+
+    public void addThing(MaMThing thing, int x, int y, Direction dir, IScript<IGameEntity> onUpdate)
+    {
+        entities.add(IGameEntity.fromRenderable(thing, x, y, dir, onUpdate));
+    }
 }

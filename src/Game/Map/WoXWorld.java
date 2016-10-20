@@ -127,6 +127,18 @@ public class WoXWorld extends MaMWorld
         return ccFileCur;
     }
 
+    public WoxVariant getVariant() {
+        return variant;
+    }
+
+    public WoXIndoorEnvironmentSet[] getIndoorEnvironmentSets() {
+        return indoorEnvironmentSets;
+    }
+
+    public WoXOutdoorEnvironmentSet[] getOutdoorEnvironmentSets() {
+        return outdoorEnvironmentSets;
+    }
+
     @Override
     public IMaMIndoorEnvironmentSet getIndoorEnvironmentSet(int index) {
         return indoorEnvironmentSets[index];
@@ -191,7 +203,8 @@ public class WoXWorld extends MaMWorld
     public void loadMaps() throws CCFileFormatException
     {
         int missCount=0;
-        for (int i = 0; (i < 500)&&(missCount<10); i++)
+        //TODO: > 100 (500)
+        for (int i = 0; (i < 100)&&(missCount<10); i++)
         {
             String mazeName = getMazeName(i);
             if(ccFileCur.fileExists(mazeName))
@@ -296,33 +309,32 @@ public class WoXWorld extends MaMWorld
         return s;
     }
 
-    @Override
     public String getMazeName(int id) throws CCFileFormatException {
         return makeMazeFileName("MAZE", "DAT", id);
     }
-    @Override
+
     public String getScriptedEventsName(int id) throws CCFileFormatException {
         return makeMazeFileName("MAZE", "EVT", id);
     }
-    @Override
+
     public String getMonsterLayoutFile(int id) throws CCFileFormatException {
         return makeMazeFileName("MAZE", "MOB", id);
     }
-    @Override
+
     public String getHeadingFile(int id) throws CCFileFormatException {
         //AAZE = wtf? I assume hashcode collisions in the cc file when too many similar names were used.
         return makeMazeFileName("AAZE", "HED", id);
     }
-    @Override
+
     public String getAreaNameFile(int id) throws CCFileFormatException {
         //TODO: clouds?
         return makeMazeFileName("DARK", "TXT", id);
     }
-    @Override
+
     public String getEventTextStringsFile(int id) throws CCFileFormatException {
         return makeMazeFileName("AAZE", "TXT", id);
     }
-    @Override
+
     public String getMapNameFile(int id) throws CCFileFormatException {
         //TODO: clouds?
         return makeMazeFileName("DARK", "HED", id);

@@ -1,4 +1,7 @@
 import Game.MaMGame;
+import Game.Monsters.MaMMonster;
+import Game.Monsters.MonsterFactory;
+import GameMechanics.Dice;
 import Rendering.RenderablePos;
 import Rendering.SimpleCanvas.MaMPanel;
 import mamFiles.CCFileCache;
@@ -26,7 +29,21 @@ public class Main
             Random rand = new Random(System.currentTimeMillis());
             //Create game
             //game = new MaMGame("xeen.cc");
-            game = new MaMGame("dark.cc");
+            //game = new MaMGame("dark.cc");
+            game = MaMGame.fromWoXData("dark.cc");
+
+
+            Random r = new Random();
+            for(int i=0; i < 10000; i++) {
+                try {
+                MaMMonster mon = game.getWorld().getCcFile().getMonsterFactory().createMonster(game.getWorld(), r.nextInt(50));
+                game.getWorld().addMonster(mon, r.nextInt(256), r.nextInt(256));
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+
 
             //CCFileCache.INSTANCE.setEnabled(false);
             //game = new MaMGame(IoTccFileReader.open("mm3.cc"));

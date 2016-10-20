@@ -255,7 +255,7 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
          * The transform for the current frame at frames[i]
          */
         @NotNull
-        ImageTransform[] transforms;
+        IImageWorker[] transforms;
 
         /**
          * Number of frames in this view
@@ -265,11 +265,11 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         /**
          * This constructor suites views as stored in DARK.DAT
          */
-        public SpriteView(int startFrame, int len, ImageTransform transform)
+        public SpriteView(int startFrame, int len, IImageWorker transform)
         {
             length = Math.max(len, 0);
             frames = new int[length];
-            transforms = new ImageTransform[length];
+            transforms = new IImageWorker[length];
             for(int i=0; i<len; i++)
             {
                 frames[i] = startFrame + i;

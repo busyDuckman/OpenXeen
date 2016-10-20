@@ -2,6 +2,7 @@ package mamFiles.WOX;
 
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
+import Game.Monsters.MonsterFactory;
 import Toolbox.FileHelpers;
 import mamFiles.*;
 
@@ -57,6 +58,8 @@ public class WOXccFileReader extends MaMCCFileReader
     protected WOXccFileReader(String name, WoXCCVariant variant) {
         super(name);
         this.variant = variant;
+
+        monsterFactory = MonsterFactory.newWoxMonsterFactory();
     }
 
     public static WOXccFileReader open(String filePath)
@@ -141,7 +144,7 @@ public class WOXccFileReader extends MaMCCFileReader
 
     @Override
     protected MaMMazeFile decodeMapFile(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException {
-        return new WOXMazeFile(mazeID, key, world);
+        return new WOXMazeFile(mazeID, key, (WoXWorld)world);
     }
 
 

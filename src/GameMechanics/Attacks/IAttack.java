@@ -1,4 +1,4 @@
-package Game.Attacks;
+package GameMechanics.Attacks;
 
 /**
  * Created by duckman on 3/07/2016.

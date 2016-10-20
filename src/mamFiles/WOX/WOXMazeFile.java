@@ -8,8 +8,9 @@ import Toolbox.BinaryHelpers;
 import Toolbox.Direction;
 import Toolbox.Grid;
 import mamFiles.CCFileFormatException;
-import mamFiles.MaMCCFileReader;
 import mamFiles.MaMMazeFile;
+import mamFiles.MaMThing;
+import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
@@ -19,9 +20,7 @@ import java.io.ByteArrayInputStream;
  */
 public class WOXMazeFile extends MaMMazeFile
 {
-
-
-    public WOXMazeFile(int mazeID, String key, MaMWorld world) throws CCFileFormatException {
+    public WOXMazeFile(int mazeID, String key, WoXWorld world) throws CCFileFormatException {
         super("MAZE_"+mazeID, key);
 
         int mapWidth = 16;
@@ -29,21 +28,11 @@ public class WOXMazeFile extends MaMMazeFile
 
         //there are several different files to get.
 
-        //DAT file, eg maze0001.DAT holds the terrain
-        String mapDataFile = world.getMazeName(mazeID);
-        MaMCCFileReader reader = ((WoXWorld)world).getCCFileCur();
+        byte[] mapData = world.getCCFileCur().getFileRaw(world.getMazeName(mazeID));
+        loadMaze(mapData, mapWidth, mapHeight, world);
 
-        if(reader.fileExists(mapDataFile))
-        {
-            byte[] mapData = reader.getFileRaw(mapDataFile);
-            CCFileFormatException.assertFalse(mapData == null, "WOXMazeFile(), mapData == null");
-
-            loadMaze(mapData, mapWidth, mapHeight, world);
-        }
-        else
-        {
-            throw CCFileFormatException.fromMissingFile(mapDataFile, reader);
-        }
+        byte[] monData = world.getCCFileCur().getFileRaw(world.getMonsterLayoutFile(mazeID));
+        loadMonstersAndThings(monData, world);
     }
 
     protected void loadMaze(byte[] data, int mapWidth, int mapHeight, MaMWorld world) throws CCFileFormatException {
@@ -52,7 +41,7 @@ public class WOXMazeFile extends MaMMazeFile
         int mapSize = mapWidth * mapHeight;
         this.map = new Grid<>(mapWidth, mapHeight, P -> null);
 
-            //interpret mapData
+        //interpret mapData
         int[] mapData = new int[mapSize]; //file data is in DWORD[]
         BinaryHelpers.readWORDsLSB(bisMapData, mapData, mapSize, 0);
 
@@ -253,6 +242,48 @@ public class WOXMazeFile extends MaMMazeFile
 
 
         return tile;
+    }
+
+    private void loadMonstersAndThings(byte[] monData, WoXWorld world)
+    {
+        int mapSize = map.size();
+        ByteArrayInputStream bisMapData = new ByteArrayInputStream(monData);
+
+        Direction[] dirLut = new Direction[] {Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
+
+        // look up tables
+        int[] objectLut = new int[16];
+        BinaryHelpers.readBYTEs(bisMapData, objectLut, 16, 0);
+        int[] monsterLut = new int[16];
+        BinaryHelpers.readBYTEs(bisMapData, monsterLut, 16, 0);
+        int[] decalLut = new int[16];
+        BinaryHelpers.readBYTEs(bisMapData, decalLut, 16, 0);
+
+        int[] record = new int[] {0, 0, 0, 0};
+
+        //load objects
+//        do {
+//            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
+//            int x = record[0];
+//            int y = record[1];
+//            int thingNum = objectLut[record[2]];
+//            Direction dir = dirLut[record[3]];
+//            MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
+//            world.addThing(thing, x, y, dir, null);
+//        } while(!isSentinalRecord(record));
+
+
+        int[] mapFlags = new int[mapSize];
+        BinaryHelpers.readBYTEs(bisMapData, mapFlags, mapSize, 0);
+    }
+
+    private boolean isSentinalRecord(int[] record) {
+        for (int r : record) {
+            if(r != 255) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

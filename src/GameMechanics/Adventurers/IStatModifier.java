@@ -1,7 +1,6 @@
 package GameMechanics.Adventurers;
 
 import GameMechanics.Stat;
-import GameMechanics.Stats;
 import org.joda.time.DateTime;
 
 /**
@@ -12,5 +11,6 @@ public interface IStatModifier
     DateTime getExpireTime();
     String getName();
 
-    <T extends Stats> Stat<T> applyTo(Stat<T> stat);
+    Stat applyTo(Stat stat);
+    boolean affects(Stat stat);
 }

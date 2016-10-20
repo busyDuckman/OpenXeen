@@ -67,6 +67,9 @@ public class Grid<T> implements IReadonlyGrid<T> {
         return numYValues;
     }
 
+    /**
+     * Total size of grid (width * height)
+     */
     @Override
     public int size()
     {

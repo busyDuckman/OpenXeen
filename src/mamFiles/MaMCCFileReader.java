@@ -3,6 +3,7 @@ package mamFiles;
 import Game.GlobalSettings;
 import Game.Map.MaMWorld;
 import Game.Monsters.MaMMonster;
+import Game.Monsters.MonsterFactory;
 import Toolbox.BinaryHelpers;
 import Toolbox.FileHelpers;
 import Toolbox.IValidatable;
@@ -87,6 +88,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
 
     protected Map<Integer, String> knownFileNames;
     String filePath;
+    protected MonsterFactory monsterFactory;
     //protected int fileSize;
 
     //-------------------------------------------------------------------------------------------------
@@ -602,7 +604,12 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
 
     public byte[] getFileRaw(String fileName) throws CCFileFormatException
     {
-        return getFileRaw(hashFileName(fileName));
+        if(fileExists(fileName)) {
+            return getFileRaw(hashFileName(fileName));
+        }
+        else {
+            throw CCFileFormatException.fromMissingFile(fileName, this);
+        }
     }
 
     public byte[] getFileRaw(int id) throws CCFileFormatException
@@ -616,7 +623,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         }
         else
         {
-            return null;
+            throw CCFileFormatException.fromMissingFile(getNameForID(id), this);
         }
     }
 
@@ -634,40 +641,40 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     //-------------------------------------------------------------------------------------------------
     // CC file specific loading logic
     //-------------------------------------------------------------------------------------------------
-    public MaMMonster[] loadMonsters(MaMWorld world) throws CCFileFormatException
-    {
-        List<MaMMonster> monList = new ArrayList<>();
-        int errors = 0;
-        for(int id = 0; (id<999)&&(errors<20); id++)
-        {
-            //check for monster file
-            if(fileExists(getMonsterIdleSpriteFileName(id)))
-            {
-                try
-                {
-                    MaMMonster mon = new MaMMonster("foo", id, world);
-                    monList.add(mon);
-                }
-                catch (Exception ex)
-                {
-                    System.out.println("Error loading monster: #" + id);
-                    ex.printStackTrace();
-                }
-                //System.out.println("Loaded monster: " + mon.toString());
-            }
-            else
-            {
-                errors++;
-                //System.out.println("Loaded " + id +  " monsters.");
-                //break;
-            }
-        }
-
-        MaMMonster[] monsters = new MaMMonster[monList.size()];
-        monsters = monList.toArray(monsters);
-
-        return monsters;
-    }
+//    public MaMMonster[] loadMonsters(MaMWorld world) throws CCFileFormatException
+//    {
+//        List<MaMMonster> monList = new ArrayList<>();
+//        int errors = 0;
+//        for(int id = 0; (id<999)&&(errors<20); id++)
+//        {
+//            //check for monster file
+//            if(fileExists(getMonsterIdleSpriteFileName(id)))
+//            {
+//                try
+//                {
+//                    MaMMonster mon = new MaMMonster("foo", id, world);
+//                    monList.add(mon);
+//                }
+//                catch (Exception ex)
+//                {
+//                    System.out.println("Error loading monster: #" + id);
+//                    ex.printStackTrace();
+//                }
+//                //System.out.println("Loaded monster: " + mon.toString());
+//            }
+//            else
+//            {
+//                errors++;
+//                //System.out.println("Loaded " + id +  " monsters.");
+//                //break;
+//            }
+//        }
+//
+//        MaMMonster[] monsters = new MaMMonster[monList.size()];
+//        monsters = monList.toArray(monsters);
+//
+//        return monsters;
+//    }
 
     public String getMonsterIdleSpriteFileName(int monsterID)
     {
@@ -677,6 +684,10 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     public String getMonsterAttackSpriteFileName(int monsterID)
     {
         return String.format("%03d", monsterID) + ".ATT";
+    }
+
+    public MonsterFactory getMonsterFactory() {
+        return monsterFactory;
     }
 
     //-------------------------------------------------------------------------------------------------
