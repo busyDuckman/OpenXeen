@@ -143,8 +143,8 @@ public abstract class MaMWorld implements AutoCloseable
         entities.add(mon);
     }
 
-    public void addThing(MaMThing thing, int x, int y, Direction dir, IScript<IGameEntity> onUpdate)
+    public void addThing(MaMThing thing, int x, int y, Direction dir, MaMMazeFile parentMaze, IScript<IGameEntity> onUpdate)
     {
-        entities.add(IGameEntity.fromRenderable(thing, x, y, dir, onUpdate));
+        entities.add(IGameEntity.fromRenderable(thing, x, y, dir, parentMaze, onUpdate));
     }
 }

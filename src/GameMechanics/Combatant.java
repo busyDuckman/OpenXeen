@@ -3,6 +3,7 @@ package GameMechanics;
 import Game.GameEntityBase;
 import Game.IAttackable;
 import Toolbox.Direction;
+import mamFiles.MaMMazeFile;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -39,16 +40,16 @@ public abstract class Combatant extends GameEntityBase implements IAttackable, I
 
     public Stat hitPoints = new Stat("stat_hit_points", 0, miscStatMax);
 
-    public Combatant(int id, String name, Point location) {
-        super(id, name, location);
+    public Combatant(int id, String name, Point location, MaMMazeFile parentMaze) {
+        super(id, name, location, parentMaze);
     }
 
-    public Combatant(int id, String name, Direction heading, Point location) {
-        super(id, name, heading, location);
+    public Combatant(int id, String name, Direction heading, Point location, MaMMazeFile parentMaze) {
+        super(id, name, heading, location, parentMaze);
     }
 
-    public Combatant(int id, String name, boolean visible, Direction heading, Point location) {
-        super(id, name, visible, heading, location);
+    public Combatant(int id, String name, boolean visible, Direction heading, Point location, MaMMazeFile parentMaze) {
+        super(id, name, visible, heading, location, parentMaze);
     }
 
     private static volatile Map<Type, Field[]> statLut = new HashMap<>();

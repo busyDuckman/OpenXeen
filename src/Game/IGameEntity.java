@@ -4,6 +4,7 @@ import Game.Map.MaMWorld;
 import Rendering.IRelativeToLocationSprite;
 import Toolbox.Direction;
 import com.sun.istack.internal.NotNull;
+import mamFiles.MaMMazeFile;
 import mamFiles.MaMThing;
 
 import java.awt.*;
@@ -30,6 +31,12 @@ public interface IGameEntity extends IUpdateable
     Direction getHeading();
 
     /**
+     * Gets the parentMaze.
+     * @return the parentMaze.
+     */
+    MaMMazeFile getParentMaze();
+
+    /**
      * False means "not part of the game".
      * NB: does not mean not updateable.
      *
@@ -41,12 +48,12 @@ public interface IGameEntity extends IUpdateable
      */
     IRelativeToLocationSprite getSprite();
 
-    static IGameEntity fromRenderable(MaMThing thing, Point location, Direction heading, IScript<IGameEntity> onUpdate) {
-        return new BoundRenderable(location, heading, thing, onUpdate);
+    static IGameEntity fromRenderable(MaMThing thing, Point location, Direction heading, MaMMazeFile parentMaze, IScript<IGameEntity> onUpdate) {
+        return new BoundRenderable(location, heading, thing, parentMaze, onUpdate);
     }
 
-    static IGameEntity fromRenderable(MaMThing thing, int wsX, int wsY, Direction heading, IScript<IGameEntity> onUpdate) {
-        return new BoundRenderable(new Point(wsX, wsY), heading, thing, onUpdate);
+    static IGameEntity fromRenderable(MaMThing thing, int wsX, int wsY, Direction heading, MaMMazeFile parentMaze, IScript<IGameEntity> onUpdate) {
+        return new BoundRenderable(new Point(wsX, wsY), heading, thing, parentMaze, onUpdate);
     }
 }
 
@@ -56,25 +63,29 @@ class BoundRenderable implements IGameEntity {
     protected boolean visible;
     protected IRelativeToLocationSprite sprite;
     protected IScript<IGameEntity> onUpdate;
+    protected MaMMazeFile parentMaze;
 
-    public BoundRenderable(Point location, Direction heading, boolean visible, IRelativeToLocationSprite sprite, IScript<IGameEntity> onUpdate) {
+    public BoundRenderable(Point location, Direction heading, boolean visible, IRelativeToLocationSprite sprite, MaMMazeFile parentMaze, IScript<IGameEntity> onUpdate) {
         this.location = location;
         this.heading = heading;
         this.visible = visible;
         this.sprite = sprite;
         this.onUpdate = onUpdate;
+        this.parentMaze = parentMaze;
     }
 
-    public BoundRenderable(Point location, Direction heading, IRelativeToLocationSprite sprite, IScript<IGameEntity> onUpdate) {
+    public BoundRenderable(Point location, Direction heading, IRelativeToLocationSprite sprite, MaMMazeFile parentMaze, IScript<IGameEntity> onUpdate) {
         this.location = location;
         this.heading = heading;
         this.sprite = sprite;
         this.onUpdate = onUpdate;
+        this.parentMaze = parentMaze;
         visible = true;
     }
 
     @Override
-    public Point getLocation() {
+    public Point getLocation()
+    {
         return location;
     }
 
@@ -98,6 +109,10 @@ class BoundRenderable implements IGameEntity {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public MaMMazeFile getParentMaze() {
+        return parentMaze;
     }
 
     @Override

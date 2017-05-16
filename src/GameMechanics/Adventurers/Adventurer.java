@@ -12,6 +12,7 @@ import GameMechanics.Inventory;
 import GameMechanics.Stat;
 import Rendering.IRelativeToLocationSprite;
 import Rendering.IRenderableGameObject;
+import mamFiles.MaMMazeFile;
 
 import java.awt.*;
 import java.util.Iterator;
@@ -151,7 +152,7 @@ public class Adventurer extends Combatant implements IUpdateable, IAttackable, I
 
 
     public Adventurer(String name, CharGender sex, CharRace race, CharClass klass, int faceNum) {
-        super(faceNum, name, new Point(0,0));
+        super(faceNum, name, new Point(0,0), null);
         this.name = name;
         this.sex = sex;
         this.race = race;

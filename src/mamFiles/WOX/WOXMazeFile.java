@@ -3,10 +3,12 @@ package mamFiles.WOX;
 import Game.Map.MaMTile;
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
+import Game.Monsters.MaMMonster;
 import GameMechanics.Magic.SpellManager;
 import Toolbox.BinaryHelpers;
 import Toolbox.Direction;
 import Toolbox.Grid;
+import Toolbox.MaMGameException;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMMazeFile;
 import mamFiles.MaMThing;
@@ -244,8 +246,20 @@ public class WOXMazeFile extends MaMMazeFile
         return tile;
     }
 
-    private void loadMonstersAndThings(byte[] monData, WoXWorld world)
-    {
+    /**
+     * Loads a mob file.
+     * MAZExxxx.MOB files contain the Monster and Object information for each map.
+     *
+     * 3 lists:
+     *      - Object Sprites
+     *      - monster id's
+     *      - Wall object sprites.
+     *
+     * See http://xeen.wikia.com/wiki/MAZExxxx.MOB_File_Format
+     * @param monData
+     * @param world
+     */
+    private void loadMonstersAndThings(byte[] monData, WoXWorld world) throws CCFileFormatException {
         int mapSize = map.size();
         ByteArrayInputStream bisMapData = new ByteArrayInputStream(monData);
 
@@ -262,19 +276,56 @@ public class WOXMazeFile extends MaMMazeFile
         int[] record = new int[] {0, 0, 0, 0};
 
         //load objects
+        do {
+            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
+            int x = record[0];
+            int y = record[1];
+            int lutPos = record[2];
+            if(lutPos < objectLut.length) {
+                int thingNum = objectLut[lutPos];
+                Direction dir = dirLut[record[3]];
+                MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
+                world.addThing(thing, x, y, dir, this, null);
+            }
+            else if (lutPos != 255) {
+                throw new CCFileFormatException("error in maze.mon");
+            }
+        } while(!isSentinalRecord(record));
+
+
+        //load monsters
 //        do {
 //            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
 //            int x = record[0];
 //            int y = record[1];
-//            int thingNum = objectLut[record[2]];
-//            Direction dir = dirLut[record[3]];
-//            MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
-//            world.addThing(thing, x, y, dir, null);
+//            int lutPos = record[2];
+//            if(lutPos < objectLut.length) {
+//                int thingNum = objectLut[lutPos];
+//                Direction dir = dirLut[record[3]];
+//
+//                MaMMonster mon = world.getCcFile().getMonsterFactory().createMonster(world, 10);
+//                world.addMonster(mon, x, y);
+//            }
+//            else if (lutPos != 255) {
+//                throw new CCFileFormatException("error in maze.mon");
+//            }
 //        } while(!isSentinalRecord(record));
 
+        //load wall objects
+        do {
+            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
+            int x = record[0];
+            int y = record[1];
+            int lutPos = record[2];
+            if(lutPos < objectLut.length) {
+                int thingNum = objectLut[lutPos];
+                Direction dir = dirLut[record[3]];
 
-        int[] mapFlags = new int[mapSize];
-        BinaryHelpers.readBYTEs(bisMapData, mapFlags, mapSize, 0);
+            }
+            else if (lutPos != 255) {
+                throw new CCFileFormatException("error in maze.mon");
+            }
+        } while(!isSentinalRecord(record));
     }
 
     private boolean isSentinalRecord(int[] record) {

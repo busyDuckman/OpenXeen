@@ -29,7 +29,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
     protected IMaMGame game;
 
-    protected double scale = 4.0;
+    protected double scale = 2.0;
     protected Dimension mamNativeSize = new Dimension(320, 200);
     protected Font messageFont = new Font("TimesRoman", Font.PLAIN, 20);
 

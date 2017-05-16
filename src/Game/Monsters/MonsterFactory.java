@@ -5,6 +5,7 @@ import Game.Map.WoXWorld;
 import GameMechanics.Adventurers.CharClass;
 import GameMechanics.Attacks.AttackType;
 import mamFiles.CCFileFormatException;
+import mamFiles.MaMMazeFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6522,7 +6523,7 @@ public class MonsterFactory
 
     }
 
-    public MaMMonster createMonster(MaMWorld world, int id) throws CCFileFormatException {
+    public MaMMonster createMonster(MaMWorld world, MaMMazeFile maze, int id) throws CCFileFormatException {
         MaMMonsterRecord rec = null;
         if(world instanceof WoXWorld)
         {
@@ -6533,7 +6534,7 @@ public class MonsterFactory
                 .orElseGet(null);
         }
 
-        return (rec == null) ? null : rec.newMonster(world);
+        return (rec == null) ? null : rec.newMonster(world, maze);
     }
 
     private static class MaMMonsterRecord {
@@ -6574,8 +6575,8 @@ public class MonsterFactory
             this.name = name;
         }
 
-        public MaMMonster newMonster(MaMWorld world) throws CCFileFormatException {
-            MaMMonster mon = new MaMMonster(name, number, world);
+        public MaMMonster newMonster(MaMWorld world, MaMMazeFile parentMaze) throws CCFileFormatException {
+            MaMMonster mon = new MaMMonster(name, number, world, parentMaze);
             mon.setExperience(this.experience);
 
             mon.setHitPoints(this.hp);
