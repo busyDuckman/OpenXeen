@@ -3,7 +3,7 @@ package mamFiles;
 import Rendering.AnimationSettings;
 import Rendering.IRenderableGameObject;
 import Toolbox.*;
-import com.sun.istack.internal.NotNull;
+
 
 import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
@@ -248,13 +248,13 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         /**
          * The frames in this view (the view may arbitrarily re-organise the animation)
          */
-        @NotNull
+
         int[] frames;
 
         /**
          * The transform for the current frame at frames[i]
          */
-        @NotNull
+
         IImageWorker[] transforms;
 
         /**

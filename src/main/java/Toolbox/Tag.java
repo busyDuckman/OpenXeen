@@ -1,6 +1,6 @@
 package Toolbox;
 
-import com.sun.istack.internal.NotNull;
+
 
 /**
  * Created by duckman on 1/07/2016.
@@ -21,11 +21,11 @@ import com.sun.istack.internal.NotNull;
  */
 public final class Tag<K, T>
 {
-    @NotNull
+
     private final K key;
     private final T tag;
 
-    public Tag(@NotNull K key, T tag) {
+    public Tag( K key, T tag) {
         this.key = key;
         this.tag = tag;
     }
