@@ -3,7 +3,6 @@ package Rendering;
 import Toolbox.Direction;
 import Toolbox.IHasProperties;
 import Toolbox.ImageHelpers;
-//import com.sun.istack.internal.NotNull;
 import mamFiles.CCFileFormatException;
 import mamFiles.IHasProxy;
 import mamFiles.MAMFile;
@@ -276,7 +275,7 @@ final class RelativeLocationWrapper implements IRelativeToLocationSprite
     }
 
     @Override
-    public IRenderableGameObject getView(Point mapPosRelative, Direction viewDir) {
+    public IRenderableGameObject getView( Point mapPosRelative, Direction viewDir) {
         return rgo;
     }
 

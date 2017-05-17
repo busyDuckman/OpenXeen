@@ -32,17 +32,17 @@ public class Main
             //game = new MaMGame("dark.cc");
             game = MaMGame.fromWoXData("dark.cc");
 
+//            Random r = new Random();
+//            for(int i=0; i < 10000; i++) {
+//                try {
+//                MaMMonster mon = game.getWorld().getCcFile().getMonsterFactory().createMonster(game.getWorld(), r.nextInt(50));
+//                game.getWorld().addMonster(mon, r.nextInt(256), r.nextInt(256));
+//                }
+//                catch (Exception ex)
+//                {
+//                }
+//            }
 
-            Random r = new Random();
-            for(int i=0; i < 10000; i++) {
-                try {
-                MaMMonster mon = game.getWorld().getCcFile().getMonsterFactory().createMonster(game.getWorld(), r.nextInt(50));
-                game.getWorld().addMonster(mon, r.nextInt(256), r.nextInt(256));
-                }
-                catch (Exception ex)
-                {
-                }
-            }
 
 
             //CCFileCache.INSTANCE.setEnabled(false);

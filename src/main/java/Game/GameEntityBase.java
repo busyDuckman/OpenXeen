@@ -3,6 +3,7 @@ package Game;
 import Game.Map.MaMWorld;
 import Rendering.IRelativeToLocationSprite;
 import Toolbox.Direction;
+import mamFiles.MaMMazeFile;
 
 import java.awt.*;
 
@@ -24,20 +25,28 @@ public abstract class GameEntityBase implements IGameEntity
     protected Direction heading;
     protected Point location;
 
-    public GameEntityBase(int id, String name, Point location) {
-        this(id, name, Direction.UP, location);
+
+    /**
+     * NULL if entity not bound to any maze (adventurer)
+     */
+    protected MaMMazeFile parentMaze;
+
+    public GameEntityBase(int id, String name, Point location, MaMMazeFile parentMaze) {
+        this(id, name, Direction.UP, location, parentMaze);
     }
 
-    public GameEntityBase(int id, String name, Direction heading, Point location) {
-        this(id, name, true, heading,location);
+    public GameEntityBase(int id, String name, Direction heading, Point location, MaMMazeFile parentMaze) {
+        this(id, name, true, heading,location, parentMaze);
     }
 
-    public GameEntityBase(int id, String name, boolean visible, Direction heading, Point location) {
+    public GameEntityBase(int id, String name, boolean visible, Direction heading, Point location, MaMMazeFile parentMaze) {
+
         this.id = id;
         Name = name;
         this.visible = visible;
         this.heading = heading;
         this.location = location;
+        this.parentMaze = parentMaze;
     }
 
     @Override
@@ -77,6 +86,19 @@ public abstract class GameEntityBase implements IGameEntity
 
     @Override
     public abstract IRelativeToLocationSprite getSprite();
+
+    /**
+     * Gets the parentMaze.
+     *
+     * NULL if entity not bound to any maze (adventurer)
+     *
+     * @return the parentMaze.
+     */
+    @Override
+    public MaMMazeFile getParentMaze() {
+        return parentMaze;
+    }
+
 
     @Override
     public abstract void update(MaMWorld world);

@@ -1,8 +1,6 @@
 package Rendering;
 
 import Toolbox.Direction;
-//import com.sun.istack.internal.NotNull;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 

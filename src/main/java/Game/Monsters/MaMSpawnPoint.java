@@ -4,6 +4,7 @@ import Game.GameEntityBase;
 import Game.Map.MaMWorld;
 import Rendering.IRelativeToLocationSprite;
 import Toolbox.Direction;
+import mamFiles.MaMMazeFile;
 
 import java.awt.*;
 
@@ -14,16 +15,17 @@ public class MaMSpawnPoint extends GameEntityBase
 {
     long monstersSpawned;
 
-    public MaMSpawnPoint(int id, String name, Point location) {
-        this(id, name, Direction.UP, location);
+
+    public MaMSpawnPoint(int id, String name, MaMMazeFile maze, Point location) {
+        this(id, name, Direction.UP, maze, location);
     }
 
-    public MaMSpawnPoint(int id, String name, Direction heading, Point location) {
-        this(id, name, false, heading, location);
+    public MaMSpawnPoint(int id, String name, Direction heading, MaMMazeFile maze, Point location) {
+        this(id, name, false, heading, maze, location);
     }
 
-    public MaMSpawnPoint(int id, String name, boolean visible, Direction heading, Point location) {
-        super(id, name, visible, heading, location);
+    public MaMSpawnPoint(int id, String name, boolean visible, Direction heading, MaMMazeFile maze, Point location) {
+        super(id, name, visible, heading, location, maze);
         monstersSpawned = 0;
     }
 

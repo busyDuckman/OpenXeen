@@ -13,6 +13,8 @@ import Rendering.IMaMSprite;
 import Rendering.IRelativeToLocationSprite;
 import Rendering.IRenderableGameObject;
 import mamFiles.CCFileFormatException;
+import mamFiles.MaMMazeFile;
+
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -59,27 +61,29 @@ public class MaMMonster extends Combatant implements IGameEntity, IAttackable, I
     protected String attackVoc;
 
 
-    public MaMMonster(String name, int id, IMaMSprite idleAnimation, IMaMSprite attackAnimation)
+
+    public MaMMonster(String name, int id, MaMMazeFile parentMaze, IMaMSprite idleAnimation, IMaMSprite attackAnimation)
     {
-        super(id, name, new Point(0,0));
+        super(id, name, new Point(0,0), parentMaze);
         this.idleAnimation = idleAnimation;
         this.attackAnimation = attackAnimation;
         this.id = id;
         Name = name;
     }
 
-    public MaMMonster(String name, int id, MaMWorld world, String idleAnimationFile, String attackAnimationFile ) throws CCFileFormatException {
-        super(id, name, new Point(0,0));
+    public MaMMonster(String name, int id, MaMWorld world, MaMMazeFile parentMaze, String idleAnimationFile, String attackAnimationFile) throws CCFileFormatException {
+        super(id, name, new Point(0,0), parentMaze);
         this.idleAnimation = world.getCcFile().getSprite(idleAnimationFile);
         this.attackAnimation = world.getCcFile().getSprite(attackAnimationFile);
         this.id = id;
         Name = name;
     }
 
-    public MaMMonster(String name, int id, MaMWorld world) throws CCFileFormatException {
+    public MaMMonster(String name, int id, MaMWorld world, MaMMazeFile parentMaze) throws CCFileFormatException {
         this(name,
                 id,
                 world,
+                parentMaze,
                 world.getCcFile().getMonsterIdleSpriteFileName(id),
                 world.getCcFile().getMonsterIdleSpriteFileName(id));
     }

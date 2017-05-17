@@ -1,5 +1,6 @@
 package Game.Map;
 
+import Game.IGameEntity;
 import Toolbox.Direction;
 import Toolbox.Grid;
 import Toolbox.IReadonlyGrid;
@@ -27,7 +28,7 @@ import java.util.function.Function;
  * Concepts:
  *    NAME          PREFIX     DESCRIPTION
  *    --------------------------------------------------------------------
- *  - World space   ws         The absolute location of a tile or th party.
+ *  - World space   ws         The absolute location of a tile or the party.
  *  - View space    vs         The world, from the perspective of the party.
  *  - Maze space    ms         Local co-ordinates for any individual maze.
  *  - Join space    js         The location of a maze (unit is 'one maze length')
@@ -170,4 +171,13 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
         }
         return maze;
     }
+
+
+//    public Point getWorldSpaceForEntity(IGameEntity entity)
+//    {
+//        MaMMazeFile maze = entity.getParentMaze();
+//        //maze.get
+//
+//    }
+
 }
