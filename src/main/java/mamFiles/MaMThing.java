@@ -4,7 +4,7 @@ import Game.IGameEntity;
 import Rendering.AnimationSettings;
 import Rendering.IRenderableGameObject;
 import Toolbox.Direction;
-import com.sun.istack.internal.NotNull;
+//import com.sun.istack.internal.NotNull;
 import mamFiles.WOX.WOXSpriteFile;
 
 import java.awt.*;
@@ -90,7 +90,9 @@ public class MaMThing extends MAMFile implements Rendering.IRelativeToLocationSp
 
 
     @Override
-    public IRenderableGameObject getView(@NotNull Point mapPosRelative, Direction viewDir) {
+    public IRenderableGameObject getView(//@NotNull
+                                         Point mapPosRelative,
+                                         Direction viewDir) {
         return directionalViews[viewDir.ordinal()];
     }
 

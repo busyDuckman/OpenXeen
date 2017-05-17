@@ -3,7 +3,7 @@ package Game;
 import Game.Map.MaMWorld;
 import Rendering.IRelativeToLocationSprite;
 import Toolbox.Direction;
-import com.sun.istack.internal.NotNull;
+//import com.sun.istack.internal.NotNull;
 import mamFiles.MaMThing;
 
 import java.awt.*;
@@ -21,7 +21,7 @@ public interface IGameEntity extends IUpdateable
     /**
      * World space position of the item.
      */
-    @NotNull Point getLocation();
+    Point getLocation();
 
     /**
      * Direction the entity is pointing.

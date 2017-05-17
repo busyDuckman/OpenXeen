@@ -1,6 +1,6 @@
 package Toolbox;
 
-import com.sun.istack.internal.NotNull;
+//import com.sun.istack.internal.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class HackMe
     private String nameOfSet;
 
 
-    public HackMe(@NotNull String name) {
+    public HackMe(String name) {
         this.nameOfSet = name;
         namedAdjustments = new HashMap<>();
         currentHack = 0;
