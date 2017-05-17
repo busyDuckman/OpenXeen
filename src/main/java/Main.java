@@ -32,7 +32,6 @@ public class Main
             //game = new MaMGame("dark.cc");
             game = MaMGame.fromWoXData("dark.cc");
 
-
 //            Random r = new Random();
 //            for(int i=0; i < 10000; i++) {
 //                try {
@@ -43,6 +42,7 @@ public class Main
 //                {
 //                }
 //            }
+
 
 
             //CCFileCache.INSTANCE.setEnabled(false);

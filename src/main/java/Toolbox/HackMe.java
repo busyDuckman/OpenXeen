@@ -1,7 +1,4 @@
 package Toolbox;
-
-
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +32,7 @@ public class HackMe
     private String nameOfSet;
 
 
-    public HackMe( String name) {
+    public HackMe(String name) {
         this.nameOfSet = name;
         namedAdjustments = new HashMap<>();
         currentHack = 0;

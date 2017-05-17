@@ -15,6 +15,7 @@ public class MaMSpawnPoint extends GameEntityBase
 {
     long monstersSpawned;
 
+
     public MaMSpawnPoint(int id, String name, MaMMazeFile maze, Point location) {
         this(id, name, Direction.UP, maze, location);
     }

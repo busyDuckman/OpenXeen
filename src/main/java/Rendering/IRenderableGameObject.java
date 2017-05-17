@@ -3,7 +3,6 @@ package Rendering;
 import Toolbox.Direction;
 import Toolbox.IHasProperties;
 import Toolbox.ImageHelpers;
-
 import mamFiles.CCFileFormatException;
 import mamFiles.IHasProxy;
 import mamFiles.MAMFile;

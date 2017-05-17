@@ -6,7 +6,6 @@ import Game.MaMGame;
 import Game.Monsters.MaMMonster;
 import Rendering.ISceneComposition;
 import Toolbox.Direction;
-
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
@@ -85,7 +84,7 @@ public abstract class MaMWorld implements AutoCloseable
         return currentMazeView;
     }
 
-    public void addMaze( MaMMazeFile maze)
+    public void addMaze(MaMMazeFile maze)
     {
         mazeFiles.put(maze.getMazeID(), maze);
     }

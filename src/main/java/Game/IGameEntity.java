@@ -3,10 +3,8 @@ package Game;
 import Game.Map.MaMWorld;
 import Rendering.IRelativeToLocationSprite;
 import Toolbox.Direction;
-
 import mamFiles.MaMMazeFile;
 import mamFiles.MaMThing;
-
 import java.awt.*;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -37,6 +35,7 @@ public interface IGameEntity extends IUpdateable
     MaMMazeFile getParentMaze();
 
     /**
+
      * False means "not part of the game".
      * NB: does not mean not updateable.
      *
@@ -54,6 +53,7 @@ public interface IGameEntity extends IUpdateable
 
     static IGameEntity fromRenderable(MaMThing thing, int wsX, int wsY, Direction heading, MaMMazeFile parentMaze, IScript<IGameEntity> onUpdate) {
         return new BoundRenderable(new Point(wsX, wsY), heading, thing, parentMaze, onUpdate);
+
     }
 }
 
@@ -114,7 +114,7 @@ class BoundRenderable implements IGameEntity {
     public MaMMazeFile getParentMaze() {
         return parentMaze;
     }
-
+    
     @Override
     public IRelativeToLocationSprite getSprite() {
         return sprite;

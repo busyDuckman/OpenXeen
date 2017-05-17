@@ -15,6 +15,7 @@ import Rendering.IRenderableGameObject;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMMazeFile;
 
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -58,6 +59,7 @@ public class MaMMonster extends Combatant implements IGameEntity, IAttackable, I
     protected int animationEffect;
     protected int idleSound;
     protected String attackVoc;
+
 
 
     public MaMMonster(String name, int id, MaMMazeFile parentMaze, IMaMSprite idleAnimation, IMaMSprite attackAnimation)

@@ -172,10 +172,12 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
         return maze;
     }
 
+
 //    public Point getWorldSpaceForEntity(IGameEntity entity)
 //    {
 //        MaMMazeFile maze = entity.getParentMaze();
 //        //maze.get
 //
 //    }
+
 }

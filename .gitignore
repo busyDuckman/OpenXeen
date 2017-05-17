@@ -15,5 +15,5 @@ buildNumber.properties
 *.cur
 *.CUR
 
-#ide
+# ide
 .idea/
