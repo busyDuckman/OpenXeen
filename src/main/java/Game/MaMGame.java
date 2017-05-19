@@ -15,11 +15,14 @@ import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 import mamFiles.SpriteHelpers.RenderPosHelper;
 import mamFiles.WOX.WOXccFileReader;
 import org.joda.time.DateTime;
+
+import static Toolbox.Misc.ifNull;
 import static Toolbox.PointHelper.*;
 import static mamFiles.SpriteHelpers.RenderPosHelper.RenderableType;
 
 import java.awt.*;
 import java.io.Console;
+import java.sql.Struct;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
@@ -76,6 +79,9 @@ public class MaMGame implements IMaMGame
     }
 
     public static MaMGame fromWoXData(String ccFilePath) throws CCFileFormatException {
+        if(!FileHelpers.fileExists(ccFilePath)) {
+            throw new CCFileFormatException(".CC file not found: " + ifNull(ccFilePath, "<NULL>"));
+        }
         MaMCCFileReader ccFile = WOXccFileReader.open(ccFilePath);
         MaMGame game = new MaMGame(ccFile);
         return game;
@@ -96,6 +102,11 @@ public class MaMGame implements IMaMGame
         }
         else
         {
+            throw new CCFileFormatException("Unknown .CC file type");
+        }
+
+        if(world == null) {
+            throw new CCFileFormatException("Failed to load world from: " + ifNull(ccFile,"<NULL>"));
         }
 
         //world.loadMaps();
