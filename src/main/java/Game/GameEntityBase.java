@@ -25,6 +25,7 @@ public abstract class GameEntityBase implements IGameEntity
     protected Direction heading;
     protected Point location;
 
+
     /**
      * NULL if entity not bound to any maze (adventurer)
      */
@@ -39,6 +40,7 @@ public abstract class GameEntityBase implements IGameEntity
     }
 
     public GameEntityBase(int id, String name, boolean visible, Direction heading, Point location, MaMMazeFile parentMaze) {
+
         this.id = id;
         Name = name;
         this.visible = visible;
@@ -96,6 +98,7 @@ public abstract class GameEntityBase implements IGameEntity
     public MaMMazeFile getParentMaze() {
         return parentMaze;
     }
+
 
     @Override
     public abstract void update(MaMWorld world);

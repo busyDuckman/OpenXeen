@@ -4,11 +4,13 @@ import Game.Map.MaMTile;
 import Game.Map.MaMWorld;
 import Game.Map.WoXWorld;
 import Game.Monsters.MaMMonster;
+
 import GameMechanics.Magic.SpellManager;
 import Toolbox.BinaryHelpers;
 import Toolbox.Direction;
 import Toolbox.Grid;
 import Toolbox.MaMGameException;
+
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMMazeFile;
 import mamFiles.MaMThing;
@@ -294,6 +296,7 @@ public class WOXMazeFile extends MaMMazeFile
 
 
         //load monsters
+
 //        do {
 //            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
 //            int x = record[0];

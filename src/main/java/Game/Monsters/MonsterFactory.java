@@ -6,7 +6,6 @@ import GameMechanics.Adventurers.CharClass;
 import GameMechanics.Attacks.AttackType;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMMazeFile;
-
 import java.util.ArrayList;
 import java.util.List;
 

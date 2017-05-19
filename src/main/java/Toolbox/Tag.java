@@ -1,7 +1,5 @@
 package Toolbox;
 
-
-
 /**
  * Created by duckman on 1/07/2016.
  *
@@ -21,11 +19,10 @@ package Toolbox;
  */
 public final class Tag<K, T>
 {
-
     private final K key;
     private final T tag;
 
-    public Tag( K key, T tag) {
+    public Tag(K key, T tag) {
         this.key = key;
         this.tag = tag;
     }

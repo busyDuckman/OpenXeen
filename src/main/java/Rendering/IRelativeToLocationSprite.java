@@ -1,8 +1,6 @@
 package Rendering;
 
 import Toolbox.Direction;
-
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -23,7 +21,7 @@ public interface IRelativeToLocationSprite extends IRenderableGameObject
      * @param viewDir The direction the viewer is looking. This allows a directional object to
      *                show the correct side to the viewport.
      */
-    IRenderableGameObject getView( Point mapPosRelative, Direction viewDir);
+    IRenderableGameObject getView(Point mapPosRelative, Direction viewDir);
 
     @Override
     default BufferedImage getImage(int frame) {

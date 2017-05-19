@@ -5,6 +5,7 @@ import Game.IAttackable;
 import Toolbox.Direction;
 import mamFiles.MaMMazeFile;
 
+
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -39,6 +40,7 @@ public abstract class Combatant extends GameEntityBase implements IAttackable, I
     public Stat magicResist = new Stat("stat_magic_res", 0, naturalStatMax);
 
     public Stat hitPoints = new Stat("stat_hit_points", 0, miscStatMax);
+
 
     public Combatant(int id, String name, Point location, MaMMazeFile parentMaze) {
         super(id, name, location, parentMaze);
