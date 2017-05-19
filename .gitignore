@@ -17,3 +17,6 @@ buildNumber.properties
 
 #ide
 .idea/
+
+#xeen cc files in here so they dont commit
+game_data/

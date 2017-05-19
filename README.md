@@ -1,13 +1,13 @@
 ---
  OpenXeen
 ---
-![Last Screen Shot](Doco/Dev%20History/openXeen14.png?raw=true "Last Screen Shot")
+![Last Screen Shot](doco/Dev History/openXeen14.png?raw=true "Last Screen Shot")
 
 OpenXeen is a mod for Might and Magic IV & V - World of Xeen (WOX), programmed by duuckman (Dr Warren Creemers).
 It is a game engine rewrite in java designed to make MaM gaming more available.
 
-__NB:__ This project is very new, and I have limited spare time.
-It is not yet playable, **Check back around the end of 2016 If you want to see a game**
+__NB:__ This project is very new, and I have limited spare time.  
+__News:__ Back from 6 months hiatus on this project.
 
 Resources:
   - Wiki: [here](https://github.com/busyDuckman/OpenXeen/wiki)
@@ -35,7 +35,7 @@ The game mechanics, and engine, are based on things I would have liked to see do
 NB: OpenXeen is programmed in java because I needed a project to "freshen" up
     my java skills and learn java 8. No other reason.
 
-Status:
+Status:  
   - Software is not ready for release.
   - At the moment it can:
      - Parse the cc files and open some graphics and audio files

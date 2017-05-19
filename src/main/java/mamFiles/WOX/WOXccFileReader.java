@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static Toolbox.Misc.ifNull;
+
 /**
  * Created by duckman on 7/05/2016.
  */
@@ -62,12 +64,12 @@ public class WOXccFileReader extends MaMCCFileReader
         monsterFactory = MonsterFactory.newWoxMonsterFactory();
     }
 
-    public static WOXccFileReader open(String filePath)
+    public static WOXccFileReader open(String filePath) throws CCFileFormatException
     {
         //validate params and get file info
         if(!FileHelpers.fileExists(filePath))
         {
-            return null;
+            throw new CCFileFormatException("File not found: " + ifNull(filePath, "<NULL>"));
         }
         Path path = Paths.get(filePath);
         String name = path.getFileName().toString();

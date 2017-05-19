@@ -28,23 +28,23 @@ public class WoXWorld extends MaMWorld
         DARK_SIDE {
             @Override
             public String getIntroCCFileName() {
-                return "INTRO.CC";
+                return "intro.cc";
             }
 
             @Override
             public String getCurCCFileName() {
-                return "DARK.CUR";
+                return "dark.cur";
             }
         },
         CLOUDS {
             @Override
             public String getIntroCCFileName() {
-                return "INTRO.CC";
+                return "intro.cc";
             }
 
             @Override
             public String getCurCCFileName() {
-                return "XEEN.CUR";
+                return "xeen.cur";
             }
         },
         SWORDS {
