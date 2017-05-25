@@ -78,11 +78,17 @@ public class MaMGame implements IMaMGame
 
     }
 
-    public static MaMGame fromWoXData(String ccFilePath) throws CCFileFormatException {
+    public static MaMGame fromWoXData(String ccFilePath, WoXWorld.WoxVariant variant) throws CCFileFormatException {
         if(!FileHelpers.fileExists(ccFilePath)) {
             throw new CCFileFormatException(".CC file not found: " + ifNull(ccFilePath, "<NULL>"));
         }
         MaMCCFileReader ccFile = WOXccFileReader.open(ccFilePath);
+        if(((WOXccFileReader)ccFile).getVariant().getWoxVariant() != variant) {
+            throw new CCFileFormatException(String.format("Wrong cc file (%s)[%s] for specified variant %s.",
+                    ccFilePath,
+                    ((WOXccFileReader)ccFile).getVariant().getWoxVariant(),
+                    variant));
+        }
         MaMGame game = new MaMGame(ccFile);
         return game;
     }

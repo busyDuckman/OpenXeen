@@ -1,4 +1,6 @@
+import Game.GlobalSettings;
 import Game.MaMGame;
+import Game.Map.WoXWorld;
 import Rendering.SimpleCanvas.MaMPanel;
 import mamFiles.CCFileCache;
 import mamFiles.CCFileFormatException;
@@ -37,18 +39,26 @@ public class Main
             System.exit(0);
         }
 
+
+        // global settings (from command line, or whatever)
+        GlobalSettings.INSTANCE.setRebuildProxies(CMDOptions.REBUILD_PROXY.isSet(cmd));
+        GlobalSettings.INSTANCE.setDebugMode(CMDOptions.DEBUG.isSet(cmd));
+        GlobalSettings.INSTANCE.setDisableHUD(CMDOptions.NO_HUD.isSet(cmd));
+        CCFileCache.INSTANCE.setEnabled(!CMDOptions.NO_CACHE.isSet(cmd));
+
+        // run game
         try {
             if(CMDOptions.GAME_MM3.isSet(cmd)) {
                 game = new MaMGame(IoTccFileReader.open("mm3.cc"));
             }
             else if(CMDOptions.GAME_MM4.isSet(cmd)) {
-                game = MaMGame.fromWoXData("xeen.cc");
+                game = MaMGame.fromWoXData("xeen.cc", WoXWorld.WoxVariant.CLOUDS);
             }
             else if(CMDOptions.GAME_MM5.isSet(cmd)) {
-                game = MaMGame.fromWoXData("dark.cc");
+                game = MaMGame.fromWoXData("dark.cc", WoXWorld.WoxVariant.DARK_SIDE);
             }
             else if(CMDOptions.GAME_WOX.isSet(cmd)) {
-                game = MaMGame.fromWoXData("dark.cc"); //TODO
+                game = MaMGame.fromWoXData("dark.cc", WoXWorld.WoxVariant.DARK_SIDE); //TODO
             }
             else {
                 System.out.println("Error: No game specified.");
@@ -64,9 +74,7 @@ public class Main
             //MaMMonster mon = game.getWorld().getCcFile().getMonsterFactory().createMonster(game.getWorld(), r.nextInt(50));
             //game.getWorld().addMonster(mon, r.nextInt(256), r.nextInt(256));
 
-            if(CMDOptions.NO_CACHE.isSet(cmd)) {
-                CCFileCache.INSTANCE.setEnabled(false);
-            }
+
 
             //Create a renderer for the game (renderer is embedded in a JPanel)
             MaMPanel window = new MaMPanel(game);
@@ -104,6 +112,7 @@ public class Main
 
         System.out.println();
         HelpFormatter formatter = new HelpFormatter();
+        formatter.setOptionComparator((a, b) -> CMDOptions.compare(a, b));
         formatter.printHelp("OpenXeen", options, true);
 
         System.out.println();

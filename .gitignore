@@ -17,6 +17,10 @@ buildNumber.properties
 
 # ide
 .idea/
+*.iml
 
 #xeen cc files in here so they dont commit
 game_data/
+
+# doxygen
+doco/doxygen/html/

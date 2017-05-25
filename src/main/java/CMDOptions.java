@@ -3,14 +3,20 @@
  */
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.OptionalInt;
+import java.util.stream.IntStream;
+
+import static Toolbox.Misc.ifNull;
 
 /**
  * A helper for working with commons CLI.
  *
- * Beyond the basics, it allows me to direct the order of printing in the help output.
+ * Items in this enum will be printed in the same order they are defined.
  */
 public enum CMDOptions {
     GAME_MM3 ("mm3", false, "Runs M&M III, Isles of Terra"),
@@ -19,18 +25,30 @@ public enum CMDOptions {
     GAME_WOX ("wox", false, "Runs M&M IV + V, World of Xeen"),
 
     DIR      ("dir", true, "Source directory for M&M game"),
-    NO_CACHE ("no_cache", false, "Disable caching of files (for debuging/editing).");
+    REBUILD_PROXY ("rebuild_proxy", "p", false, "Extracts all data in the original ccFiles to a proxy file."),
+
+    DEBUG   ("debug", "d", false, "Runs application in debug mode (recommended for developers)"),
+    NO_CACHE ("no_cache", false, "Disable caching of files (for debugging/editing)."),
+    NO_HUD  ("no_hud", false, "Disables rendering of the user interface, showing just the world.");
 
     String name;
     String shortName;
     String desc;
     boolean hasArg;
+    Option option;
 
     CMDOptions(String name, String shortName, boolean hasArg, String desc) {
         this.name = name;
         this.shortName = shortName;
         this.hasArg = hasArg;
         this.desc = desc;
+
+        if(this.shortName == null) {
+            this.option = new Option(name, hasArg, desc);
+        }
+        else {
+            this.option = new Option(shortName, name, hasArg, desc);
+        }
     }
 
     CMDOptions(String name, boolean hasArg, String desc) {
@@ -56,17 +74,21 @@ public enum CMDOptions {
     public static Options getOptions() {
         Options options = new Options();
         Arrays.stream(CMDOptions.values())
-                .sorted((a,b) -> Integer.compare(a.ordinal(), b.ordinal()))
-                .forEach(C -> C.addToOptions(options));
+                .sorted(Comparator.comparingInt(Enum::ordinal))
+                .forEach(C -> options.addOption(C.option));
         return options;
     }
 
-    private void addToOptions(Options options) {
-        if(shortName != null) {
-            options.addOption(name, hasArg, desc);
+    public static int compare(Option a, Option b) {
+        // This is not the logical and direct way of approaching the problem, but java.
+        Option[] options = Arrays.stream(CMDOptions.values()).map(C -> C.option).toArray(Option[]::new);
+        OptionalInt aPos = IntStream.range(0, options.length).filter(I -> options[I].equals(a)).findFirst();
+        OptionalInt bPos = IntStream.range(0, options.length).filter(I -> options[I].equals(b)).findFirst();
+
+        if(aPos.isPresent() && bPos.isPresent()) {
+            return Integer.compare(aPos.getAsInt(), bPos.getAsInt());
         }
-        else {
-            options.addOption(shortName, name, hasArg, desc);
-        }
+
+        else return ifNull(a.getLongOpt(),"").compareTo(ifNull(b.getLongOpt(), ""));
     }
 }

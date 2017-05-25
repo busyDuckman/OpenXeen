@@ -33,10 +33,12 @@ public class WOXMazeFile extends MaMMazeFile
         //there are several different files to get.
 
         byte[] mapData = world.getCCFileCur().getFileRaw(world.getMazeName(mazeID));
-        loadMaze(mapData, mapWidth, mapHeight, world);
+        loadMaze(mapData, mapWidth, mapHeight, world); //TODO: This bombs out silently in MM$
 
         byte[] monData = world.getCCFileCur().getFileRaw(world.getMonsterLayoutFile(mazeID));
-        loadMonstersAndThings(monData, world);
+        if(world.getVariant() != WoXWorld.WoxVariant.CLOUDS) {
+            loadMonstersAndThings(monData, world); //TODO: get clouds working
+        }
     }
 
     protected void loadMaze(byte[] data, int mapWidth, int mapHeight, MaMWorld world) throws CCFileFormatException {

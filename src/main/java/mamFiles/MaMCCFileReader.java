@@ -7,6 +7,7 @@ import Game.Monsters.MonsterFactory;
 import Toolbox.BinaryHelpers;
 import Toolbox.FileHelpers;
 import Toolbox.IValidatable;
+import mamFiles.WOX.WOXccFileReader;
 //import mamFiles.WOX.WOXSpriteFile;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static Toolbox.BinaryHelpers.BYTES2INT_lsb;
 
@@ -22,7 +24,6 @@ import static Toolbox.BinaryHelpers.BYTES2INT_lsb;
  */
 public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
 {
-
     protected static class CCFileTocEntry implements IValidatable
     {
         public int ID = 0; //unit16
@@ -90,6 +91,8 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     String filePath;
     protected MonsterFactory monsterFactory;
     //protected int fileSize;
+    List<MaMCCFileReader> assosiates;
+
 
     //-------------------------------------------------------------------------------------------------
     // Constructor
@@ -98,6 +101,67 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     {
         super(FileHelpers.getFileNameNoExtension(fileName), "root@" + fileName);
         filePath = fileName;
+        assosiates = new ArrayList<>();
+    }
+
+    //-------------------------------------------------------------------------------------------------
+    // Association
+    //-------------------------------------------------------------------------------------------------
+
+    /**
+     * Resource files often don't exist on their own.
+     * Sometimes loading one file may require going to another cc file.
+     */
+    public void associate(MaMCCFileReader ccFile) {
+         if(!assosiates.contains(ccFile)) {
+             assosiates.add(ccFile);
+         }
+    }
+
+    public MaMCCFileReader getAssosiate(String name) {
+        return assosiates.stream().filter(R -> R.getName() == name).findFirst().orElse(null);
+    }
+
+    /**
+     * Finds a file, if its location is uncertain.
+     * @param file File name to find.
+     * @param onlySearchAssociatesOnFileMissing Search does not happen if this file has the file.
+     * @return null on no matches (or null file name), a MaMCCFileReader owning the file on one success.
+     *         Otherwise throws an exception.
+     * @throws CCFileFormatException Normally because more than one match was found.
+     */
+    public MaMCCFileReader searchWithAssociatesForFile(String file,
+                                                       boolean onlySearchAssociatesOnFileMissing)
+            throws CCFileFormatException
+    {
+        List<MaMCCFileReader> sources = new ArrayList<>();
+        if(file == null) {
+            return null;
+        }
+
+        //build a list of all ccfiles that know of the file.
+        if(this.fileExists(file)) {
+            if(onlySearchAssociatesOnFileMissing) {
+                return this;
+            }
+            sources.add(this);
+        }
+
+        assosiates.stream().filter(C -> {
+            try {
+                return C.fileExists(file);
+            } catch (CCFileFormatException e) {
+                return false;
+            }
+        }).forEach(F -> sources.add(F));
+
+        if(sources.size() == 0) {
+            return null;
+        } else if(sources.size() == 1) {
+            return sources.get(0);
+        } else {
+            throw new CCFileFormatException("Search found more than one ccfile found containing: " + file);
+        }
     }
 
     //-------------------------------------------------------------------------------------------------
@@ -200,7 +264,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
             seekDataBegin = tocLen + 2;
             createTocFromEncryptedHeader(rawToc, this.numberOfFiles, fileSize);
 
-            //parse known files
+            //parse known files (using csv file of same name)
             loadKnownFiles(filePath);
 
             if (GlobalSettings.INSTANCE.discoverFileNames())
@@ -268,7 +332,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         }
 
 
-        BinaryHelpers.DebugDumpBinary(rawToc, "Headers.last");
+        //BinaryHelpers.DebugDumpBinary(rawToc, "Headers.last");
 
         //parse
         for(int i=0; i<numberOfFiles; i++)
@@ -725,12 +789,16 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         }
     }
 
+    /**
+     * Find a matching csv, parse out the file names, load known file names.
+     * @param filePath
+     */
     public void loadKnownFiles(String filePath)
     {
         knownFileNames = new HashMap<>();
 
-        //find a matcching csv and pars out the file names
-        Path path = Paths.get(filePath + ".csv");
+        String path = FileHelpers.resolveFile(filePath + ".csv", true, true);
+
         if(FileHelpers.fileExists(path))
         {
             String[] lines = FileHelpers.readAllLines(path);
@@ -740,8 +808,6 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                                     .toArray(size -> new String[size]);
 
             Arrays.stream(fileNameList).forEach(f -> knownFileNames.put(hashFileName(f), f));
-
-
         }
     }
 
@@ -916,20 +982,26 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
 
     protected static boolean looksLikeText(byte[] data)
     {
-        int nonTextLikeBytes = 0;
-        int len = data.length;
-        for(byte b : data)
-        {
-            // > 128 is probably not text.
-            if(b < 0) {
-                nonTextLikeBytes++;
-            }
-        }
+        try {
+            String asText = new String(data, "UTF-8");
+            Stream<Character> commonASCII = asText.chars()
+                    .mapToObj(I -> (char) I)
+                    .filter(C -> ((C > 'a') && (C < 'z')) ||
+                            ((C > 'A') && (C < 'Z')) ||
+                            "1234567890\r\n\t ~!@#$%^&*()`-=_+[]{};':\"\\|<>?,./".contains("" + C));
 
-        //does this look text like
-        return (((len < 20) && (nonTextLikeBytes <= 1)) ||
-                ((len <= 1024) && (nonTextLikeBytes <= 12)) ||
-                ((len > 1024) && (nonTextLikeBytes / (double)len) < 0.001));
+            Stream<Character> lettersASCII = commonASCII.filter(C -> Character.isLetter(C));
+
+
+            double perOk = (data.length - (int)commonASCII.count()) / (double)data.length;
+            double letterRatio = lettersASCII.count() / (double)commonASCII.count();
+
+            return (perOk < 0.01) && (letterRatio > 0.9);
+
+        } catch (UnsupportedEncodingException e) {
+            //TODO: log not supposed to be here
+            return false;
+        }
     }
 
     private String getProxyFilePath(String fileName, MAMFile mamFile) {
