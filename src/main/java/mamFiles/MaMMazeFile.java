@@ -48,7 +48,7 @@ public abstract class MaMMazeFile extends MAMFile
     protected IMaMEnvironmentSet environmentSet;
 
     protected MaMMazeView parentView;
-    protected Point worldSpacePos;
+    //protected Point worldSpacePos;
 
     public MaMMazeFile(String name, String key) throws CCFileFormatException {
         super(name, key);

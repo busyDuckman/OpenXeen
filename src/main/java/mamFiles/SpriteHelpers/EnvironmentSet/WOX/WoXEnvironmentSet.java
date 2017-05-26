@@ -166,6 +166,7 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
                 fileName = Misc.padZeros(objectIndex, 3)+".OBJ";
                 break;
             case CLOUDS:
+                objectIndex = objectIndex % 121;
                 fileName = Misc.padZeros(objectIndex, 3)+".OBJ";
                 break;
             case SWORDS:
@@ -176,7 +177,9 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
 
         try {
             //return ccFile.getThing(fileName);
+
             return new WoXThing(ccFile.getSprite(fileName), MAMFile.generateUniqueKey(fileName));
+
             //return ccFile.getSprite(fileName).getView(
         } catch (CCFileFormatException e) {
             e.printStackTrace();

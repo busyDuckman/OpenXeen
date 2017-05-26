@@ -1,7 +1,6 @@
 package Game;
 
 import Game.Map.*;
-import Game.Monsters.MaMMonster;
 import GameMechanics.Adventurers.Adventurer;
 import GameMechanics.Adventurers.CharClass;
 import GameMechanics.Adventurers.CharGender;
@@ -21,11 +20,8 @@ import static Toolbox.PointHelper.*;
 import static mamFiles.SpriteHelpers.RenderPosHelper.RenderableType;
 
 import java.awt.*;
-import java.io.Console;
-import java.sql.Struct;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Created by duckman on 15/05/2016.
@@ -258,7 +254,8 @@ public class MaMGame implements IMaMGame
             view.setSky(world.getOutdoorEnvironmentSet(0).getSky());
 
             //render the current view
-            IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
+            //IReadonlyGrid<MaMTile>
+            MaMMazeView map = world.getCurrentMazeView();
 
             //System.out.println("----------------------------------------------");
             if(map != null)
@@ -344,7 +341,7 @@ public class MaMGame implements IMaMGame
 
                             // entities (& monsters)
                             world.getEntities().stream()
-                                    .filter(M -> M.getLocation().equals(wsPos))
+                                    .filter(M -> wsPos.equals(M.getLocationWorldSpace(map))) //this filters out NULL positions.
 
                                     .forEach(M -> {
                                         try {

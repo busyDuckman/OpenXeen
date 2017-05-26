@@ -8,7 +8,9 @@ import Toolbox.LRUCache;
 import mamFiles.MaMMazeFile;
 
 import java.awt.*;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by duckman on 1/07/2016.
@@ -51,20 +53,23 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
     // The number of mazes in our grid
     protected final int jsWidth;
     protected final int jsHeight;
-    protected final Function<Point, MaMMazeFile> getMaze;
+    //protected final Function<Point, MaMMazeFile> getMaze;
+    protected final Map<Point, MaMMazeFile> mazeLut;
+    transient protected final Map<MaMMazeFile, Point> reverseMazeLut;
+
     protected final Function<Point, MaMMazeFile> onLeaveMaze;
     protected final Function<Point, MaMMazeFile> onEnterMaze;
 
     protected Point wsPlayerPos;
 
     /**
-     * @param getMaze Returns a sub maze for a point (point is in join space, not world space)
+     * @param mazeLut Returns a sub maze for a point (point is in join space, not world space)
      * @param onLeaveMaze Notifies game that the player has left a maze (so it can save it)
      * @param onEnterMaze  Notifies game that the player has entered a maze (activate Monsters)
      */
     public MaMMazeView(int subMazeWidth, int subMazeHeight,
                        int totalMapsInXAxis, int totalMapsInYAxis,
-                       Function<Point, MaMMazeFile> getMaze,
+                       Map<Point, MaMMazeFile> mazeLut,
                        Function<Point, MaMMazeFile> onLeaveMaze,
                        Function<Point, MaMMazeFile> onEnterMaze)
     {
@@ -72,7 +77,7 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
         this.msHeight = subMazeHeight;
         this.jsWidth = totalMapsInXAxis;
         this.jsHeight = totalMapsInYAxis;
-        this.getMaze = getMaze;
+        this.mazeLut = mazeLut;
         this.onLeaveMaze = onLeaveMaze;
         this.onEnterMaze = onEnterMaze;
 
@@ -81,6 +86,10 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
         wsPlayerPos = new Point(8,8);
         currentMaze = getMazeFileForPoint(wsPlayerPos);
         recentMazes.put(getJoinSpace(wsPlayerPos), currentMaze);
+
+        reverseMazeLut = mazeLut.entrySet()
+                            .stream()
+                            .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
     }
 
     public void changePlayerPos(Point wsPos)
@@ -92,7 +101,7 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
 
         if(!jsPosNew.equals(jsPosOld))
         {
-            currentMaze = getMaze.apply(jsPosNew);
+            currentMaze = mazeLut.getOrDefault(jsPosNew, null);
         }
     }
 
@@ -160,9 +169,9 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
     {
         Point jsPos = getJoinSpace(wsX, wsY);
         MaMMazeFile maze = recentMazes.getOrDefault(jsPos, null);
-        if ((maze == null) && (getMaze != null))
+        if (maze == null)
         {
-            maze = getMaze.apply(jsPos);
+            maze = mazeLut.getOrDefault(jsPos, null);
 
             if(maze != null)
             {
@@ -173,11 +182,20 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
     }
 
 
-//    public Point getWorldSpaceForEntity(IGameEntity entity)
-//    {
-//        MaMMazeFile maze = entity.getParentMaze();
-//        //maze.get
-//
-//    }
+    /**
+     * Gets A world space position, or null if not in the view.
+     */
+    public Point getWorldSpaceForEntity(IGameEntity entity)
+    {
+        MaMMazeFile maze = entity.getParentMaze();
+        Point jsMazePos = reverseMazeLut.getOrDefault(maze, null);
+        if(jsMazePos != null) {
+            Point wsPos = new Point((msWidth * jsMazePos.x) + entity.getLocationMapSpace().x,
+                    (msHeight * jsMazePos.y) + entity.getLocationMapSpace().y);
+            return wsPos;
+        }
+
+        return null;
+    }
 
 }

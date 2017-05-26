@@ -1,5 +1,6 @@
 package Game;
 
+import Game.Map.MaMMazeView;
 import Game.Map.MaMWorld;
 import Rendering.IRelativeToLocationSprite;
 import Toolbox.Direction;
@@ -18,9 +19,16 @@ import java.util.function.Function;
 public interface IGameEntity extends IUpdateable
 {
     /**
-     * World space position of the item.
+     * Map space position of the item.
      */
-     Point getLocation();
+     Point getLocationMapSpace();
+
+    /**
+     * Resolves a world space location, or null if not in the view.
+     */
+     default Point getLocationWorldSpace(MaMMazeView view) {
+         return view.getWorldSpaceForEntity(this);
+     }
 
     /**
      * Direction the entity is pointing.
@@ -84,7 +92,7 @@ class BoundRenderable implements IGameEntity {
     }
 
     @Override
-    public Point getLocation()
+    public Point getLocationMapSpace()
     {
         return location;
     }

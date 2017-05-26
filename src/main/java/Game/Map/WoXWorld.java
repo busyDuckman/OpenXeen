@@ -250,7 +250,7 @@ public class WoXWorld extends MaMWorld
 
         //TODO: Get bounds from mazeLut
         MaMMazeView mazeView = new MaMMazeView(16, 16, 6, 4,
-                                    P -> mazeLut.getOrDefault(P, null),
+                                    mazeLut,
                                     P -> null,
                                     P-> null);
 

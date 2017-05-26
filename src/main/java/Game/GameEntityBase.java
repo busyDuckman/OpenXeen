@@ -50,7 +50,7 @@ public abstract class GameEntityBase implements IGameEntity
     }
 
     @Override
-    public Point getLocation() {
+    public Point getLocationMapSpace() {
         return location;
     }
 
