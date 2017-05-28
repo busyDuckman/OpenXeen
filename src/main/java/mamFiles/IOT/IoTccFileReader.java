@@ -362,6 +362,11 @@ public class IoTccFileReader extends MaMCCFileReader
     }
 
     @Override
+    protected MaMScript decodeScript(String name, String key, byte[] data) throws CCFileFormatException {
+        return null;
+    }
+
+    @Override
     protected MaMMazeFile decodeMapFile(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException {
         return new WOXMazeFile(mazeID, key, (WoXWorld)world);
     }

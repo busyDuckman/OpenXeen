@@ -13,6 +13,7 @@ import Toolbox.MaMGameException;
 
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMMazeFile;
+import mamFiles.MaMScript;
 import mamFiles.MaMThing;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
 
@@ -39,6 +40,10 @@ public class WOXMazeFile extends MaMMazeFile
         //if(world.getVariant() != WoXWorld.WoxVariant.CLOUDS) {
             loadMonstersAndThings(monData, world); //TODO: get clouds working
         //}
+
+        byte[] scriptData = world.getCCFileCur().getFileRaw(world.getScriptedEventsName(mazeID));
+        WoxScript script = new WoxScript(name+"_events", key+"_events", scriptData);
+        setEventScript(script);
     }
 
     protected void loadMaze(byte[] data, int mapWidth, int mapHeight, MaMWorld world) throws CCFileFormatException {

@@ -152,11 +152,11 @@ public class MaMMazeView implements IReadonlyGrid<MaMTile>
         return getJoinSpace(wsPos.x, wsPos.y);
     }
 
-    protected final Point getMazeSpace(int wsX, int wsY) {
+    public final Point getMazeSpace(int wsX, int wsY) {
         return new Point(wsX%msWidth, wsY%msWidth);
     }
 
-    protected final Point getMazeSpace(Point wsPos) {
+    public final Point getMazeSpace(Point wsPos) {
         return getMazeSpace(wsPos.x, wsPos.y);
     }
 

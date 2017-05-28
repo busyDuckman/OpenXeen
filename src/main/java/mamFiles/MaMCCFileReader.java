@@ -193,6 +193,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     protected abstract MaMPallet   decodePallet(String name, String key, byte[] data) throws CCFileFormatException;
     protected abstract MaMSurface  decodeSurface(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException;
     protected abstract MaMThing    decodeThing(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException;
+    protected abstract MaMScript   decodeScript(String name, String key, byte[] data) throws CCFileFormatException;
     protected abstract MaMMazeFile decodeMapFile(String name, String key, byte[] data, MaMWorld world, int mazeID) throws CCFileFormatException;
 
     protected MaMRawImage decodeRawImage(String name, String key, byte[] data, MaMPallet pal) throws CCFileFormatException {
@@ -379,6 +380,11 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
         return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::decodeSurface);
     }
 
+    public MaMScript getScript(int id) throws CCFileFormatException
+    {
+        return CCFileCache.INSTANCE.cachedGetFile(this, id, this::decodeScript);
+    }
+
     public MaMThing getThing(int id, MaMPallet pal) throws CCFileFormatException
     {
         return CCFileCache.INSTANCE.cachedGetFile(this, id, pal, this::decodeThing);
@@ -454,6 +460,8 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                     return getRawImage(id);
                 case "OBJ":
                     return getThing(id);
+                case "EVT":
+                    return getScript(id);
                 case"":
                     switch (fileNameNoExt)
                     {
@@ -972,6 +980,19 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
                     System.out.println(describeFile(fileName) + " was a text file.");
                     return txt;
                 }
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                MaMScript evt = new MaMScript("SCRIPT_FOR_"+fileName,
+                        MAMFile.generateKeyFromCCFile(id, this),
+                        getFileRaw(id));
+                //if we are here, we parsed a sprite
+                System.out.println(describeFile(fileName) + " was a event script.");
+                return evt;
             }
             catch (Exception ex)
             {

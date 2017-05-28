@@ -98,6 +98,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		</dependency>
 
 		<dependency>
+			<groupId>org.luaj</groupId>
+			<artifactId>luaj-jse</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>catalano</groupId>
 			<artifactId>catalano.core</artifactId>
 			<version>1.4.0</version>

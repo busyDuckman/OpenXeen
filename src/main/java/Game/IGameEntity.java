@@ -141,9 +141,9 @@ class BoundRenderable implements IGameEntity {
     }
 
     @Override
-    public void update(MaMWorld world) {
+    public void update(MaMGame game) {
         if(onUpdate != null) {
-            onUpdate.run(world, this);
+            onUpdate.run(game, this);
         }
     }
 }

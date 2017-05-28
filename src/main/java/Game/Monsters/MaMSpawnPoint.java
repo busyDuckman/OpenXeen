@@ -1,6 +1,7 @@
 package Game.Monsters;
 
 import Game.GameEntityBase;
+import Game.MaMGame;
 import Game.Map.MaMWorld;
 import Rendering.IRelativeToLocationSprite;
 import Toolbox.Direction;
@@ -35,9 +36,9 @@ public class MaMSpawnPoint extends GameEntityBase
     }
 
     @Override
-    public void update(MaMWorld world) {
+    public void update(MaMGame game) {
         if(monstersSpawned == 0) {
-            spawnMonster(world);
+            spawnMonster(game.getWorld());
         }
     }
 
