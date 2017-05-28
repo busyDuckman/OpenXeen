@@ -25,13 +25,34 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
 //            "SPACE.SRF"};
 
     //Altered tto match the outdoor.til on my machine
-    private static final String[] surfaceNameLut = new String[] {
+    private static final String[] surfaceNameLutMM5 = new String[] {
         "WATER.SRF", "DIRT.SRF", "GRASS.SRF",
         "SNOW.SRF",  "SWAMP.SRF", "LAVA.SRF",
         "DESERT.SRF", "ROAD.SRF", "DWATER.SRF",
         "TFLR.SRF", "SKY.SRF", "CLOUD.SRF",
         "SEWER.SRF", "CROAD.SRF", "SCORTCH.SRF",
         "SPACE.SRF"};
+
+    private static final String[] surfaceNameLutMM4 = new String[] {
+
+            "WATER.SRF",//ok
+            "DIRT.SRF",//ok
+            "GRASS.SRF",//ok
+            "SNOW.SRF",//ok
+            "SWAMP.SRF",//ok
+            "LAVA.SRF",//ok
+            "DESERT.SRF",//ok
+            "ROAD.SRF",//ok
+            "DWATER.SRF",//ok
+            "TFLR.SRF",//ok
+            "SKY.SRF",//ok
+            "CLOUD.SRF", //ok
+            "SPACE.SRF",  //"SEWER.SRF" not in the file //TODO, there appears to be .SRF files I have not identified
+            "SPACE.SRF",  //"CROAD.SRF" not in the file //TODO, there appears to be .SRF files I have not identified
+            "SCORTCH.SRF",//ok
+            "SPACE.SRF"};//ok
+
+
 
     private final MaMSurface[] surfaces;
 
@@ -73,6 +94,7 @@ public class WoXOutdoorEnvironmentSet extends WoXEnvironmentSet implements IMaMO
     public WoXOutdoorEnvironmentSet(WoXWorld.WoxVariant variant, MaMCCFileReader ccFile) throws CCFileFormatException {
         super(variant, null, ccFile);
 
+        String[] surfaceNameLut = (variant == WoXWorld.WoxVariant.CLOUDS) ? surfaceNameLutMM4 : surfaceNameLutMM5;
         surfaces = new MaMSurface[surfaceNameLut.length];
         for (int i = 0; i < surfaceNameLut.length; i++) {
             String surfaceName = surfaceNameLut[i];

@@ -112,6 +112,7 @@ public class WOXccFileReader extends MaMCCFileReader
         switch (variant)
         {
             case DARK_CUR:
+            case CLOUDS_CUR:
             case UNKNOWN:
                 return data;
             default:

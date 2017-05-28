@@ -1,12 +1,17 @@
 package Toolbox;
 
+import org.apache.commons.io.IOUtils;
+import sun.nio.ch.IOUtil;
+
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by duckman on 15/05/2016.
@@ -15,22 +20,22 @@ import java.util.List;
  * Also the set of standard file operations is spread across 5 different packages.
  * So I made this class to keep my sanity.
  */
-public class FileHelpers
-{
-    public static boolean fileExists(String path)
-    {
+public class FileHelpers {
+    public static boolean fileExists(String path) {
+        if(path == null) {
+            return false;
+        }
+
         File f = new File(path);
         return (f.exists() && !f.isDirectory());
     }
 
-    public static boolean fileExists(Path path)
-    {
+    public static boolean fileExists(Path path) {
         File f = path.toFile();
         return (f.exists() && !f.isDirectory());
     }
 
-    public static String readAllText(String path)
-    {
+    public static String readAllText(String path) {
         try {
             byte[] data = Files.readAllBytes(Paths.get(path));
             return new String(data);
@@ -40,32 +45,25 @@ public class FileHelpers
         }
     }
 
-    public static String[] readAllLines(String path)
-    {
+    public static String[] readAllLines(String path) {
         return readAllLines(Paths.get(path));
     }
 
-    public static String[] readAllLines(Path path)
-    {
-        if(fileExists(path))
-        {
+    public static String[] readAllLines(Path path) {
+        if (fileExists(path)) {
             BufferedReader in = null;
-            try
-            {
+            try {
                 in = new BufferedReader(new FileReader(path.toFile()));
 
                 String str;
 
                 List<String> list = new ArrayList<String>();
-                while((str = in.readLine()) != null){
+                while ((str = in.readLine()) != null) {
                     list.add(str);
                 }
 
                 return list.toArray(new String[0]);
-            }
-
-            catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 return null;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -73,6 +71,84 @@ public class FileHelpers
             }
         }
 
+        return null;
+    }
+
+    /**
+     * Often the file is not quite where you looked for it.
+     * @param idealURL
+     * @param ignoreCase Find any file with the same name in the path (path case remains intact).
+     * @param unpackFromResources
+     * @return
+     */
+    public static String resolveFile(String idealURL, boolean ignoreCase, boolean unpackFromResources) {
+        if(idealURL == null) {
+            return null;
+        }
+
+        if(fileExists(idealURL)) {
+            return idealURL;
+        }
+
+        final String nameOnly = getFileName(idealURL);
+
+        if(ignoreCase) {
+            try {
+                Optional<Path> filePath = Files.walk(Paths.get(getParentDirectory(idealURL)))
+                        .filter(P -> getFileName(P.toString()).equalsIgnoreCase(nameOnly))
+                        .findFirst();
+                if(filePath.isPresent()) {
+                    return filePath.get().toString();
+                }
+
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        if(unpackFromResources) {
+            InputStream res = tryGetResourceFileStream(nameOnly);
+            if(res != null) {
+                try {
+                    byte[] data = IOUtils.toByteArray(res);
+                    if(data.length > 0) {
+                        if(FileHelpers.saveBytes(idealURL, data)) {
+                            return fileExists(idealURL) ? idealURL : null;
+                        }
+                    }
+                } catch (IOException e) {
+                    return null;
+                }
+
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a file out of resources.
+     * @param fileName
+     * @return An input stream, or null on error.
+     */
+    public static InputStream tryGetResourceFileStream(String fileName) {
+        return FileHelpers.class.getResourceAsStream("/"+fileName);
+    }
+
+    /**
+     * Gets a file out of resources.
+     * @param fileName
+     * @return An array of bytes, or null on error.
+     */
+    public static byte[] tryGetResourceFile(String fileName) {
+        InputStream res = tryGetResourceFileStream(fileName);
+        if(res != null) {
+            try {
+                return IOUtils.toByteArray(res);
+            } catch (IOException e) {
+                return null;
+            }
+        }
         return null;
     }
 

@@ -2,13 +2,11 @@ package mamFiles.SpriteHelpers.EnvironmentSet.WOX;
 
 import Game.Map.WoXWorld;
 import Rendering.IRenderableGameObject;
-import Rendering.RenderablePos;
 import Toolbox.*;
 import mamFiles.*;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMEnvironmentSet;
 import mamFiles.WOX.WoXThing;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -106,7 +104,21 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
      *    Each block of 4 bytes is broken into frames as front, left, back, right.
      */
     protected void loadObjectConfigFile(String file) throws CCFileFormatException {
-        byte[] data = ccFile.getFileRaw(file);
+        //Not sure where to get this file in some versions.
+        MaMCCFileReader finalCCFile = ccFile.searchWithAssociatesForFile(file, true);
+        byte[] data;
+
+        if(finalCCFile == null) {
+            //There is a CLOUDS.DAT.BIN in resources, because it was hard coded into the mm4 exe.
+            data = FileHelpers.tryGetResourceFile(file+".BIN");
+            if(data == null) {
+                throw CCFileFormatException.fromMissingFile(file, ccFile);
+            }
+        }
+        else {
+            data = finalCCFile.getFileRaw(file);
+        }
+
         ByteArrayInputStream bisConfig = new ByteArrayInputStream(data);
         Direction[] unPackOrder = new Direction[] {Direction.UP, Direction.LEFT, Direction.DOWN, Direction.RIGHT};
         if(things == null) {
@@ -154,6 +166,7 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
                 fileName = Misc.padZeros(objectIndex, 3)+".OBJ";
                 break;
             case CLOUDS:
+                objectIndex = objectIndex % 121;
                 fileName = Misc.padZeros(objectIndex, 3)+".OBJ";
                 break;
             case SWORDS:
@@ -164,7 +177,9 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
 
         try {
             //return ccFile.getThing(fileName);
+
             return new WoXThing(ccFile.getSprite(fileName), MAMFile.generateUniqueKey(fileName));
+
             //return ccFile.getSprite(fileName).getView(
         } catch (CCFileFormatException e) {
             e.printStackTrace();

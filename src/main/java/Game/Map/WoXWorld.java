@@ -13,6 +13,7 @@ import mamFiles.SpriteHelpers.EnvironmentSet.IMaMIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.IMaMOutdoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXIndoorEnvironmentSet;
 import mamFiles.SpriteHelpers.EnvironmentSet.WOX.WoXOutdoorEnvironmentSet;
+import mamFiles.WOX.WOXMazeFile;
 import mamFiles.WOX.WOXccFileReader;
 
 import java.awt.*;
@@ -102,6 +103,10 @@ public class WoXWorld extends MaMWorld
         //todo? clouds?
         ccFileCur = WOXccFileReader.open(FileHelpers.join(ccPath, variant.getCurCCFileName()));
         ccFileAnimations = WOXccFileReader.open(FileHelpers.join(ccPath, variant.getIntroCCFileName()));
+
+        ccFile.associate(ccFileCur);
+        ccFile.associate(ccFileAnimations);
+
         outdoorEnvironmentSets = new WoXOutdoorEnvironmentSet[] { new WoXOutdoorEnvironmentSet(variant, ccFile) };
         indoorEnvironmentSets = WoXIndoorEnvironmentSet.getEnvironmentSets(variant, ccFile);
 
@@ -211,13 +216,17 @@ public class WoXWorld extends MaMWorld
             {
                 //temporary name
                 String name = "maze {" + i +"}";
+                String areaFile = getAreaNameFile(i);
 
-                if(ccFile.fileExists(getAreaNameFile(i)))
+                if(ccFile.fileExists(areaFile))
                 {
-                    name = ccFile.getText(getAreaNameFile(i)).getText();
+                    name = ccFile.getText(areaFile).getText();
                 }
 
-                mazeFiles.put(i, ccFileCur.getMapFile(mazeName, this, i));
+                MaMMazeFile maze = ccFileCur.getMapFile(mazeName, this, i);
+                maze.setName(name);
+
+                mazeFiles.put(i, maze);
 
                 //reset miss count
                 missCount = 0;
@@ -241,7 +250,7 @@ public class WoXWorld extends MaMWorld
 
         //TODO: Get bounds from mazeLut
         MaMMazeView mazeView = new MaMMazeView(16, 16, 6, 4,
-                                    P -> mazeLut.getOrDefault(P, null),
+                                    mazeLut,
                                     P -> null,
                                     P-> null);
 

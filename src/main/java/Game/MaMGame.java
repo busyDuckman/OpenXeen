@@ -1,7 +1,6 @@
 package Game;
 
 import Game.Map.*;
-import Game.Monsters.MaMMonster;
 import GameMechanics.Adventurers.Adventurer;
 import GameMechanics.Adventurers.CharClass;
 import GameMechanics.Adventurers.CharGender;
@@ -21,11 +20,8 @@ import static Toolbox.PointHelper.*;
 import static mamFiles.SpriteHelpers.RenderPosHelper.RenderableType;
 
 import java.awt.*;
-import java.io.Console;
-import java.sql.Struct;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Created by duckman on 15/05/2016.
@@ -78,11 +74,17 @@ public class MaMGame implements IMaMGame
 
     }
 
-    public static MaMGame fromWoXData(String ccFilePath) throws CCFileFormatException {
+    public static MaMGame fromWoXData(String ccFilePath, WoXWorld.WoxVariant variant) throws CCFileFormatException {
         if(!FileHelpers.fileExists(ccFilePath)) {
             throw new CCFileFormatException(".CC file not found: " + ifNull(ccFilePath, "<NULL>"));
         }
         MaMCCFileReader ccFile = WOXccFileReader.open(ccFilePath);
+        if(((WOXccFileReader)ccFile).getVariant().getWoxVariant() != variant) {
+            throw new CCFileFormatException(String.format("Wrong cc file (%s)[%s] for specified variant %s.",
+                    ccFilePath,
+                    ((WOXccFileReader)ccFile).getVariant().getWoxVariant(),
+                    variant));
+        }
         MaMGame game = new MaMGame(ccFile);
         return game;
     }
@@ -252,7 +254,8 @@ public class MaMGame implements IMaMGame
             view.setSky(world.getOutdoorEnvironmentSet(0).getSky());
 
             //render the current view
-            IReadonlyGrid<MaMTile> map = world.getCurrentMazeView();
+            //IReadonlyGrid<MaMTile>
+            MaMMazeView map = world.getCurrentMazeView();
 
             //System.out.println("----------------------------------------------");
             if(map != null)
@@ -338,7 +341,7 @@ public class MaMGame implements IMaMGame
 
                             // entities (& monsters)
                             world.getEntities().stream()
-                                    .filter(M -> M.getLocation().equals(wsPos))
+                                    .filter(M -> wsPos.equals(M.getLocationWorldSpace(map))) //this filters out NULL positions.
 
                                     .forEach(M -> {
                                         try {
