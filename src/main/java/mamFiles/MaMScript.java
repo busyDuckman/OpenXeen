@@ -4,6 +4,7 @@ import Game.GlobalSettings;
 import Game.IScript;
 import Game.MaMGame;
 import Game.Map.MaMWorld;
+import Game.WoxOpcode;
 import Toolbox.BinaryHelpers;
 import Toolbox.Direction;
 import Toolbox.FileHelpers;
@@ -15,8 +16,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.*;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
@@ -26,6 +30,8 @@ import org.luaj.vm2.lib.jse.JsePlatform;
  */
 public class MaMScript extends MAMFile implements IScript<MaMMazeFile>, IHasProperties {
     String script;
+
+    transient Globals globals = null;
 
     /**
      * One raw line in a script file
@@ -91,9 +97,12 @@ public class MaMScript extends MAMFile implements IScript<MaMMazeFile>, IHasProp
         script = new String(data.toCharArray());
     }
 
+    /**
+     * This should be overridden by a sub class to convert a binary script to lua.
+     * @param data File
+     * @return lua code.
+     */
     protected String parseScript(byte[] data) throws CCFileFormatException {
-        StringBuilder sb = new StringBuilder();
-        //Bin
         return "print 'no script parsed'";
     }
 
@@ -106,6 +115,22 @@ public class MaMScript extends MAMFile implements IScript<MaMMazeFile>, IHasProp
     @Override
     public void setScript(String script) {
         this.script = script;
+        globals = null; // clear previously loaded script.
+    }
+
+    public static class OpcodeLib extends TwoArgFunction {
+        public OpcodeLib() { }
+
+        public LuaValue call(LuaValue modname, LuaValue env) {
+            LuaValue lib = tableOf();
+
+            Arrays.stream(WoxOpcode.values()).forEach(C -> {
+                lib.set(C.name(), C.getFunc());
+            });
+            env.set("opLib", lib);
+            env.get("package").get("loaded").set("opLib", lib);
+            return lib;
+        }
     }
 
     @Override
@@ -113,34 +138,29 @@ public class MaMScript extends MAMFile implements IScript<MaMMazeFile>, IHasProp
         //TODO: This gives lua too much and needs to be sandboxed to prevent plugin scripts doing damage.
         // see: http://www.luaj.org/luaj/3.0/examples/jse/SampleSandboxed.java
 
-        Globals globals = JsePlatform.standardGlobals();
-        globals.set("_game", CoerceJavaToLua.coerce(game));
-        globals.set("_world", CoerceJavaToLua.coerce(game.getWorld()));
-        globals.set("_map", CoerceJavaToLua.coerce(game.getWorld().getCurrentMazeView().getMazeFileForPoint(game.getPartyPos())));
-        globals.set("_pos", CoerceJavaToLua.coerce(game.getPartyPos()));
-        globals.set("_dir", CoerceJavaToLua.coerce(game.getPartyDir().ordinal()));
-        globals.set("_party", CoerceJavaToLua.coerce(game.getParty()));
-        globals.set("DIR_UP", CoerceJavaToLua.coerce(Direction.UP.ordinal()));
-        globals.set("DIR_DOWN", CoerceJavaToLua.coerce(Direction.DOWN.ordinal()));
-        globals.set("DIR_LEFT", CoerceJavaToLua.coerce(Direction.LEFT.ordinal()));
-        globals.set("DIR_RIGHT", CoerceJavaToLua.coerce(Direction.RIGHT.ordinal()));
-
         try {
-//            LuaValue chunk = globals.load("function foo(pos)\r\n  print 'pos:getX()';\r\nend");
-//            LuaValue chunk = globals.load(script);
-//            chunk.call(CoerceJavaToLua.coerce(game.getPartyPos()));
-//            LuaValue fooFunct = chunk.get("foo");
-//            fooFunct.call(CoerceJavaToLua.coerce(game.getPartyPos()));
+            // load script
+            if(globals == null) {
+                globals = JsePlatform.standardGlobals();
+                globals.load(new OpcodeLib());
+                globals.load(script).call();
+            }
 
-            //this works
-//            LuaValue chunk = globals.load("print ('pos:getX()', _pos:getX());");
+            // update game info
+            globals.set("_game", CoerceJavaToLua.coerce(game));
+            globals.set("_world", CoerceJavaToLua.coerce(game.getWorld()));
+            globals.set("_map", CoerceJavaToLua.coerce(game.getWorld().getCurrentMazeView().getMazeFileForPoint(game.getPartyPos())));
+            globals.set("_pos", CoerceJavaToLua.coerce(game.getPartyPos()));
+            globals.set("_dir", CoerceJavaToLua.coerce(game.getPartyDir().ordinal()));
+            globals.set("_party", CoerceJavaToLua.coerce(game.getParty()));
+            globals.set("DIR_UP", CoerceJavaToLua.coerce(Direction.UP.ordinal()));
+            globals.set("DIR_DOWN", CoerceJavaToLua.coerce(Direction.DOWN.ordinal()));
+            globals.set("DIR_LEFT", CoerceJavaToLua.coerce(Direction.LEFT.ordinal()));
+            globals.set("DIR_RIGHT", CoerceJavaToLua.coerce(Direction.RIGHT.ordinal()));
 
-            //this works
-            //globals.load("function doMap() \r\n print ('pos:getX()', _pos:getX()); \r\n end").call();
-            globals.load(script).call();
+            // call script
             LuaValue fooFunct = globals.get("doMap");
             fooFunct.call();
-            //chunk.call("foo");
         }
         catch (Exception ex) {
             if(GlobalSettings.INSTANCE.debugMode()) {

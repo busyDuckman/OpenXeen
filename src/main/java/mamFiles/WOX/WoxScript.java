@@ -1,5 +1,6 @@
 package mamFiles.WOX;
 
+import Game.WoxOpcode;
 import Toolbox.Direction;
 import mamFiles.CCFileFormatException;
 import mamFiles.MaMCCFileReader;
@@ -66,7 +67,7 @@ public class WoxScript extends MaMScript {
         StringBuilder sb = new StringBuilder();
         String nl = System.lineSeparator();
 
-
+        sb.append("require 'opLib'"+nl);
 
         functions.stream().forEach(F -> {
             sb.append(getFuncCode(F));
@@ -74,6 +75,8 @@ public class WoxScript extends MaMScript {
         });
 
         sb.append("function doMap()" + nl);
+        sb.append("  print ('mapX=', _pos:getX(), ', mapY=',_pos:getY());" + nl);
+        sb.append(nl);
         functions.stream().forEach(F -> {
             sb.append("  if " + getFuncCondition(F) + " then" + nl);
             sb.append("    " + getFuncName(F) + "()" + nl);
@@ -88,8 +91,8 @@ public class WoxScript extends MaMScript {
         StringBuilder sb = new StringBuilder();
         String nl = System.lineSeparator();
         sb.append("function " + getFuncName(func) + "()" + nl);
-        sb.append("print ('in event script: " + getFuncName(func) + "()');");
-        func.stream().forEach(L -> sb.append("  -- " + translateLine(L) + nl));
+        sb.append("  print 'in event script: " +  getFuncName(func) + "(...)'" + nl);
+        func.stream().forEach(L -> sb.append("  " + translateLine(L) + nl));
 
         sb.append("end" + nl);
 
@@ -98,7 +101,10 @@ public class WoxScript extends MaMScript {
 
     private String translateLine(MaMScriptLine line) {
         WoxOpcode op = getWoxOpcode(line);
-        String s = line.getLineNumber() + ": ";
+        String s = "::line" + line.getLineNumber() + ":: ";
+        if(line.getLineNumber() < 10) {
+            s += " "; // pad the script to align functions
+        }
         if (op == null) {
             s += "error(\"null command\")";
         }
@@ -110,7 +116,7 @@ public class WoxScript extends MaMScript {
     }
 
     private WoxOpcode getWoxOpcode(MaMScriptLine line) {
-        return Arrays.stream(WoxOpcode.values()).filter(C -> C.code == line.getOpcode()).findFirst().orElse(null);
+        return Arrays.stream(WoxOpcode.values()).filter(C -> C.getCode() == line.getOpcode()).findFirst().orElse(null);
     }
 
     private String getFuncName(List<MaMScriptLine> func) {
@@ -194,120 +200,3 @@ public class WoxScript extends MaMScript {
     }
 }
 
-
-enum WoxOpcode
-{
-    Display(0x01),
-    DoorTextSml(0x02),
-    DoorTextLrg(0x03),
-    SignTxt(0x04),
-    NPC(0x05),
-    PlayFX(0x06),
-    Teleport_7(0x07),
-
-    If_8(0x08) {
-        @Override
-        public String translate(MaMScript.MaMScriptLine line) {
-            return "  -- TODO: IF";
-        }
-    },
-
-    If_9(0x09){
-        @Override
-        public String translate(MaMScript.MaMScriptLine line) {
-            return "  -- TODO: IF";
-        }
-    },
-
-    If_A(0x0A){
-        @Override
-        public String translate(MaMScript.MaMScriptLine line) {
-            return "  -- TODO: IF";
-        }
-    },
-
-    MoveObj(0x0B),
-    TakeOrGive_C(0x0C),
-    NoAction_D(0x0D),
-    Remove(0x0E),
-    SetChar(0x0F),
-    Spawn(0x10),
-    DoTownEvent(0x11),
-
-    Exit(0x12){
-        @Override
-        public String translate(MaMScript.MaMScriptLine line) {
-            return "return";
-        }
-    },
-
-    AlterMap(0x13),
-    GiveExtended(0x14),
-    ConfirmWord(0x15),
-    Damage(0x16),
-    JumpRnd(0x17),
-    AlterEvent(0x18),
-    CallEvent(0x19),
-    Return(0x1A),
-    SetVar(0x1B),
-    TakeOrGive_1C(0x1C),
-    TakeOrGive_1D(0x1D),
-    CutsceneEndClouds(0x1E),
-    Teleport(0x1F),
-    WhoWill(0x20),
-    RndDamage(0x21),
-    MoveWallObj(0x22),
-    AlterCellFlag(0x23),
-    AlterHed(0x24),
-    DisplayStat(0x25),
-    TakeOrGive(0x26),
-    SeatTextSml(0x27),
-    PlayEventVoc(0x28),
-    DisplayBottom(0x29),
-    IfMapFlag(0x2A),
-    SelRndChar(0x2B),
-    GiveEnchanted(0x2C),
-    ItemType(0x2D),
-    MakeNothingHere(0x2E),
-    NoAction(0x2F),
-    ChooseNumeric(0x30),
-    DisplayBottomTwoLines(0x31),
-    DisplayLarge(0x32),
-    ExchObj(0x33),
-    FallToMap(0x34),
-    DisplayMain(0x35),
-    Goto(0x36) {
-        @Override
-        public String translate(MaMScript.MaMScriptLine line) {
-            return "goto " + line.getArgs()[0];
-        }
-    },
-
-    ConfirmWord2(0x37),
-    GotoRandom(0x38),
-    CutsceneEndDarkside(0x39),
-    CutsceneEndWorld(0x3A),
-    FlipWorld(0x3B),
-    PlayCD(0x3C);
-
-    int code;
-
-    WoxOpcode(int code) {
-        this.code = code;
-    }
-
-    public String translate(MaMScript.MaMScriptLine line) {
-        if(line.getArgs().length > 0) {
-            return this.name()
-                    + " (" +
-                    IntStream.range(0, line.getArgs().length)
-                            .map(i -> line.getArgs()[i])
-                            .mapToObj(I -> "" + I)
-                            .collect(Collectors.joining(", "))
-                    + ")";
-        }
-        else {
-            return this.name() + " ()";
-        }
-    }
-}
