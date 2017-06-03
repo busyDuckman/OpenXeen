@@ -317,6 +317,11 @@ public class FileHelpers {
     public static boolean ensurePathExists(String path)
     {
         File ffs = new File(path);
+
+        if(path.equals("")) {
+            return true; //we are using the current path.
+        }
+
         //total bug here if file and folder of same name...
         // but just can't be bothered babysitting java tonight
         if(!ffs.exists())
@@ -358,6 +363,7 @@ public class FileHelpers {
     public static boolean saveBytes(String path, byte[] data)
     {
         try {
+            ensurePathExists(getParentDirectory(path));
             Files.write(Paths.get(path), data);
             return true;
         } catch (IOException e) {

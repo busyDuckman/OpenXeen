@@ -313,6 +313,22 @@ public class ImageHelpers
         return newImage;
     }
 
+    /**
+     * Loads an image, returning null on error.
+     */
+    public static BufferedImage loadOrNull(String imgPath) {
+        if(imgPath == null) {
+            return null;
+        }
+
+        try {
+            return ImageIO.read(new File(imgPath));
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+        return null;
+    }
+
     public enum AlphaTransforms
     {
         SET_MAX {

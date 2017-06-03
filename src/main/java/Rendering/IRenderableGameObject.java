@@ -202,6 +202,24 @@ public interface IRenderableGameObject
     }
 
     /**
+     * Gets a sub region of a renderable object.
+     * @param region A Region. If outside of image, behaviour is undefined.
+     * @return An IRenderableGameObject.
+     */
+    default IRenderableGameObject getRegion(Rectangle region)
+    {
+        BufferedImage[] sourceImages = getRenderedFrames();
+        BufferedImage[] destImages= new BufferedImage[sourceImages.length];
+
+        for (int i = 0; i < destImages.length; i++) {
+            destImages[i] = sourceImages[i].getSubimage(region.x, region.y, region.width, region.height);
+        }
+        String name = (this instanceof MAMFile) ? ("cropped_"+((MAMFile)this).getName()) : "via getRegion()";
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, destImages);
+    }
+
+    /**
      * Sometimes simple sprites need to be upgraded act like one of the more powerful
      * versions. This is backward to the normal way of doing things, but it is done
      * to enable the modding engine to work in a graceful manor. Especially in respect

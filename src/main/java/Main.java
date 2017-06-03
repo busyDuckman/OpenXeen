@@ -5,6 +5,7 @@ import Rendering.SimpleCanvas.MaMPanel;
 import mamFiles.CCFileCache;
 import mamFiles.CCFileFormatException;
 import mamFiles.IOT.IoTccFileReader;
+import net.miginfocom.swing.MigLayout;
 import org.apache.commons.cli.*;
 import javax.swing.*;
 import static Toolbox.Misc.ifNull;

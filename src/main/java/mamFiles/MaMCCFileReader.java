@@ -1026,33 +1026,55 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     }
 
     private String getProxyFilePath(String fileName, MAMFile mamFile) {
-        String fileNameOnly =FileHelpers.getFileNameNoExtension(fileName);
-        String fileExt = FileHelpers.getFileExtension(fileName);
+        String path = getAbsPathForProxies(FileHelpers.getFileNameNoExtension(fileName));
 
+        String proxyExt = FileHelpers.getFileExtension(mamFile.suggestProxyFileName());
+        String proxyFileName = fileName + "." + proxyExt;
+
+        return FileHelpers.join(path, proxyFileName);
+    }
+
+    /**
+     * Given a (MAM) file extension, where should the proxy be stored?
+     * @param fileExt The file extension, or empty/null for a misc path.
+     * @return
+     */
+    public String getAbsPathForProxies(String fileExt) {
         String ccPath = FileHelpers.getParentDirectory(FileHelpers.getAbsolutePath(this.filePath));
 
-        String proxyDir = FileHelpers.getFileName(this.filePath.toLowerCase()).replace('.', '_');
-        String proxyPath = FileHelpers.join(ccPath, proxyDir+"_proxy");
+        String proxyRelativePath = FileHelpers.getFileName(this.filePath.toLowerCase())
+                .replace('.', '_')
+                + "_proxy";
 
-        //add catagory directory
-        switch(fileExt.toUpperCase())
-        {
-            case "MON":
-            case "ATT":
-                proxyPath = FileHelpers.join(proxyPath, "Monsters");
-                break;
-            default:
-                proxyPath = FileHelpers.join(proxyPath, fileExt.toUpperCase()+"_files");
+        String proxyAbsPath = FileHelpers.join(ccPath, proxyRelativePath);
+
+        String proxySubFolder = "misc_files";
+
+        // Empty path.
+        if((fileExt != null) && (fileExt.trim().length() > 0)) {
+            //add catagory directory
+            switch (fileExt.toUpperCase()) {
+                case "MON":
+                case "ATT":
+                    proxySubFolder = "monsters";
+                    break;
+
+                case "EVT":
+                case "LUA":
+                    proxySubFolder = "scripts";
+                    break;
+
+                case "PNG":
+                    //nop
+                    break;
+
+                default:
+                    proxySubFolder = fileExt.trim().toLowerCase() + "_files";
+
+            }
         }
 
-        //add name and extension
-        //proxyPath = FileHelpers.join(proxyPath, fileNameOnly + "." + "proxy");
-        String desiredExt = FileHelpers.getFileExtension(mamFile.suggestProxyFileName());
-
-        //as in LAVA.TIl.GIF - done this way to avoid name space conflicts
-        proxyPath = FileHelpers.join(proxyPath, fileName + "." + desiredExt);
-
-        return proxyPath;
+        return FileHelpers.join(proxyAbsPath, proxySubFolder);
     }
 
     /**

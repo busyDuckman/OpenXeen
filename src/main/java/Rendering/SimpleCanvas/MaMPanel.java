@@ -4,7 +4,9 @@ import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.MaMActions;
 import Game.Map.IoTWorld;
-import Rendering.RenderablePos;
+import Rendering.GUI.PapyrusDialogBase;
+import Rendering.GUI.PapyrusMessageBox;
+import Rendering.ISScalableGUI;
 import Toolbox.HackMe;
 import mamFiles.CCFileCache;
 import mamFiles.WOX.WOXSpriteFile;
@@ -20,7 +22,7 @@ import java.awt.event.*;
  */
 
 
-public class MaMPanel extends JPanel implements  KeyListener, ComponentListener//implements WindowListener // implements MouseListener
+public class MaMPanel extends JPanel implements  KeyListener, ComponentListener, ISScalableGUI//implements WindowListener // implements MouseListener
 {
     //------------------------------------------------------------------------------------------------------------------
     // Instance Data
@@ -37,6 +39,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
     protected Timer timer;
     protected GraphicsRenderer renderer = null;
 
+    int frame = 0;
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -52,8 +55,11 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
         // frame in GLOBAL.ICN
         super();
 
+        scale = GlobalSettings.INSTANCE.getRenderingScale();
         this.title = title;
-        this.setLayout(new MigLayout("","",""));
+        this.setLayout(new MigLayout("fill, debug 20",
+                "2.5%![67.5%!]2.5%![25%]2.5%![grow]0!",
+                "2.5%![grow]2.5%![7.5%]2.5%![grow]0!"));
 
         //this.addMouseMotionListener(this);
         //this.addMouseListener(this);
@@ -62,6 +68,11 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
         Dimension size = new Dimension((int)(mamNativeSize.width*scale), (int)(mamNativeSize.height*scale));
         this.setPreferredSize(size);
         this.addComponentListener(this);
+
+        this.add(PapyrusMessageBox.fromModalOKMessage(game.getWorld().getCcFile(),
+                "OpenXeen",
+                "Welcome adventurer. You have entered the " + game.getWorld().getWorldName() + "."),
+                "cell 0 0");
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -93,12 +104,36 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Getters and Setters
+    //------------------------------------------------------------------------------------------------------------------
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
+    /**
+     * We ignore this because this does not scale relative to a parent container.
+     */
+    @Override
+    public Rectangle getUnscaledBounds() {
+        return this.getBounds();
+    }
+
+    /**
+     * We ignore this because this does not scale relative to a parent container.
+     */
+    @Override
+    public void setUnscaledBounds(Rectangle r) {
+        // unused
+    }
 
     //------------------------------------------------------------------------------------------------------------------
     // Drawing
     //------------------------------------------------------------------------------------------------------------------
-    int frame = 0;
-
     public void paint(Graphics g)
     {
         paint(g, false);
@@ -121,6 +156,10 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
         frame++;
 
+//        for(Component c : this.getComponents()) {
+//            //c.paintAll(g);
+//        }
+        this.paintChildren(g);
     }
 
     private void DrawOutlinedString(Graphics g, String text, int x, int y, Color _fillColor, Color _borderColor)
@@ -143,13 +182,26 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
     //------------------------------------------------------------------------------------------------------------------
     // ComponentListener
     //------------------------------------------------------------------------------------------------------------------
-
     @Override
     public void componentResized(ComponentEvent e) {
         scale = Math.min((this.getWidth() / (double)mamNativeSize.width),
                          (this.getHeight() / (double)mamNativeSize.height));
 
         renderer.setScale(scale);
+
+        this.setPreferredSize(getScaledBounds().getSize());
+        this.setMinimumSize(getScaledBounds().getSize());
+        this.setMaximumSize(getScaledBounds().getSize());
+
+        for(Component c : this.getComponents()) {
+            if(c instanceof ISScalableGUI) {
+                ((ISScalableGUI)c).setScale(scale);
+                c.setSize(((ISScalableGUI) c).getScaledBounds().getSize());
+                c.setLocation(((ISScalableGUI) c).getScaledBounds().getLocation());
+                //c.setBounds(((ISScalableGUI) c).getScaledBounds());
+                c.invalidate();
+            }
+        }
     }
 
     @Override

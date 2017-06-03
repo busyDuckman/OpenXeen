@@ -411,12 +411,12 @@ public enum WoxOpcode
                     run(parsedArgs);
                 }
                 catch (Exception ex) {
-                    //debuging is hard because luaj errors look like a script problem
+                    //debugging is hard because luaj errors look like a script problem
                     System.out.println("ERROR EXECUTING OPERATOR SERVER SIDE: "
                             + name()
                             + "(...) with " +  args.narg() + numArgs + " arguments. -> "
                             + ex.getMessage());
-                    throw ex;//new Exception("ERROR EXECUTING OPERATOR SERVER SIDE: " + ex.getMessage());
+                    throw ex;
                 }
                 return args;
             }
