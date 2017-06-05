@@ -4,7 +4,6 @@ import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.MaMActions;
 import Game.Map.IoTWorld;
-import Rendering.GUI.PapyrusDialogBase;
 import Rendering.GUI.PapyrusMessageBox;
 import Rendering.ISScalableGUI;
 import Toolbox.HackMe;
@@ -17,6 +16,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static Toolbox.SwingHelpers.makeClearPanel;
+
 /**
  * Created by duckman on 16/05/2016.
  */
@@ -28,9 +29,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
     // Instance Data
     //------------------------------------------------------------------------------------------------------------------
     protected String title;
-
     protected IMaMGame game;
-
 
     protected double scale = 2.0;
     protected Dimension mamNativeSize = new Dimension(320, 200);
@@ -40,6 +39,9 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
     protected GraphicsRenderer renderer = null;
 
     int frame = 0;
+
+    JPanel pnlView, pnlControl, pnlNavigateBtnPad, pnlChars,
+            pnlControlBtnPad;
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -57,10 +59,6 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
 
         scale = GlobalSettings.INSTANCE.getRenderingScale();
         this.title = title;
-        this.setLayout(new MigLayout("fill, debug 20",
-                "2.5%![67.5%!]2.5%![25%]2.5%![grow]0!",
-                "2.5%![grow]2.5%![7.5%]2.5%![grow]0!"));
-
         //this.addMouseMotionListener(this);
         //this.addMouseListener(this);
         this.setFocusable(true);
@@ -68,11 +66,6 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         Dimension size = new Dimension((int)(mamNativeSize.width*scale), (int)(mamNativeSize.height*scale));
         this.setPreferredSize(size);
         this.addComponentListener(this);
-
-        this.add(PapyrusMessageBox.fromModalOKMessage(game.getWorld().getCcFile(),
-                "OpenXeen",
-                "Welcome adventurer. You have entered the " + game.getWorld().getWorldName() + "."),
-                "cell 0 0");
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -88,6 +81,75 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
             }
         });
 
+
+        // NB: the 73.5% is calculated from original screen pixels (147/200).
+        this.setLayout(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0%![72.5%!]0%![25%!]2.5%!",   // col
+                "0%![73.5%!]0%![22.5%!]4%!"));  // row
+
+        // panels
+        pnlView = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0![5%]0![90%]0![5%]0!",   // col
+                "0![5%]0![90%]0![5%]0!")); // row
+        this.add(pnlView, "cell 0 0, grow");
+
+        pnlNavigateBtnPad = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0.5%![33%]0![33%]0![33%]0.5%!",   // col
+                "0![50%]0![50%]0!")); // row
+        this.add(pnlNavigateBtnPad, "cell 1 1, grow");
+
+        pnlChars = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "4%![14%]1.5%![14%]1.5%![14%]1.5%![14%]1.5%![14%]1.5%![14%]3.5%!",   // col
+                "5%![71%]0![24%]0!")); // row
+        this.add(pnlChars, "cell 0 1, grow");
+
+        pnlControl = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0![100%]0!",   // col
+                "5%![45%]1%[45%]4%!")); // row
+        this.add(pnlControl, "cell 1 0, grow");
+
+        pnlControlBtnPad = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "3%![30%]2%![30%]2%![30%]3%!",   // col
+                "3%![30%]2%![30%]2%![30%]3%!")); // row
+        // this sits in pnlControl, as I need to put an odd dialog over the whole thing (eg shop options).
+        pnlControl.add(pnlControlBtnPad, "cell 0 1, grow");
+
+
+        // items
+        pnlView.add(PapyrusMessageBox.fromModalOKMessage(game.getWorld().getCcFile(),
+                "OpenXeen",
+                "Welcome adventurer. You have entered the " + game.getWorld().getWorldName() + "."),
+                "cell 1 1, gapleft 10%, gapright 10%");
+
+
+
+        pnlChars.add(makeTestButton("C1"), "cell 0 0, grow");
+        pnlChars.add(makeTestButton("C2"), "cell 1 0, grow");
+        pnlChars.add(makeTestButton("C3"), "cell 2 0, grow");
+        pnlChars.add(makeTestButton("C4"), "cell 3 0, grow");
+        pnlChars.add(makeTestButton("C5"), "cell 4 0, grow");
+        pnlChars.add(makeTestButton("C6"), "cell 5 0, grow");
+
+        pnlNavigateBtnPad.add(makeTestButton("\\"), "cell 0 0, grow");
+        pnlNavigateBtnPad.add(makeTestButton("U"), "cell 1 0, grow");
+        pnlNavigateBtnPad.add(makeTestButton("/"), "cell 2 0, grow");
+        pnlNavigateBtnPad.add(makeTestButton("L"), "cell 0 1, grow");
+        pnlNavigateBtnPad.add(makeTestButton("D"), "cell 1 1, grow");
+        pnlNavigateBtnPad.add(makeTestButton("R"), "cell 2 1, grow");
+
+        pnlControl.add(makeTestButton("map"), "cell 0 0, grow");
+        pnlControlBtnPad.add(makeTestButton("s"), "cell 0 0, grow");
+        pnlControlBtnPad.add(makeTestButton("c"), "cell 1 0, grow");
+        pnlControlBtnPad.add(makeTestButton("r"), "cell 2 0, grow");
+        pnlControlBtnPad.add(makeTestButton("b"), "cell 0 1, grow");
+        pnlControlBtnPad.add(makeTestButton("d"), "cell 1 1, grow");
+        pnlControlBtnPad.add(makeTestButton("q"), "cell 2 1, grow");
+        pnlControlBtnPad.add(makeTestButton("m"), "cell 0 2, grow");
+        pnlControlBtnPad.add(makeTestButton("t"), "cell 1 2, grow");
+        pnlControlBtnPad.add(makeTestButton("p"), "cell 2 2, grow");
+
+
+
         this.game = game;
 
         renderer = new GraphicsRenderer(scale);
@@ -102,6 +164,12 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         timer.setInitialDelay(190);
         timer.start();
 
+    }
+
+    protected JComponent makeTestButton(String s) {
+        JButton btnTest = new JButton(s);
+        btnTest.setBackground(new Color(64, 128, 32, 128));
+        return btnTest;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -184,14 +252,14 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
     //------------------------------------------------------------------------------------------------------------------
     @Override
     public void componentResized(ComponentEvent e) {
-        scale = Math.min((this.getWidth() / (double)mamNativeSize.width),
-                         (this.getHeight() / (double)mamNativeSize.height));
-
-        renderer.setScale(scale);
-
-        this.setPreferredSize(getScaledBounds().getSize());
-        this.setMinimumSize(getScaledBounds().getSize());
-        this.setMaximumSize(getScaledBounds().getSize());
+//        scale = Math.min((this.getWidth() / (double)mamNativeSize.width),
+//                         (this.getHeight() / (double)mamNativeSize.height));
+//
+//        renderer.setScale(scale);
+//
+//        this.setPreferredSize(getScaledBounds().getSize());
+//        this.setMinimumSize(getScaledBounds().getSize());
+//        this.setMaximumSize(getScaledBounds().getSize());
 
         for(Component c : this.getComponents()) {
             if(c instanceof ISScalableGUI) {

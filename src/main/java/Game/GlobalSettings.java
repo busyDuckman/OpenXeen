@@ -69,4 +69,8 @@ public enum GlobalSettings
     public String relativeToGameDir(String relativePath) {
         return FileHelpers.join(getGameDir(), relativePath);
     }
+
+    public String migDebugText() {
+        return debugMode() ? ", debug 20" : "";
+    }
 }
