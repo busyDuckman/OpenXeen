@@ -1,8 +1,10 @@
 package Rendering.SimpleCanvas;
 
+import Game.GlobalSettings;
 import Game.MaMGame;
 import Rendering.ISScalableGUI;
 import Toolbox.SwingHelpers;
+import mamFiles.CCFileFormatException;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -24,11 +26,11 @@ public class OpenXeenFrame extends JFrame implements ComponentListener
 
     boolean centreGame = true;
 
-    public OpenXeenFrame(String title, MaMGame game) throws HeadlessException {
+    public OpenXeenFrame(String title, MaMGame game) throws HeadlessException, CCFileFormatException {
         super(title);
 
         this.game = game;
-        this.setLayout(new MigLayout("fill, debug 20",
+        this.setLayout(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
                 "0![]0![grow]0![]0!",
                 "0![]0![grow]0![]0!"));
 

@@ -4,10 +4,13 @@ import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.MaMActions;
 import Game.Map.IoTWorld;
+import Rendering.GUI.GUIGraphicsSet;
 import Rendering.GUI.PapyrusMessageBox;
+import Rendering.IRenderableGameObject;
 import Rendering.ISScalableGUI;
 import Toolbox.HackMe;
 import mamFiles.CCFileCache;
+import mamFiles.CCFileFormatException;
 import mamFiles.WOX.WOXSpriteFile;
 import net.miginfocom.swing.MigLayout;
 import org.joda.time.DateTime;
@@ -43,17 +46,17 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
     JPanel pnlView, pnlControl, pnlNavigateBtnPad, pnlChars,
             pnlControlBtnPad;
 
+    GUIGraphicsSet graphicsSet;
+
 
     //------------------------------------------------------------------------------------------------------------------
     // Constructors
     //------------------------------------------------------------------------------------------------------------------
-    public MaMPanel(IMaMGame game)
-    {
+    public MaMPanel(IMaMGame game) throws CCFileFormatException {
         this(null, game);
     }
 
-    public MaMPanel(String title, IMaMGame game)
-    {
+    public MaMPanel(String title, IMaMGame game) throws CCFileFormatException {
         // frame in GLOBAL.ICN
         super();
 
@@ -66,6 +69,8 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         Dimension size = new Dimension((int)(mamNativeSize.width*scale), (int)(mamNativeSize.height*scale));
         this.setPreferredSize(size);
         this.addComponentListener(this);
+        graphicsSet = new GUIGraphicsSet(game.getWorld().getCcFile());
+
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -123,32 +128,30 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
 
 
 
-        pnlChars.add(makeTestButton("C1"), "cell 0 0, grow");
-        pnlChars.add(makeTestButton("C2"), "cell 1 0, grow");
-        pnlChars.add(makeTestButton("C3"), "cell 2 0, grow");
-        pnlChars.add(makeTestButton("C4"), "cell 3 0, grow");
-        pnlChars.add(makeTestButton("C5"), "cell 4 0, grow");
-        pnlChars.add(makeTestButton("C6"), "cell 5 0, grow");
+        pnlChars.add(makeGuiButton("C1"), "cell 0 0, grow");
+        pnlChars.add(makeGuiButton("C2"), "cell 1 0, grow");
+        pnlChars.add(makeGuiButton("C3"), "cell 2 0, grow");
+        pnlChars.add(makeGuiButton("C4"), "cell 3 0, grow");
+        pnlChars.add(makeGuiButton("C5"), "cell 4 0, grow");
+        pnlChars.add(makeGuiButton("C6"), "cell 5 0, grow");
 
-        pnlNavigateBtnPad.add(makeTestButton("\\"), "cell 0 0, grow");
-        pnlNavigateBtnPad.add(makeTestButton("U"), "cell 1 0, grow");
-        pnlNavigateBtnPad.add(makeTestButton("/"), "cell 2 0, grow");
-        pnlNavigateBtnPad.add(makeTestButton("L"), "cell 0 1, grow");
-        pnlNavigateBtnPad.add(makeTestButton("D"), "cell 1 1, grow");
-        pnlNavigateBtnPad.add(makeTestButton("R"), "cell 2 1, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("\\", graphicsSet.getBtnTurnLeftAction()), "cell 0 0, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("U", graphicsSet.getBtnMoveForwardAction()), "cell 1 0, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("/", graphicsSet.getBtnTurnRightAction()), "cell 2 0, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("L", graphicsSet.getBtnMoveLeftAction()), "cell 0 1, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("D", graphicsSet.getBtnMoveBackAction()), "cell 1 1, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("R", graphicsSet.getBtnMoveRightAction()), "cell 2 1, grow");
 
-        pnlControl.add(makeTestButton("map"), "cell 0 0, grow");
-        pnlControlBtnPad.add(makeTestButton("s"), "cell 0 0, grow");
-        pnlControlBtnPad.add(makeTestButton("c"), "cell 1 0, grow");
-        pnlControlBtnPad.add(makeTestButton("r"), "cell 2 0, grow");
-        pnlControlBtnPad.add(makeTestButton("b"), "cell 0 1, grow");
-        pnlControlBtnPad.add(makeTestButton("d"), "cell 1 1, grow");
-        pnlControlBtnPad.add(makeTestButton("q"), "cell 2 1, grow");
-        pnlControlBtnPad.add(makeTestButton("m"), "cell 0 2, grow");
-        pnlControlBtnPad.add(makeTestButton("t"), "cell 1 2, grow");
-        pnlControlBtnPad.add(makeTestButton("p"), "cell 2 2, grow");
-
-
+        pnlControl.add(makeGuiButton("map"), "cell 0 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("s", graphicsSet.getBtnShootAction()), "cell 0 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("c", graphicsSet.getBtnCastAction()), "cell 1 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("r", graphicsSet.getBtnRestAction()), "cell 2 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("b", graphicsSet.getBtnBashAction()), "cell 0 1, grow");
+        pnlControlBtnPad.add(makeGuiButton("d", graphicsSet.getBtnDismssAction()), "cell 1 1, grow");
+        pnlControlBtnPad.add(makeGuiButton("q", graphicsSet.getBtnQuestsAction()), "cell 2 1, grow");
+        pnlControlBtnPad.add(makeGuiButton("m", graphicsSet.getBtnViewMapAction()), "cell 0 2, grow");
+        pnlControlBtnPad.add(makeGuiButton("t", graphicsSet.getBtnViewTimeAction()), "cell 1 2, grow");
+        pnlControlBtnPad.add(makeGuiButton("p", graphicsSet.getBtnViewPartyAction()), "cell 2 2, grow");
 
         this.game = game;
 
@@ -166,10 +169,28 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
 
     }
 
-    protected JComponent makeTestButton(String s) {
-        JButton btnTest = new JButton(s);
-        btnTest.setBackground(new Color(64, 128, 32, 128));
-        return btnTest;
+    protected JComponent makeGuiButton(String s) {
+        return makeGuiButton(s, null);
+    }
+    protected JComponent makeGuiButton(String s, IRenderableGameObject btnFrames) {
+        return new MaMButton("", btnFrames);
+//        if(btnFrames != null) {
+//            JButton btn = new MaMButton("", btnFrames) ;
+//
+//
+//            //btn.setText("");
+//            //btn.setIcon(new ImageIcon(btnFrames.getRenderedFrames()[0]));
+//            btn.setMargin(new Insets(0, 0, 0, 0));
+//            //btn.setBorder(null);
+//            return btn;
+//        }
+//        else {
+//            JButton btn = new JButton(s);
+//            btn.setFocusPainted(false);
+//            btn.setFocusable(false);
+//            btn.setBackground(new Color(64, 128, 32, 128));
+//            return btn;
+//        }
     }
 
     //------------------------------------------------------------------------------------------------------------------

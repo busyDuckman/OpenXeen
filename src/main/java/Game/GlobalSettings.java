@@ -71,6 +71,6 @@ public enum GlobalSettings
     }
 
     public String migDebugText() {
-        return debugMode() ? ", debug 20" : "";
+        return ""; //debugMode() ? ", debug 20" : "";
     }
 }

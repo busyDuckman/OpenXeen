@@ -22,7 +22,7 @@ public class GUIGraphicsSet
 
     protected MaMSprite btnShootAction;
     protected MaMSprite btnCastAction;
-    protected MaMSprite btnSleepAction;
+    protected MaMSprite btnRestAction;
     protected MaMSprite btnBashAction;
     protected MaMSprite btnDismssAction;
     protected MaMSprite btnQuestsAction;
@@ -49,7 +49,7 @@ public class GUIGraphicsSet
 
         btnShootAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnShootAction", 0, 2);
         btnCastAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnCastAction", 2, 2);
-        btnSleepAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnSleepAction", 4, 2);
+        btnRestAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnRestAction", 4, 2);
         btnBashAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnBashAction", 6, 2);
         btnDismssAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnDismssAction", 8, 2);
         btnQuestsAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnQuestsAction", 10, 2);
@@ -66,4 +66,91 @@ public class GUIGraphicsSet
     }
 
 
+    //------------------------------------------------------------------------------------------------------------------
+    // A Bazillion Getters
+    //------------------------------------------------------------------------------------------------------------------
+
+    public MaMSprite getBtnBankDeposit() {
+        return btnBankDeposit;
+    }
+
+    public MaMSprite getBtnBankWithdraw() {
+        return btnBankWithdraw;
+    }
+
+    public MaMSprite getBtnCloseDialog() {
+        return btnCloseDialog;
+    }
+
+    public MaMSprite getBtnYes() {
+        return btnYes;
+    }
+
+    public MaMSprite getBtnNo() {
+        return btnNo;
+    }
+
+    public MaMSprite getBtnShootAction() {
+        return btnShootAction;
+    }
+
+    public MaMSprite getBtnCastAction() {
+        return btnCastAction;
+    }
+
+    public MaMSprite getBtnRestAction() {
+        return btnRestAction;
+    }
+
+    public MaMSprite getBtnBashAction() {
+        return btnBashAction;
+    }
+
+    public MaMSprite getBtnDismssAction() {
+        return btnDismssAction;
+    }
+
+    public MaMSprite getBtnQuestsAction() {
+        return btnQuestsAction;
+    }
+
+    public MaMSprite getBtnViewMapAction() {
+        return btnViewMapAction;
+    }
+
+    public MaMSprite getBtnViewTimeAction() {
+        return btnViewTimeAction;
+    }
+
+    public MaMSprite getBtnViewPartyAction() {
+        return btnViewPartyAction;
+    }
+
+    public MaMSprite getBtnMrWizardAction() {
+        return btnMrWizardAction;
+    }
+
+    public MaMSprite getBtnTurnLeftAction() {
+        return btnTurnLeftAction;
+    }
+
+    public MaMSprite getBtnMoveForwardAction() {
+        return btnMoveForwardAction;
+    }
+
+    public MaMSprite getBtnTurnRightAction() {
+        return btnTurnRightAction;
+    }
+
+    public MaMSprite getBtnMoveLeftAction() {
+        return btnMoveLeftAction;
+    }
+
+    public MaMSprite getBtnMoveBackAction() {
+        return btnMoveBackAction;
+    }
+
+    public MaMSprite getBtnMoveRightAction() {
+        return btnMoveRightAction;
+    }
 }
