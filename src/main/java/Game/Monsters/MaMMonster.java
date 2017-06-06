@@ -130,7 +130,7 @@ public class MaMMonster extends Combatant implements IGameEntity, IAttackable, I
     }
 
     @Override
-    public void update(MaMWorld world) {
+    public void update(MaMGame game) {
 
     }
 

@@ -20,6 +20,6 @@ public class EntityScript implements IScript<IGameEntity>
     }
 
     @Override
-    public void run(MaMWorld world, IGameEntity owner) {
+    public void run(MaMGame game, IGameEntity owner) {
     }
 }

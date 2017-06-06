@@ -50,6 +50,12 @@ public class IoTWorld extends MaMWorld
 //        //return MaMPallet.getDefaultMaMPallate();
 //    }
 
+
+    @Override
+    public String getWorldName() {
+        return "Isles of Terra";
+    }
+
     @Override
     public void loadMaps() throws CCFileFormatException {
 

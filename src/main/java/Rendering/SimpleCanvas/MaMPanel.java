@@ -4,9 +4,13 @@ import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.MaMActions;
 import Game.Map.IoTWorld;
-import Rendering.RenderablePos;
+import Rendering.GUI.GUIGraphicsSet;
+import Rendering.GUI.PapyrusMessageBox;
+import Rendering.IRenderableGameObject;
+import Rendering.ISScalableGUI;
 import Toolbox.HackMe;
 import mamFiles.CCFileCache;
+import mamFiles.CCFileFormatException;
 import mamFiles.WOX.WOXSpriteFile;
 import net.miginfocom.swing.MigLayout;
 import org.joda.time.DateTime;
@@ -15,20 +19,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static Toolbox.SwingHelpers.makeClearPanel;
+
 /**
  * Created by duckman on 16/05/2016.
  */
 
 
-public class MaMPanel extends JPanel implements  KeyListener, ComponentListener//implements WindowListener // implements MouseListener
+public class MaMPanel extends JPanel implements  KeyListener, ComponentListener, ISScalableGUI//implements WindowListener // implements MouseListener
 {
     //------------------------------------------------------------------------------------------------------------------
     // Instance Data
     //------------------------------------------------------------------------------------------------------------------
     protected String title;
-
     protected IMaMGame game;
-
 
     protected double scale = 2.0;
     protected Dimension mamNativeSize = new Dimension(320, 200);
@@ -37,24 +41,27 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
     protected Timer timer;
     protected GraphicsRenderer renderer = null;
 
+    int frame = 0;
+
+    JPanel pnlView, pnlControl, pnlNavigateBtnPad, pnlChars,
+            pnlControlBtnPad;
+
+    GUIGraphicsSet graphicsSet;
 
 
     //------------------------------------------------------------------------------------------------------------------
     // Constructors
     //------------------------------------------------------------------------------------------------------------------
-    public MaMPanel(IMaMGame game)
-    {
+    public MaMPanel(IMaMGame game) throws CCFileFormatException {
         this(null, game);
     }
 
-    public MaMPanel(String title, IMaMGame game)
-    {
+    public MaMPanel(String title, IMaMGame game) throws CCFileFormatException {
         // frame in GLOBAL.ICN
         super();
 
+        scale = GlobalSettings.INSTANCE.getRenderingScale();
         this.title = title;
-        this.setLayout(new MigLayout("","",""));
-
         //this.addMouseMotionListener(this);
         //this.addMouseListener(this);
         this.setFocusable(true);
@@ -62,6 +69,8 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
         Dimension size = new Dimension((int)(mamNativeSize.width*scale), (int)(mamNativeSize.height*scale));
         this.setPreferredSize(size);
         this.addComponentListener(this);
+        graphicsSet = new GUIGraphicsSet(game.getWorld().getCcFile());
+
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -76,6 +85,73 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
                 }
             }
         });
+
+
+        // NB: the 73.5% is calculated from original screen pixels (147/200).
+        this.setLayout(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0%![72.5%!]0%![25%!]2.5%!",   // col
+                "0%![73.5%!]0%![22.5%!]4%!"));  // row
+
+        // panels
+        pnlView = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0![5%]0![90%]0![5%]0!",   // col
+                "0![5%]0![90%]0![5%]0!")); // row
+        this.add(pnlView, "cell 0 0, grow");
+
+        pnlNavigateBtnPad = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0.5%![33%]0![33%]0![33%]0.5%!",   // col
+                "0![50%]0![50%]0!")); // row
+        this.add(pnlNavigateBtnPad, "cell 1 1, grow");
+
+        pnlChars = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "4%![14%]1.5%![14%]1.5%![14%]1.5%![14%]1.5%![14%]1.5%![14%]3.5%!",   // col
+                "5%![71%]0![24%]0!")); // row
+        this.add(pnlChars, "cell 0 1, grow");
+
+        pnlControl = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "0![100%]0!",   // col
+                "5%![45%]1%[45%]4%!")); // row
+        this.add(pnlControl, "cell 1 0, grow");
+
+        pnlControlBtnPad = makeClearPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "3%![30%]2%![30%]2%![30%]3%!",   // col
+                "3%![30%]2%![30%]2%![30%]3%!")); // row
+        // this sits in pnlControl, as I need to put an odd dialog over the whole thing (eg shop options).
+        pnlControl.add(pnlControlBtnPad, "cell 0 1, grow");
+
+
+        // items
+        pnlView.add(PapyrusMessageBox.fromModalOKMessage(game.getWorld().getCcFile(),
+                "OpenXeen",
+                "Welcome adventurer. You have entered the " + game.getWorld().getWorldName() + "."),
+                "cell 1 1, gapleft 10%, gapright 10%");
+
+
+
+        pnlChars.add(makeGuiButton("C1"), "cell 0 0, grow");
+        pnlChars.add(makeGuiButton("C2"), "cell 1 0, grow");
+        pnlChars.add(makeGuiButton("C3"), "cell 2 0, grow");
+        pnlChars.add(makeGuiButton("C4"), "cell 3 0, grow");
+        pnlChars.add(makeGuiButton("C5"), "cell 4 0, grow");
+        pnlChars.add(makeGuiButton("C6"), "cell 5 0, grow");
+
+        pnlNavigateBtnPad.add(makeGuiButton("\\", graphicsSet.getBtnTurnLeftAction()), "cell 0 0, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("U", graphicsSet.getBtnMoveForwardAction()), "cell 1 0, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("/", graphicsSet.getBtnTurnRightAction()), "cell 2 0, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("L", graphicsSet.getBtnMoveLeftAction()), "cell 0 1, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("D", graphicsSet.getBtnMoveBackAction()), "cell 1 1, grow");
+        pnlNavigateBtnPad.add(makeGuiButton("R", graphicsSet.getBtnMoveRightAction()), "cell 2 1, grow");
+
+        pnlControl.add(makeGuiButton("map"), "cell 0 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("s", graphicsSet.getBtnShootAction()), "cell 0 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("c", graphicsSet.getBtnCastAction()), "cell 1 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("r", graphicsSet.getBtnRestAction()), "cell 2 0, grow");
+        pnlControlBtnPad.add(makeGuiButton("b", graphicsSet.getBtnBashAction()), "cell 0 1, grow");
+        pnlControlBtnPad.add(makeGuiButton("d", graphicsSet.getBtnDismssAction()), "cell 1 1, grow");
+        pnlControlBtnPad.add(makeGuiButton("q", graphicsSet.getBtnQuestsAction()), "cell 2 1, grow");
+        pnlControlBtnPad.add(makeGuiButton("m", graphicsSet.getBtnViewMapAction()), "cell 0 2, grow");
+        pnlControlBtnPad.add(makeGuiButton("t", graphicsSet.getBtnViewTimeAction()), "cell 1 2, grow");
+        pnlControlBtnPad.add(makeGuiButton("p", graphicsSet.getBtnViewPartyAction()), "cell 2 2, grow");
 
         this.game = game;
 
@@ -93,12 +169,60 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
     }
 
+    protected JComponent makeGuiButton(String s) {
+        return makeGuiButton(s, null);
+    }
+    protected JComponent makeGuiButton(String s, IRenderableGameObject btnFrames) {
+        return new MaMButton("", btnFrames);
+//        if(btnFrames != null) {
+//            JButton btn = new MaMButton("", btnFrames) ;
+//
+//
+//            //btn.setText("");
+//            //btn.setIcon(new ImageIcon(btnFrames.getRenderedFrames()[0]));
+//            btn.setMargin(new Insets(0, 0, 0, 0));
+//            //btn.setBorder(null);
+//            return btn;
+//        }
+//        else {
+//            JButton btn = new JButton(s);
+//            btn.setFocusPainted(false);
+//            btn.setFocusable(false);
+//            btn.setBackground(new Color(64, 128, 32, 128));
+//            return btn;
+//        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Getters and Setters
+    //------------------------------------------------------------------------------------------------------------------
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
+    /**
+     * We ignore this because this does not scale relative to a parent container.
+     */
+    @Override
+    public Rectangle getUnscaledBounds() {
+        return this.getBounds();
+    }
+
+    /**
+     * We ignore this because this does not scale relative to a parent container.
+     */
+    @Override
+    public void setUnscaledBounds(Rectangle r) {
+        // unused
+    }
 
     //------------------------------------------------------------------------------------------------------------------
     // Drawing
     //------------------------------------------------------------------------------------------------------------------
-    int frame = 0;
-
     public void paint(Graphics g)
     {
         paint(g, false);
@@ -121,6 +245,10 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
 
         frame++;
 
+//        for(Component c : this.getComponents()) {
+//            //c.paintAll(g);
+//        }
+        this.paintChildren(g);
     }
 
     private void DrawOutlinedString(Graphics g, String text, int x, int y, Color _fillColor, Color _borderColor)
@@ -143,13 +271,26 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener/
     //------------------------------------------------------------------------------------------------------------------
     // ComponentListener
     //------------------------------------------------------------------------------------------------------------------
-
     @Override
     public void componentResized(ComponentEvent e) {
-        scale = Math.min((this.getWidth() / (double)mamNativeSize.width),
-                         (this.getHeight() / (double)mamNativeSize.height));
+//        scale = Math.min((this.getWidth() / (double)mamNativeSize.width),
+//                         (this.getHeight() / (double)mamNativeSize.height));
+//
+//        renderer.setScale(scale);
+//
+//        this.setPreferredSize(getScaledBounds().getSize());
+//        this.setMinimumSize(getScaledBounds().getSize());
+//        this.setMaximumSize(getScaledBounds().getSize());
 
-        renderer.setScale(scale);
+        for(Component c : this.getComponents()) {
+            if(c instanceof ISScalableGUI) {
+                ((ISScalableGUI)c).setScale(scale);
+                c.setSize(((ISScalableGUI) c).getScaledBounds().getSize());
+                c.setLocation(((ISScalableGUI) c).getScaledBounds().getLocation());
+                //c.setBounds(((ISScalableGUI) c).getScaledBounds());
+                c.invalidate();
+            }
+        }
     }
 
     @Override

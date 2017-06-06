@@ -28,7 +28,8 @@ public final class PointHelper
 
     public static Point navigate(Point pos, Direction dir, int dist)
     {
-        return add(pos, multiply(dir.getVector(), dist));
+        Point p = add(pos, multiply(dir.getVector(), dist));
+        return p;
     }
 
     public static double length(Point a)

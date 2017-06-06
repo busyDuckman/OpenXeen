@@ -1,5 +1,6 @@
 package GameMechanics.Adventurers;
 
+import Game.MaMGame;
 import GameMechanics.Attacks.IAttack;
 import Game.IAttackable;
 import Game.IUpdateable;
@@ -199,7 +200,7 @@ public class Adventurer extends Combatant implements IUpdateable, IAttackable, I
          *  -regen spell points
          */
     @Override
-    public void update(MaMWorld world) {
+    public void update(MaMGame game) {
 
     }
 

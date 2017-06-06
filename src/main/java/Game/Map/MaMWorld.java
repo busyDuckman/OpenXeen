@@ -32,8 +32,6 @@ public abstract class MaMWorld implements AutoCloseable
     //MaMMonster[] entities = null;
     MaMGame game;
 
-    String worldName;
-
     Map<Integer, MaMMazeFile> mazeFiles;
     Map<String, MaMMazeView> mazeViews;
     MaMMazeView currentMazeView;
@@ -69,9 +67,7 @@ public abstract class MaMWorld implements AutoCloseable
         return entities;
     }
 
-    public String getWorldName() {
-        return worldName;
-    }
+    public abstract String getWorldName();
 
     public abstract void loadMaps() throws CCFileFormatException;
     public abstract void loadMazeViews() throws CCFileFormatException;

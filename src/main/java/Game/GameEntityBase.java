@@ -101,7 +101,7 @@ public abstract class GameEntityBase implements IGameEntity
 
 
     @Override
-    public abstract void update(MaMWorld world);
+    public abstract void update(MaMGame game);
 
 
 }

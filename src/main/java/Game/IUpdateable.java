@@ -10,5 +10,5 @@ public interface IUpdateable
     /**
      * Update the state of the object, it can see the world.
      */
-    void update(MaMWorld world);
+    void update(MaMGame game);
 }

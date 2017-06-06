@@ -1,5 +1,6 @@
 package mamFiles;
 
+import Game.IScript;
 import Game.Map.MaMMazeView;
 import Game.Map.MaMTile;
 import Toolbox.Grid;
@@ -50,10 +51,13 @@ public abstract class MaMMazeFile extends MAMFile
     protected MaMMazeView parentView;
     //protected Point worldSpacePos;
 
+    MaMScript eventScript;
+
     public MaMMazeFile(String name, String key) throws CCFileFormatException {
         super(name, key);
 
         cantCastList = new ArrayList<>();
+        eventScript = new MaMScript(name+"_events", key+"_events", "");
     }
 
     @Override
@@ -113,5 +117,13 @@ public abstract class MaMMazeFile extends MAMFile
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public MaMScript getEventScript() {
+        return eventScript;
+    }
+
+    public void setEventScript(MaMScript eventScript) {
+        this.eventScript = eventScript;
     }
 }

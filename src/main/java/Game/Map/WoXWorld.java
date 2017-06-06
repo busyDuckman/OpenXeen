@@ -136,6 +136,21 @@ public class WoXWorld extends MaMWorld
         return variant;
     }
 
+    @Override
+    public String getWorldName() {
+        switch (variant) {
+
+            case DARK_SIDE:
+                return "Dark Side of Xeen";
+            case CLOUDS:
+                return "Clouds of Xeen";
+            case SWORDS:
+                return "Swords of Xeen";
+            default:
+                return "Unknown Parts of Xeen";
+        }
+    }
+
     public WoXIndoorEnvironmentSet[] getIndoorEnvironmentSets() {
         return indoorEnvironmentSets;
     }

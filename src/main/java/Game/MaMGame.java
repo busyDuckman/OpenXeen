@@ -175,7 +175,17 @@ public class MaMGame implements IMaMGame
             case Sleep:
                 break;
         }
-        System.out.println(getDebugInfo());
+
+        MaMMazeFile currentMaze = world.getCurrentMazeView().getMazeFileForPoint(this.partyPos);
+        if(currentMaze != null) {
+            currentMaze.getEventScript().run(this, world.getCurrentMazeView().getMazeFileForPoint(this.partyPos));
+        }
+
+        if(GlobalSettings.INSTANCE.debugMode()) {
+            System.out.println(getDebugInfo());
+            Point msPos = world.getCurrentMazeView().getMazeSpace(this.partyPos);
+
+        }
     }
 
 
@@ -231,6 +241,18 @@ public class MaMGame implements IMaMGame
         return activePartyEnchantments;
     }
 
+    public List<Adventurer> getParty() {
+        return party;
+    }
+
+    public Point getPartyPos() {
+        return partyPos;
+    }
+
+    public Direction getPartyDir() {
+        return partyDir;
+    }
+
     //-------------------------------------------------------------------------------------------------
     // Rendering
     //-------------------------------------------------------------------------------------------------
@@ -240,7 +262,7 @@ public class MaMGame implements IMaMGame
     @Override
     public MaM3DSceneComposition render()
     {
-        MaM3DSceneComposition view = new MaM3DSceneComposition();
+        MaM3DSceneComposition Scene = new MaM3DSceneComposition();
 
         try
         {
@@ -248,17 +270,17 @@ public class MaMGame implements IMaMGame
 //            MaMMonster mon = (world.getMonsters().length > 0) ?
 //                    world.getMonsters()[testMonsterID%world.getMonsters().length]
 //                    : null;
-            //view.addMonster(new Point(100,0), mon);
+            //Scene.addMonster(new Point(100,0), mon);
 
-            view.setGround(world.getOutdoorEnvironmentSet(0).getGround());
-            view.setSky(world.getOutdoorEnvironmentSet(0).getSky());
+            Scene.setGround(world.getOutdoorEnvironmentSet(0).getGround());
+            Scene.setSky(world.getOutdoorEnvironmentSet(0).getSky());
 
-            //render the current view
+            //render the current Scene
             //IReadonlyGrid<MaMTile>
-            MaMMazeView map = world.getCurrentMazeView();
+            MaMMazeView mazeView = world.getCurrentMazeView();
 
             //System.out.println("----------------------------------------------");
-            if(map != null)
+            if(mazeView != null)
             {
                 Point viewNormal = partyDir.getVector();
                 Point viewNormalOrth = partyDir.turnRight().getVector();
@@ -280,9 +302,9 @@ public class MaMGame implements IMaMGame
                         Point wsPos = new Point(xPos, yPos);
 
                         //render tile at xPos, yPos  to xsX, vsY
-                        if(map.isValidLocation(xPos, yPos))
+                        if(mazeView.isValidLocation(xPos, yPos))
                         {
-                            MaMTile tile =  map.get(xPos, yPos);
+                            MaMTile tile =  mazeView.get(xPos, yPos);
                             int surfaceNum = tile.getIndexBase();
                             MaMSurface surf = world.getOutdoorEnvironmentSet(0).getSurface(surfaceNum);
 
@@ -292,14 +314,14 @@ public class MaMGame implements IMaMGame
 
                                 if(surfaceLayer != null)
                                 {
-                                    // surfaceLayer is null if not renderable on screen, as the view sweep
+                                    // surfaceLayer is null if not renderable on screen, as the Scene sweep
                                     // is deliberately too large,  this is normal.
                                     int surfaceDepth = RenderPosHelper.getGlobalHelper().getDepth(RenderableType.SURFACE, vsY);
-                                    view.addRenderable(new RenderablePos(8, 67, 1.0, surfaceDepth), surfaceLayer);
+                                    Scene.addRenderable(new RenderablePos(8, 67, 1.0, surfaceDepth), surfaceLayer);
                                 }
                                 else
                                 {
-                                    //System.out.println("NULL surface overlay for view space :" + vsX + ", " + vsY);
+                                    //System.out.println("NULL surface overlay for Scene space :" + vsX + ", " + vsY);
                                 }
                             }
 
@@ -313,7 +335,7 @@ public class MaMGame implements IMaMGame
                                 {
                                     //that whole left/right side of screen frame thing
                                     String name = (envobject instanceof MaMSprite) ? ((MaMSprite)envobject).getName() : "?";
-                                    view.addRenderable(spPos, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
+                                    Scene.addRenderable(spPos, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
                                 }
                             }
 
@@ -331,17 +353,17 @@ public class MaMGame implements IMaMGame
                                 //int frame = RenderPosHelper.getGlobalHelper().getOutdoorEnvFrame(vsPos);
                                 if(spPos != null)
                                 {
-                                    view.addRenderable(spPos, thing);
+                                    Scene.addRenderable(spPos, thing);
 
                                     //that whole left/right side of screen frame thing
                                     //String name = (envobject instanceof MaMSprite) ? ((MaMSprite)envobject).getName() : "?";
-                                    //view.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
+                                    //Scene.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
                                 }
                             }
 
                             // entities (& monsters)
                             world.getEntities().stream()
-                                    .filter(M -> wsPos.equals(M.getLocationWorldSpace(map))) //this filters out NULL positions.
+                                    .filter(M -> wsPos.equals(M.getLocationWorldSpace(mazeView))) //this filters out NULL positions.
 
                                     .forEach(M -> {
                                         try {
@@ -354,7 +376,7 @@ public class MaMGame implements IMaMGame
                                                         M.getSprite().getRenderedFrames()[0].getWidth() / 2,
                                                         M.getSprite().getRenderedFrames()[0].getHeight() / 2);
                                                 if (spPos != null) {
-                                                    view.addRenderable(spPos.scaleScaleOnly(0.5).above().above(), M.getSprite());
+                                                    Scene.addRenderable(spPos.scaleScaleOnly(0.5).above().above(), M.getSprite());
                                                 }
                                             }
                                         } catch (MaMGameException e) {
@@ -373,7 +395,7 @@ public class MaMGame implements IMaMGame
             e.printStackTrace();
         }
 
-        return view;
+        return Scene;
     }
 
     @Override

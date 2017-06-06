@@ -2,9 +2,11 @@ import Game.GlobalSettings;
 import Game.MaMGame;
 import Game.Map.WoXWorld;
 import Rendering.SimpleCanvas.MaMPanel;
+import Rendering.SimpleCanvas.OpenXeenFrame;
 import mamFiles.CCFileCache;
 import mamFiles.CCFileFormatException;
 import mamFiles.IOT.IoTccFileReader;
+import net.miginfocom.swing.MigLayout;
 import org.apache.commons.cli.*;
 import javax.swing.*;
 import static Toolbox.Misc.ifNull;
@@ -74,23 +76,9 @@ public class Main
             //MaMMonster mon = game.getWorld().getCcFile().getMonsterFactory().createMonster(game.getWorld(), r.nextInt(50));
             //game.getWorld().addMonster(mon, r.nextInt(256), r.nextInt(256));
 
+            OpenXeenFrame frame = new OpenXeenFrame("OpenXeen", game);
+            frame.setVisible(true);
 
-
-            //Create a renderer for the game (renderer is embedded in a JPanel)
-            MaMPanel window = new MaMPanel(game);
-
-            //Create a window to hold the JPanel
-            JFrame f = new JFrame("openXeen");
-            f.getContentPane().setPreferredSize(window.getPreferredSize()); //set internal size, not window size.
-            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            try {
-                f.setIconImage(game.getWorld().getPlayerFaceOrNull(15).getRenderedFrames()[0]);
-            }
-            catch (Exception ex) {
-            }
-            f.add(window);
-            f.pack();
-            f.setVisible(true);
         } catch (CCFileFormatException e) {
             e.printStackTrace();
         }
