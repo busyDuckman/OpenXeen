@@ -48,4 +48,8 @@ public class MaMButton extends JButton {
 
         //getIcon().paintIcon(this, g, 0, 0);
     }
+
+    public String getTag() {
+        return tag;
+    }
 };

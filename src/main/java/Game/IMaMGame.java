@@ -1,6 +1,7 @@
 package Game;
 
 import Game.Map.MaMWorld;
+import GameMechanics.Adventurers.Adventurer;
 import GameMechanics.Magic.PartyEnchantments.IPartyEnchantment;
 import Rendering.ISceneComposition;
 import Rendering.MaM2DMapComposition;
@@ -65,6 +66,7 @@ public interface IMaMGame extends AutoCloseable
 
     List<IPartyEnchantment> getActivePartyEnchantments();
 
+    List<Adventurer> getParty();
 
 
 

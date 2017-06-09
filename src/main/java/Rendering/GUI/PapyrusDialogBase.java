@@ -1,6 +1,7 @@
 package Rendering.GUI;
 
 import Game.GlobalSettings;
+import Game.Map.MaMWorld;
 import Rendering.IRenderableGameObject;
 import Rendering.ISScalableGUI;
 import Toolbox.FileHelpers;
@@ -31,7 +32,8 @@ public class PapyrusDialogBase extends JPanel implements ComponentListener, ISSc
                           lowerLeftImage, lowerImage, lowerRightImage,
                           textureImage;
 
-    MaMCCFileReader ccFile;
+    protected MaMCCFileReader ccFile;
+    protected MaMWorld world;
 
     private int thinBorderWidth = 8;
     private int longBorderWidth = 32;
@@ -40,8 +42,9 @@ public class PapyrusDialogBase extends JPanel implements ComponentListener, ISSc
     protected Font messageFont;
     protected Font boldFont;
 
-    public PapyrusDialogBase(MaMCCFileReader ccFile) {
-        this.ccFile = ccFile;
+    public PapyrusDialogBase(MaMWorld world) {
+        this.world = world;
+        this.ccFile = world.getCcFile();
         scale = GlobalSettings.INSTANCE.getRenderingScale();
 
 
@@ -109,6 +112,10 @@ public class PapyrusDialogBase extends JPanel implements ComponentListener, ISSc
 
     public int getScaledLongBorderWidth() {
         return (int)(longBorderWidth * scale);
+    }
+
+    public MaMWorld getWorld() {
+        return world;
     }
 
     //------------------------------------------------------------------------------------------------------------------

@@ -9,15 +9,14 @@ import mamFiles.MaMMazeFile;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by duckman on 20/08/2016.
  */
-public abstract class Combatant extends GameEntityBase implements IAttackable, Iterable<Stat>
+public abstract class Combatant extends GameEntityBase implements IAttackable
 {
 //    public int hp;
 //    public int acc;
@@ -54,40 +53,13 @@ public abstract class Combatant extends GameEntityBase implements IAttackable, I
         super(id, name, visible, heading, location, parentMaze);
     }
 
-    private static volatile Map<Type, Field[]> statLut = new HashMap<>();
+    public List<Stat> getStats() {
+        Stat[] stats = new Stat[] { armour, level, speed, accuracy, endurance, fireResist, coldResist, elecResist, poisonResist, energyResist, magicResist, hitPoints};
+        return Arrays.stream(stats).collect(Collectors.toList());
 
-    @Override
-    public Iterator<Stat> iterator() {
-        updateStatLut();
-
-        return new Iterator<Stat>() {
-            private int index = 0;
-            Stat[] allStats = Arrays.stream(statLut.get(this.getClass()))
-                                    .map(F -> {
-                                        try {
-                                            return (Stat)F.get(this);
-                                        } catch (IllegalAccessException e) {
-                                            return null;
-                                        }
-                                    })
-                                    .filter(S -> (S != null))
-                                    .toArray(Stat[]::new);
-
-            @Override public boolean hasNext() { return index < allStats.length; }
-            @Override public Stat next() { return allStats[index++]; }
-        };
     }
 
-    protected synchronized void updateStatLut()
-    {
-        if(!statLut.containsKey(this.getClass()))
-        {
-            statLut.put(this.getClass(),
-                        Arrays.stream(this.getClass().getFields())
-                                .filter(F -> Stat.class.isAssignableFrom(F.getClass()))
-                                .toArray(Field[]::new));
-        }
-    }
+
 
     //------------------------------------------------------------------------------------------------------------------
     // Dear Java, It's 2016, boiler plate getters and setters should have been replaced with accessors 10 years ago.

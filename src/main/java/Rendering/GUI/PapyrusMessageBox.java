@@ -1,5 +1,6 @@
 package Rendering.GUI;
 
+import Game.Map.MaMWorld;
 import Toolbox.Tag;
 import mamFiles.MaMCCFileReader;
 import net.miginfocom.swing.MigLayout;
@@ -36,8 +37,8 @@ public class PapyrusMessageBox extends PapyrusDialogBase {
     //------------------------------------------------------------------------------------------------------------------
     // Constructor
     //------------------------------------------------------------------------------------------------------------------
-    public PapyrusMessageBox(MaMCCFileReader ccFile, String heading, String message, List<Tag<Object, DialogeResult>> buttons) {
-        super(ccFile);
+    public PapyrusMessageBox(MaMWorld world, String heading, String message, List<Tag<Object, DialogeResult>> buttons) {
+        super(world);
         this.heading = heading;
         this.message = message;
         this.buttons = buttons;
@@ -93,10 +94,10 @@ public class PapyrusMessageBox extends PapyrusDialogBase {
     //------------------------------------------------------------------------------------------------------------------
     // Factory methods
     //------------------------------------------------------------------------------------------------------------------
-    public static PapyrusMessageBox fromModalOKMessage(MaMCCFileReader ccFile, String title, String message) {
+    public static PapyrusMessageBox fromModalOKMessage(MaMWorld world, String title, String message) {
         List<Tag<Object, DialogeResult>> btnList = new ArrayList<>();
         btnList.add(new Tag<Object, DialogeResult>("OK", DialogeResult.OK));
-        PapyrusMessageBox msgBox = new PapyrusMessageBox(ccFile, title, message, btnList);
+        PapyrusMessageBox msgBox = new PapyrusMessageBox(world, title, message, btnList);
         msgBox.setFocusable(true);
         msgBox.setUnscaledBounds(new Rectangle(50, 25, 128, 64));
 

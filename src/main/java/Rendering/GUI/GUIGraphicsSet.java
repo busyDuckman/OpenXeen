@@ -37,6 +37,15 @@ public class GUIGraphicsSet
     protected MaMSprite btnMoveBackAction;
     protected MaMSprite btnMoveRightAction;
 
+    protected MaMSprite icnStatStr, icnStatInt, icnStatChr, icnStatEnd,
+            icnStatSpeed, icnStatAcy, icnStatLuck, icnStatAge,
+            icnStatLvL, icnStatAC, icnStatHP, icnStatSP, icnStatRes,
+            icnStatSkills, icnStatAwards, icnStatXP,
+            icnStatGold, icnStatGems, icnStatFood,
+            icnStatCondition;
+
+    protected MaMSprite btnPlayerDlgItem, btnPlayerDlgQuick, btnPlayerExchange, btnPlayerDlgExit;
+
     public GUIGraphicsSet(MaMCCFileReader ccFile) throws CCFileFormatException {
         this.ccFile = ccFile;
 
@@ -63,6 +72,32 @@ public class GUIGraphicsSet
         btnMoveLeftAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnMoveLeftAction", 26, 2);
         btnMoveBackAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnMoveBackAction", 28, 2);
         btnMoveRightAction = ccFile.getSprite("MAIN.ICN").subSetOfFrames("btnMoveRightAction", 30, 2);
+
+        int i = 0;
+        icnStatStr             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatInt             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatChr             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatEnd             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatSpeed           = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatAcy             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatLuck            = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatAge             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatLvL             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatAC              = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatHP              = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatSP              = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatRes             = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatSkills          = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatAwards          = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatXP              = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatGold            = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatGems            = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatFood            = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        icnStatCondition       = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        btnPlayerDlgItem       = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        btnPlayerDlgQuick      = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        btnPlayerExchange      = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
+        btnPlayerDlgExit       = ccFile.getSprite("VIEW.ICN").subSetOfFrames("PLR_DLG_"+i, i*2, 2); i++;
     }
 
 
@@ -152,5 +187,101 @@ public class GUIGraphicsSet
 
     public MaMSprite getBtnMoveRightAction() {
         return btnMoveRightAction;
+    }
+
+    public MaMSprite getIcnStatStr() {
+        return icnStatStr;
+    }
+
+    public MaMSprite getIcnStatInt() {
+        return icnStatInt;
+    }
+
+    public MaMSprite getIcnStatChr() {
+        return icnStatChr;
+    }
+
+    public MaMSprite getIcnStatEnd() {
+        return icnStatEnd;
+    }
+
+    public MaMSprite getIcnStatSpeed() {
+        return icnStatSpeed;
+    }
+
+    public MaMSprite getIcnStatAcy() {
+        return icnStatAcy;
+    }
+
+    public MaMSprite getIcnStatLuck() {
+        return icnStatLuck;
+    }
+
+    public MaMSprite getIcnStatAge() {
+        return icnStatAge;
+    }
+
+    public MaMSprite getIcnStatLvL() {
+        return icnStatLvL;
+    }
+
+    public MaMSprite getIcnStatAC() {
+        return icnStatAC;
+    }
+
+    public MaMSprite getIcnStatHP() {
+        return icnStatHP;
+    }
+
+    public MaMSprite getIcnStatSP() {
+        return icnStatSP;
+    }
+
+    public MaMSprite getIcnStatRes() {
+        return icnStatRes;
+    }
+
+    public MaMSprite getIcnStatSkills() {
+        return icnStatSkills;
+    }
+
+    public MaMSprite getIcnStatAwards() {
+        return icnStatAwards;
+    }
+
+    public MaMSprite getIcnStatXP() {
+        return icnStatXP;
+    }
+
+    public MaMSprite getIcnStatGold() {
+        return icnStatGold;
+    }
+
+    public MaMSprite getIcnStatGems() {
+        return icnStatGems;
+    }
+
+    public MaMSprite getIcnStatFood() {
+        return icnStatFood;
+    }
+
+    public MaMSprite getIcnStatCondition() {
+        return icnStatCondition;
+    }
+
+    public MaMSprite getBtnPlayerDlgItem() {
+        return btnPlayerDlgItem;
+    }
+
+    public MaMSprite getBtnPlayerDlgQuick() {
+        return btnPlayerDlgQuick;
+    }
+
+    public MaMSprite getBtnPlayerExchange() {
+        return btnPlayerExchange;
+    }
+
+    public MaMSprite getBtnPlayerDlgExit() {
+        return btnPlayerDlgExit;
     }
 }

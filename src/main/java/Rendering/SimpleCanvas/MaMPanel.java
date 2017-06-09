@@ -4,8 +4,10 @@ import Game.GlobalSettings;
 import Game.IMaMGame;
 import Game.MaMActions;
 import Game.Map.IoTWorld;
+import GameMechanics.Adventurers.Adventurer;
 import Rendering.GUI.GUIGraphicsSet;
 import Rendering.GUI.PapyrusMessageBox;
+import Rendering.GUI.PlayerDialog;
 import Rendering.IRenderableGameObject;
 import Rendering.ISScalableGUI;
 import Toolbox.HackMe;
@@ -46,8 +48,6 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
     JPanel pnlView, pnlControl, pnlNavigateBtnPad, pnlChars,
             pnlControlBtnPad;
 
-    GUIGraphicsSet graphicsSet;
-
 
     //------------------------------------------------------------------------------------------------------------------
     // Constructors
@@ -59,6 +59,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
     public MaMPanel(String title, IMaMGame game) throws CCFileFormatException {
         // frame in GLOBAL.ICN
         super();
+        this.game = game;
 
         scale = GlobalSettings.INSTANCE.getRenderingScale();
         this.title = title;
@@ -69,8 +70,6 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         Dimension size = new Dimension((int)(mamNativeSize.width*scale), (int)(mamNativeSize.height*scale));
         this.setPreferredSize(size);
         this.addComponentListener(this);
-        graphicsSet = new GUIGraphicsSet(game.getWorld().getCcFile());
-
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -121,7 +120,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
 
 
         // items
-        pnlView.add(PapyrusMessageBox.fromModalOKMessage(game.getWorld().getCcFile(),
+        pnlView.add(PapyrusMessageBox.fromModalOKMessage(game.getWorld(),
                 "OpenXeen",
                 "Welcome adventurer. You have entered the " + game.getWorld().getWorldName() + "."),
                 "cell 1 1, gapleft 10%, gapright 10%");
@@ -135,6 +134,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         pnlChars.add(makeGuiButton("C5"), "cell 4 0, grow");
         pnlChars.add(makeGuiButton("C6"), "cell 5 0, grow");
 
+        GUIGraphicsSet graphicsSet = game.getWorld().getGraphicsSet();
         pnlNavigateBtnPad.add(makeGuiButton("\\", graphicsSet.getBtnTurnLeftAction()), "cell 0 0, grow");
         pnlNavigateBtnPad.add(makeGuiButton("U", graphicsSet.getBtnMoveForwardAction()), "cell 1 0, grow");
         pnlNavigateBtnPad.add(makeGuiButton("/", graphicsSet.getBtnTurnRightAction()), "cell 2 0, grow");
@@ -153,7 +153,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         pnlControlBtnPad.add(makeGuiButton("t", graphicsSet.getBtnViewTimeAction()), "cell 1 2, grow");
         pnlControlBtnPad.add(makeGuiButton("p", graphicsSet.getBtnViewPartyAction()), "cell 2 2, grow");
 
-        this.game = game;
+
 
         renderer = new GraphicsRenderer(scale);
         renderer.setGame(game);
@@ -173,24 +173,105 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         return makeGuiButton(s, null);
     }
     protected JComponent makeGuiButton(String s, IRenderableGameObject btnFrames) {
-        return new MaMButton("", btnFrames);
-//        if(btnFrames != null) {
-//            JButton btn = new MaMButton("", btnFrames) ;
-//
-//
-//            //btn.setText("");
-//            //btn.setIcon(new ImageIcon(btnFrames.getRenderedFrames()[0]));
-//            btn.setMargin(new Insets(0, 0, 0, 0));
-//            //btn.setBorder(null);
-//            return btn;
-//        }
-//        else {
-//            JButton btn = new JButton(s);
-//            btn.setFocusPainted(false);
-//            btn.setFocusable(false);
-//            btn.setBackground(new Color(64, 128, 32, 128));
-//            return btn;
-//        }
+        MaMButton btn = new MaMButton(s, btnFrames);
+        btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(e.getSource() instanceof MaMButton) {
+                    onBtnPressed(((MaMButton) e.getSource()).getTag());
+                }
+            }
+        });
+
+        return btn;
+    }
+
+    public void onBtnPressed(String tag) {
+        switch (tag.trim()) {
+            case "U":
+                game.doAction(MaMActions.WalkForward);
+                break;
+            case "D":
+                game.doAction(MaMActions.WalkBackWard);
+                break;
+            case "L":
+                game.doAction(MaMActions.WalkLeft);
+                break;
+            case "R":
+                game.doAction(MaMActions.WalkRight);
+                break;
+            case "/":
+                game.doAction(MaMActions.TurnLeft);
+                break;
+            case "\\":
+                game.doAction(MaMActions.TurnRight);
+                break;
+
+            case "s":
+                game.doAction(MaMActions.Shoot);
+                break;
+            case "c":
+                game.doAction(MaMActions.Spell);
+                break;
+            case "r":
+                game.doAction(MaMActions.Sleep);
+                break;
+            case "b":
+                game.doAction(MaMActions.Bash);
+                break;
+            case "d":
+                game.doAction(MaMActions.Dismiss);
+                break;
+            case "q":
+                ShowQuestsDialog();
+                break;
+            case "m":
+                ShowMapDialog();
+                break;
+            case "t":
+                ShowTimeDialog();
+                break;
+            case "p":
+                showPlayerDialog(1);
+                break;
+            case "C1":
+                showPlayerDialog(0);
+                break;
+            case "C2":
+                showPlayerDialog(1);
+                break;
+            case "C3":
+                showPlayerDialog(2);
+                break;
+            case "C4":
+                showPlayerDialog(3);
+                break;
+            case "C5":
+                showPlayerDialog(4);
+                break;
+            case "C6":
+                showPlayerDialog(5);
+                break;
+        }
+    }
+
+    private void ShowQuestsDialog() {
+
+    }
+
+    private void ShowMapDialog() {
+    }
+
+    private void ShowTimeDialog() {
+
+    }
+
+    private void showPlayerDialog(int player) {
+        pnlView.removeAll();
+        Adventurer adventurer = game.getParty().get(player);
+        PlayerDialog pd = new PlayerDialog(game.getWorld(), adventurer);
+        pnlView.add(pd, "cell 1 1, grow");
+        pd.setVisible(true);
     }
 
     //------------------------------------------------------------------------------------------------------------------

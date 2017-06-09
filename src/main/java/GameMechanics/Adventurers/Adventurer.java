@@ -26,7 +26,7 @@ import java.util.List;
  *
  *
  */
-public class Adventurer extends Combatant implements IUpdateable, IAttackable, Iterable<Stat>
+public class Adventurer extends Combatant implements IUpdateable, IAttackable
 {
 
     //As a reference http://xeen.wikia.com/wiki/CharacterStruct

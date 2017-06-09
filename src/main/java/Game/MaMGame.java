@@ -131,7 +131,12 @@ public class MaMGame implements IMaMGame
     private void setupDefaultGameState()
     {
         party = new ArrayList<>();
-        party.add(new Adventurer("", CharGender.Male, CharRace.HUMAN, CharClass.Archer, 1));
+        party.add(new Adventurer("Alice", CharGender.Female, CharRace.HUMAN, CharClass.Archer, 1));
+        party.add(new Adventurer("Bob", CharGender.Male, CharRace.HUMAN, CharClass.Archer, 2));
+        party.add(new Adventurer("Cathy", CharGender.Female, CharRace.HUMAN, CharClass.Archer, 3));
+        party.add(new Adventurer("Dean The Bean", CharGender.Male, CharRace.HUMAN, CharClass.Archer, 4));
+        party.add(new Adventurer("Elisa", CharGender.Female, CharRace.HUMAN, CharClass.Archer, 5));
+        party.add(new Adventurer("Fuzz Face", CharGender.Male, CharRace.HUMAN, CharClass.Archer, 6));
         partyPos = new Point(18, 53);
         partyDir = Direction.UP;
     }
@@ -241,6 +246,7 @@ public class MaMGame implements IMaMGame
         return activePartyEnchantments;
     }
 
+    @Override
     public List<Adventurer> getParty() {
         return party;
     }

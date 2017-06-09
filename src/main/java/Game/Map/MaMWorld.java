@@ -4,6 +4,7 @@ import Game.IGameEntity;
 import Game.IScript;
 import Game.MaMGame;
 import Game.Monsters.MaMMonster;
+import Rendering.GUI.GUIGraphicsSet;
 import Rendering.ISceneComposition;
 import Toolbox.Direction;
 import mamFiles.*;
@@ -40,6 +41,7 @@ public abstract class MaMWorld implements AutoCloseable
 
     protected MaMCCFileReader ccFile;
     protected MaMCCFileReader ccFileAnimations;
+    private GUIGraphicsSet graphicsSet;
 
     //protected MaMPallet currentPallate;
 
@@ -55,6 +57,8 @@ public abstract class MaMWorld implements AutoCloseable
         currentMazeView = null;
 
         entities = new ArrayList<>();
+
+        graphicsSet = new GUIGraphicsSet(getCcFile());
     }
 
     //protected abstract MaMPallet getDefaultPallate() throws CCFileFormatException;
@@ -142,5 +146,9 @@ public abstract class MaMWorld implements AutoCloseable
     {
         //parentMaze.get
         entities.add(IGameEntity.fromRenderable(thing, x, y, dir, parentMaze, onUpdate));
+    }
+
+    public GUIGraphicsSet getGraphicsSet() {
+        return graphicsSet;
     }
 }

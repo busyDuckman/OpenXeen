@@ -18,7 +18,8 @@ public enum MaMActions
     Spell(true, true),
     MelleAttack(false, true),
     MelleShield(true, true),
-    Sleep(true, false);
+    Sleep(true, false),
+    Dismiss(true, false);
 
     boolean duringExplore;
     boolean duringCombat;
