@@ -1,12 +1,15 @@
 package mamFiles;
 
+import Game.GlobalSettings;
 import Game.IGameEntity;
 import Rendering.AnimationSettings;
 import Rendering.IRenderableGameObject;
 import Toolbox.Direction;
+import Toolbox.ImageHelpers;
 import mamFiles.WOX.WOXSpriteFile;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
 /**
@@ -85,8 +88,25 @@ public class MaMThing extends MAMFile implements Rendering.IRelativeToLocationSp
                 directionalViews[3] = mamStyleSprite;
 
         }
+
+        int debugAlpha = GlobalSettings.INSTANCE.getSpriteDebugAlpha();
+        if(debugAlpha > 0) {
+            for(int i=0; i<directionalViews.length; i++) {
+                IRenderableGameObject vImg = directionalViews[i].applyAlphaTransform(debugAlpha, ImageHelpers.AlphaTransforms.SET_FOR_ALL);
+                directionalViews[i] = vImg;
+            }
+        }
     }
 
+    @Override
+    public void flush() {
+        for (int i = 0; i < directionalViews.length; i++) {
+            if(directionalViews[i] != null) {
+                directionalViews[i].flush();
+                directionalViews[i] = null;
+            }
+        }
+    }
 
     @Override
     public IRenderableGameObject getView(Point mapPosRelative, Direction viewDir) {

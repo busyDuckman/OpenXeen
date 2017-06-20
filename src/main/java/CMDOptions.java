@@ -27,9 +27,12 @@ public enum CMDOptions {
     DIR      ("dir", true, "Source directory for M&M game"),
     REBUILD_PROXY ("rebuild_proxy", "p", false, "Extracts all data in the original ccFiles to a proxy file."),
 
-    DEBUG   ("debug", "d", false, "Runs application in debug mode (recommended for developers)"),
+    SCALE    ("scale", "s", true, "A zoom factor for graphics rendering (default 2)."),
+
+    DEBUG   ("debug", "d", false, "Runs application in debug mode (recommended for developers)."),
     NO_CACHE ("no_cache", false, "Disable caching of files (for debugging/editing)."),
-    NO_HUD  ("no_hud", false, "Disables rendering of the user interface, showing just the world.");
+    NO_HUD  ("no_hud", false, "Disables rendering of the user interface, showing just the world."),
+    SPRITE_ALPHA  ("sprite_alpha", true, "Forces an alpha for many sprites (0-255).");
 
     String name;
     String shortName;
@@ -57,6 +60,24 @@ public enum CMDOptions {
 
     public boolean isSet(CommandLine cmd) {
         return ((name != null) && cmd.hasOption(name)) || ((shortName != null) && cmd.hasOption(shortName));
+    }
+
+    public String getArgOrDefault(CommandLine cmd, String onMissing) {
+        String arg = getArg(cmd);
+
+        return (arg == null) ? onMissing : arg;
+    }
+
+    public double getArgOrDefault(CommandLine cmd, double onMissing) {
+        String arg = getArg(cmd);
+
+        return (arg == null) ? onMissing : Double.parseDouble(arg);
+    }
+
+    public int getArgOrDefault(CommandLine cmd, int onMissing) {
+        String arg = getArg(cmd);
+
+        return (arg == null) ? onMissing : Integer.parseInt(arg);
     }
 
     public String getArg(CommandLine cmd) {

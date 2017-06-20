@@ -295,7 +295,7 @@ public class WOXSpriteFile extends MaMSprite
 
             frames[i] = sizeFrame(cells, cellOffsetsInThisFrame);
 
-            //uncomment If I think a sprite may be accumulative (difference between frames, like a flc)
+            //uncomment If I think a sprite may be accumulative (difference between frames, like a .flc)
 //            if(i>0)
 //            {
 //                frames[i] = new FrameInfo(frames[i-1]);

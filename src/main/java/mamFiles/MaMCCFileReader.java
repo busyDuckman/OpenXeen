@@ -97,10 +97,11 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     //-------------------------------------------------------------------------------------------------
     // Constructor
     //-------------------------------------------------------------------------------------------------
-    protected MaMCCFileReader(String fileName)
+    protected MaMCCFileReader(String path)
     {
-        super(FileHelpers.getFileNameNoExtension(fileName), "root@" + fileName);
-        filePath = fileName;
+        //String name = FileHelpers.getFileName(path);
+        super(FileHelpers.getFileNameNoExtension(FileHelpers.getFileName(path)), "root@" + FileHelpers.getFileName(path));
+        filePath = path;
         assosiates = new ArrayList<>();
     }
 

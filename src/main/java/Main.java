@@ -3,6 +3,7 @@ import Game.MaMGame;
 import Game.Map.WoXWorld;
 import Rendering.SimpleCanvas.MaMPanel;
 import Rendering.SimpleCanvas.OpenXeenFrame;
+import Toolbox.FileHelpers;
 import mamFiles.CCFileCache;
 import mamFiles.CCFileFormatException;
 import mamFiles.IOT.IoTccFileReader;
@@ -48,19 +49,28 @@ public class Main
         GlobalSettings.INSTANCE.setDisableHUD(CMDOptions.NO_HUD.isSet(cmd));
         CCFileCache.INSTANCE.setEnabled(!CMDOptions.NO_CACHE.isSet(cmd));
 
+        GlobalSettings.INSTANCE.setSpriteDebugAlpha(CMDOptions.SPRITE_ALPHA.getArgOrDefault(cmd, -1));
+
+        GlobalSettings.INSTANCE.setRenderingScale(CMDOptions.SCALE.getArgOrDefault(cmd, 2.0));
+
+        String dir = CMDOptions.DIR.getArgOrDefault(cmd, "");
+        GlobalSettings.INSTANCE.setGameDir(dir);
         // run game
         try {
             if(CMDOptions.GAME_MM3.isSet(cmd)) {
-                game = new MaMGame(IoTccFileReader.open("mm3.cc"));
+                game = new MaMGame(IoTccFileReader.open(FileHelpers.join(dir, "mm3.cc")));
             }
             else if(CMDOptions.GAME_MM4.isSet(cmd)) {
-                game = MaMGame.fromWoXData("xeen.cc", WoXWorld.WoxVariant.CLOUDS);
+                game = MaMGame.fromWoXData(FileHelpers.join(dir, "xeen.cc"),
+                            WoXWorld.WoxVariant.CLOUDS);
             }
             else if(CMDOptions.GAME_MM5.isSet(cmd)) {
-                game = MaMGame.fromWoXData("dark.cc", WoXWorld.WoxVariant.DARK_SIDE);
+                game = MaMGame.fromWoXData(FileHelpers.join(dir, "dark.cc"),
+                            WoXWorld.WoxVariant.DARK_SIDE);
             }
             else if(CMDOptions.GAME_WOX.isSet(cmd)) {
-                game = MaMGame.fromWoXData("dark.cc", WoXWorld.WoxVariant.DARK_SIDE); //TODO
+                game = MaMGame.fromWoXData(FileHelpers.join(dir, "dark.cc"),
+                        WoXWorld.WoxVariant.DARK_SIDE); //TODO
             }
             else {
                 System.out.println("Error: No game specified.");

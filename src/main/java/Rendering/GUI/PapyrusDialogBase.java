@@ -39,9 +39,6 @@ public class PapyrusDialogBase extends JPanel implements ComponentListener, ISSc
     private int longBorderWidth = 32;
     private Rectangle unscaledBounds;
 
-    protected Font messageFont;
-    protected Font boldFont;
-
     public PapyrusDialogBase(MaMWorld world) {
         this.world = world;
         this.ccFile = world.getCcFile();
@@ -77,10 +74,34 @@ public class PapyrusDialogBase extends JPanel implements ComponentListener, ISSc
             textureImage = papyrus.getRegion(new Rectangle(18, 17, 32, 32));
         }
 
-        messageFont = this.getFont();
-        boldFont = new Font(messageFont.getFontName(), Font.BOLD, messageFont.getSize()+2);
 
+    }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // GUI
+    //------------------------------------------------------------------------------------------------------------------
+    protected JButton makeButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(GlobalSettings.INSTANCE.getMessageFont());
+        btn.setFocusPainted(false);
+        //exitButton.setContentAreaFilled(false);
+        btn.setBackground(new Color(185, 116, 86));
+        return btn;
+    }
+
+    protected JLabel makeLabel(String text, Alignment hAlign) {
+        return makeLabel(text, hAlign, FontEffect.NORMAL);
+    }
+
+    protected JLabel makeLabel(String text, Alignment hAlign, FontEffect font) {
+        MaMLabel lbl = new MaMLabel(text, hAlign, font);
+        return lbl;
+    }
+
+    protected JPanel makePanel(LayoutManager layout) {
+        JPanel pnl = new JPanel(layout);
+        pnl.setBackground(new Color(0,0,0,0));
+        return pnl;
     }
 
     //------------------------------------------------------------------------------------------------------------------

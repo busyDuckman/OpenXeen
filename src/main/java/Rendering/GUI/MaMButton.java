@@ -1,5 +1,6 @@
-package Rendering.SimpleCanvas;
+package Rendering.GUI;
 
+import Game.GlobalSettings;
 import Rendering.IRenderableGameObject;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import java.awt.*;
 public class MaMButton extends JButton {
     Rendering.IRenderableGameObject btnFrames;
     String tag;
+    Dimension size;
 
     public MaMButton(String tag, IRenderableGameObject btnFrames) {
         this(tag, btnFrames, null);
@@ -29,6 +31,18 @@ public class MaMButton extends JButton {
         this.setBackground(new Color(255, 255, 255, 0));
         this.setMargin(new Insets(0, 0, 0, 0));
         this.tag = tag;
+
+        double scale = GlobalSettings.INSTANCE.getRenderingScale();
+        if(this.btnFrames != null) {
+            this.size = new Dimension((int)(this.btnFrames.getImage(0).getWidth() * scale),
+                                      (int)(this.btnFrames.getImage(0).getHeight() * scale));
+        }
+        else {
+            this.size = new Dimension((int)(16 * scale), (int)(16 * scale));
+        }
+        this.setPreferredSize(size);
+        this.setMaximumSize(size);
+        this.setMinimumSize(size);
     }
 
     @Override

@@ -91,6 +91,7 @@ public class ImageHelpers
         {
             return null;
         }
+
         BufferedImage imgARGB = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         //final WritableRaster wr = (WritableRaster) imgARGB.getData();
         //wr.setPixels(0, 0, width, height, data);

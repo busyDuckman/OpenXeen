@@ -66,6 +66,14 @@ public class WOXSurface extends MaMSurface
         return new WOXSurface(sprite, MAMFile.generateKeyFromPath(path));
     }
 
+    @Override
+    public void flush() {
+        if(fullSurface != null) {
+            fullSurface.flush();
+            fullSurface = null;
+        }
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // MaMSurface
     //------------------------------------------------------------------------------------------------------------------

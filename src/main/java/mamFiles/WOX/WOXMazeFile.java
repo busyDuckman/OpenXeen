@@ -304,22 +304,22 @@ public class WOXMazeFile extends MaMMazeFile
 
         //load monsters
 
-//        do {
-//            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
-//            int x = record[0];
-//            int y = record[1];
-//            int lutPos = record[2];
-//            if(lutPos < objectLut.length) {
-//                int thingNum = objectLut[lutPos];
-//                Direction dir = dirLut[record[3]];
-//
-//                MaMMonster mon = world.getCcFile().getMonsterFactory().createMonster(world, 10);
-//                world.addMonster(mon, x, y);
-//            }
-//            else if (lutPos != 255) {
-//                throw new CCFileFormatException("error in maze.mon");
-//            }
-//        } while(!isSentinalRecord(record));
+        do {
+            BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
+            int x = record[0];
+            int y = record[1];
+            int lutPos = record[2];
+            if(lutPos < objectLut.length) {
+                int thingNum = objectLut[lutPos];
+                Direction dir = dirLut[record[3]];
+
+                MaMMonster mon = world.getCcFile().getMonsterFactory().createMonster(world, this, thingNum);
+                world.addMonster(mon, x, y);
+            }
+            else if (lutPos != 255) {
+                throw new CCFileFormatException("error in maze.mon");
+            }
+        } while(!isSentinalRecord(record));
 
         //load wall objects
         do {

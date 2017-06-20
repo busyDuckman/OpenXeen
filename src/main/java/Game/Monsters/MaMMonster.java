@@ -89,6 +89,18 @@ public class MaMMonster extends Combatant implements IGameEntity, IAttackable, I
     }
 
     @Override
+    public void flush() {
+        if(idleAnimation != null) {
+            idleAnimation.flush();
+            idleAnimation = null;
+        }
+
+        if(attackAnimation != null) {
+            attackAnimation.flush();
+        }
+    }
+
+    @Override
     public String toString() {
         return "MaMMonster{" +
                 "idleAnimation=" + idleAnimation +

@@ -115,6 +115,7 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
             return;
         }
 
+
         view.depthSort();
         for (Pair<RenderablePos, IRenderableGameObject> renderable : view.getRenderables())
         {
@@ -151,6 +152,7 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
         if(view == null) {
             return;
         }
+
         //view.depthSort();
         //this should already be depth sorted.
         for (Pair<RenderablePos, IRenderableGameObject> renderable : view.getRenderables())
@@ -174,13 +176,6 @@ public class GraphicsRenderer implements IMaMRenderer<Graphics>
                 System.out.println("Sprite is corrupted?");
                 continue;
             }
-
-//            double spriteScale = renderable.getKey().getScale();
-//            if(spriteScale != 1.0)
-//            {
-//                //spriteScale *= 0.25;
-//                System.out.println("scale="+spriteScale);
-//            }
 
             Rectangle bounds = renderable.getKey().getImageBounds(frame.getWidth(), frame.getHeight());
             bounds = ISceneComposition.scaleRectangleNoTearing(bounds, scale);

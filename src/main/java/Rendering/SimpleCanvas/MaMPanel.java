@@ -6,6 +6,7 @@ import Game.MaMActions;
 import Game.Map.IoTWorld;
 import GameMechanics.Adventurers.Adventurer;
 import Rendering.GUI.GUIGraphicsSet;
+import Rendering.GUI.MaMButton;
 import Rendering.GUI.PapyrusMessageBox;
 import Rendering.GUI.PlayerDialog;
 import Rendering.IRenderableGameObject;
@@ -25,6 +26,9 @@ import static Toolbox.SwingHelpers.makeClearPanel;
 
 /**
  * Created by duckman on 16/05/2016.
+ *
+ * This is a JPanel that holds a M&M Game.
+ * It handles all input and rendering.
  */
 
 
@@ -271,7 +275,10 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
         Adventurer adventurer = game.getParty().get(player);
         PlayerDialog pd = new PlayerDialog(game.getWorld(), adventurer);
         pnlView.add(pd, "cell 1 1, grow");
-        pd.setVisible(true);
+        //pd.setVisible(true);
+
+        pnlView.revalidate();
+        this.invalidate();
     }
 
     //------------------------------------------------------------------------------------------------------------------

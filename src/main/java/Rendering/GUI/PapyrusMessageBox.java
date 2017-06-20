@@ -2,7 +2,6 @@ package Rendering.GUI;
 
 import Game.Map.MaMWorld;
 import Toolbox.Tag;
-import mamFiles.MaMCCFileReader;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -57,7 +56,7 @@ public class PapyrusMessageBox extends PapyrusDialogBase {
         this.setLayout(new MigLayout("fillx, filly", colConstraints, rowConstraints));
 
         this.setFocusable(false);
-        JButton exitButton = new JButton("Ok");
+        JButton exitButton = makeButton("Ok");
         exitButton.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -66,19 +65,13 @@ public class PapyrusMessageBox extends PapyrusDialogBase {
             }
         });
 
-        //exitButton.setBorderPainted(false);
-        exitButton.setFocusPainted(false);
-        //exitButton.setContentAreaFilled(false);
-        exitButton.setBackground(new Color(185, 116, 86));
         this.add(exitButton, "cell 0 2, center");
         exitButton.setFocusable(false);
 
-        lblTitle = new JLabel(heading);
-        lblTitle.setFont(boldFont);
+        lblTitle = makeLabel(asHtml(heading), Alignment.CENTER, FontEffect.HEADING);
         this.add(lblTitle, "cell 0 0, center");
 
-        lblText = new JLabel(asHtml(message));
-        lblText.setFont(messageFont);
+        lblText = makeLabel(asHtml(message), Alignment.CENTER);
         this.add(lblText, "cell 0 1, center");
 
         this.addComponentListener(this);

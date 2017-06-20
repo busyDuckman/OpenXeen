@@ -8,6 +8,7 @@ import mamFiles.IHasProxy;
 import mamFiles.MAMFile;
 import mamFiles.MaMSprite;
 import mamFiles.WOX.WOXSpriteFile;
+import sun.misc.GC;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -276,6 +277,11 @@ public interface IRenderableGameObject
         String key = MAMFile.generateUniqueKey(name);
         return new MaMSprite(name, key, newFrames);
     }
+
+    /**
+     * Causes memory to be explicitly freed (or marked for GC).
+     */
+    void flush();
 }
 
 /**
@@ -301,6 +307,11 @@ final class RelativeLocationWrapper implements IRelativeToLocationSprite
     public AnimationSettings getAnimationSettings() {
         return rgo.getAnimationSettings();
     }
+
+    @Override
+    public void flush() {
+        rgo.flush();
+    }
 }
 
 /**
@@ -322,5 +333,10 @@ final class ImageWrapper implements IRenderableGameObject
     @Override
     public final AnimationSettings getAnimationSettings() {
         return null;
+    }
+
+    @Override
+    public void flush() {
+        image.flush();
     }
 }

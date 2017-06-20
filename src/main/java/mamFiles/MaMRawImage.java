@@ -50,6 +50,15 @@ public class MaMRawImage extends MAMFile implements Rendering.IMaMSprite
         this.image = image;
     }
 
+    @Override
+    public void flush() {
+        if(image != null) {
+            image.flush();
+            image = null;
+        }
+        pallet = null;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Raw image logic
     //------------------------------------------------------------------------------------------------------------------

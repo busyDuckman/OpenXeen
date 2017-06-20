@@ -4,8 +4,6 @@ import Game.GlobalSettings;
 import Game.Map.MaMWorld;
 import GameMechanics.Adventurers.Adventurer;
 import GameMechanics.Stat;
-import Rendering.SimpleCanvas.MaMButton;
-import mamFiles.MaMCCFileReader;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -21,9 +19,7 @@ public class PlayerDialog extends PapyrusDialogBase
 
     public PlayerDialog(MaMWorld world, Adventurer adventurer) {
         super(world);
-
         pnlStats = new JPanel(new GridLayout(0, 3));
-
 
         for(Stat stat : adventurer.getStats())
         {
@@ -35,12 +31,15 @@ public class PlayerDialog extends PapyrusDialogBase
     }
 
     private Component makeStatViewer(Adventurer adventurer, Stat stat) {
-        JPanel pnl = new JPanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
-                "[]",
-                "[][grow]"));
-        MaMButton btn  = new MaMButton("", world.getGraphicsSet().getIcnStatAcy());
+        JPanel pnl = makePanel(new MigLayout("fill" + GlobalSettings.INSTANCE.migDebugText(),
+                "[]0[left]", // col
+                "[]"));   // row
+        MaMButton btn  = new MaMButton("", stat.getIcon(world));// world.getGraphicsSet().getIcnStatAcy());
         pnl.add(btn, "cell 0 0");
+        pnl.add(makeLabel(stat.getName(), Alignment.LEFT), "cell 1 0");
 
         return pnl;
     }
+
+
 }

@@ -6523,17 +6523,30 @@ public class MonsterFactory
     }
 
     public MaMMonster createMonster(MaMWorld world, MaMMazeFile maze, int id) throws CCFileFormatException {
-        MaMMonsterRecord rec = null;
-        if(world instanceof WoXWorld)
+        try
         {
-            rec = monsters.stream()
-                .filter(M -> M.number == id)
-                .filter(M -> M.side == ((WoXWorld)world).getVariant())
-                .findFirst()
-                .orElseGet(null);
-        }
+            MaMMonsterRecord rec = null;
+            if(world instanceof WoXWorld)
+            {
+                rec = monsters.stream()
+                    .filter(M -> M.number == id)
+                    .filter(M -> M.side == ((WoXWorld)world).getVariant())
+                    .findFirst()
+                    .orElse(null);
+            }
 
-        return (rec == null) ? null : rec.newMonster(world, maze);
+            //return (rec == null) ? null : rec.newMonster(world, maze);
+            return rec.newMonster(world, maze);
+        }
+        catch (Exception ex) {
+            if(id != 10) {
+                System.out.println("NO MONSTER FOR ID: " + id + "(default to monster 10)");
+                return createMonster(world, maze, 10);
+            }
+            else {
+                throw ex;
+            }
+        }
     }
 
     private static class MaMMonsterRecord {

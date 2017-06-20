@@ -128,6 +128,18 @@ public class MaMSprite extends MAMFile implements Rendering.IMaMSprite, IHasProp
         transparentIndex = 0;
     }
 
+    @Override
+    public void flush() {
+        if(this.renderedFrames != null) {
+            for (int i=0; i<this.renderedFrames.length; i++) {
+                renderedFrames[i].flush();
+                renderedFrames[i] = null;
+            }
+        }
+        this.animationSettings = null;
+        this.frames = null;
+    }
+
     public MaMSprite appendSprite(String newName, MaMSprite another) throws CCFileFormatException {
         BufferedImage[] images = Stream.concat(Arrays.stream(this.getRenderedFrames()),
                                                Arrays.stream(another.getRenderedFrames()))

@@ -57,8 +57,8 @@ public class WOXccFileReader extends MaMCCFileReader
 
     WoXCCVariant variant;
 
-    protected WOXccFileReader(String name, WoXCCVariant variant) {
-        super(name);
+    protected WOXccFileReader(String path, WoXCCVariant variant) {
+        super(path);
         this.variant = variant;
 
         monsterFactory = MonsterFactory.newWoxMonsterFactory();
@@ -72,10 +72,10 @@ public class WOXccFileReader extends MaMCCFileReader
             throw new CCFileFormatException("File not found: " + ifNull(filePath, "<NULL>"));
         }
         Path path = Paths.get(filePath);
-        String name = path.getFileName().toString();
+        //String name = path.getFileName().toString();
 
         //create cc file reader.
-        WOXccFileReader ccFile = new WOXccFileReader(name, getVariant(filePath));
+        WOXccFileReader ccFile = new WOXccFileReader(filePath, getVariant(filePath));
 
         ccFile.parseTocAndLoadFiles();
 

@@ -176,9 +176,9 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
         }
 
         try {
-            //return ccFile.getThing(fileName);
-
-            return new WoXThing(ccFile.getSprite(fileName), MAMFile.generateUniqueKey(fileName));
+            return ccFile.getThing(fileName);
+            //TODO: Cache this
+            //return new WoXThing(ccFile.getSprite(fileName), MAMFile.generateUniqueKey(fileName));
 
             //return ccFile.getSprite(fileName).getView(
         } catch (CCFileFormatException e) {
@@ -201,7 +201,7 @@ public abstract class WoXEnvironmentSet implements IMaMEnvironmentSet
     public IRenderableGameObject getMapObject(int objectIndex) {
 //        objectIndex = objectIndex % 16;
 //        return IRenderableGameObject.fromImage(basicMapTileSet.getRenderedFrames()[32 + objectIndex]);
-        return basicMapObjects[objectIndex%basicMapObjects.length];
+        return basicMapObjects[(objectIndex)%basicMapObjects.length];
     }
 
 }
