@@ -5,11 +5,15 @@ import Game.IGameEntity;
 import Rendering.AnimationSettings;
 import Rendering.IRenderableGameObject;
 import Toolbox.Direction;
+import Toolbox.FileHelpers;
 import Toolbox.ImageHelpers;
 import mamFiles.WOX.WOXSpriteFile;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -127,7 +131,21 @@ public class MaMThing extends MAMFile implements Rendering.IRelativeToLocationSp
 
     @Override
     public boolean saveProxy(String path) throws CCFileFormatException {
-        //TODO
-        return false;
+
+        //TODO: clean up
+        //CCFileFormatException.assertFalse(width  <= 0, "MaMSprite::saveProxy() width <= 0");
+        //CCFileFormatException.assertFalse(height <= 0, "MaMSprite::saveProxy() height <= 0");
+
+        BufferedImage join = ImageHelpers.joinHorizontally(this.getRenderedFrames());
+        //BufferedImage xBRJoin = ResizeXBR.xBR(join, 4);
+        try {
+            ImageIO.write(join, "png", new File(path));
+            //ImageIO.write(xBRJoin, "png", new File(MaMGame.getModVersionOfPath(path, "xbr")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return saveProperties(FileHelpers.changeExtesion(path, "cfg"), "openXeen sprite configuration file");
     }
 }

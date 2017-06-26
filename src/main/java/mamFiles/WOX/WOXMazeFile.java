@@ -288,7 +288,7 @@ public class WOXMazeFile extends MaMMazeFile
         do {
             BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
             int x = record[0];
-            int y = record[1];
+            int y = 15-record[1];
             int lutPos = record[2];
             if(lutPos < objectLut.length) {
                 int thingNum = objectLut[lutPos];
@@ -303,17 +303,16 @@ public class WOXMazeFile extends MaMMazeFile
 
 
         //load monsters
-
         do {
             BinaryHelpers.readBYTEs(bisMapData, record, 4, 0);
             int x = record[0];
-            int y = record[1];
+            int y = 15-record[1];
             int lutPos = record[2];
-            if(lutPos < objectLut.length) {
-                int thingNum = objectLut[lutPos];
+            if(lutPos < monsterLut.length) {
+                int monsterNum = monsterLut[lutPos];
                 Direction dir = dirLut[record[3]];
 
-                MaMMonster mon = world.getCcFile().getMonsterFactory().createMonster(world, this, thingNum);
+                MaMMonster mon = world.getCcFile().getMonsterFactory().createMonster(world, this, monsterNum);
                 world.addMonster(mon, x, y);
             }
             else if (lutPos != 255) {
@@ -327,8 +326,8 @@ public class WOXMazeFile extends MaMMazeFile
             int x = record[0];
             int y = record[1];
             int lutPos = record[2];
-            if(lutPos < objectLut.length) {
-                int thingNum = objectLut[lutPos];
+            if(lutPos < decalLut.length) {
+                int thingNum = decalLut[lutPos];
                 int d = record[3];
                 if(d < dirLut.length) {
                     Direction dir = dirLut[d];

@@ -1027,7 +1027,7 @@ public abstract class MaMCCFileReader extends MAMFile implements AutoCloseable
     }
 
     private String getProxyFilePath(String fileName, MAMFile mamFile) {
-        String path = getAbsPathForProxies(FileHelpers.getFileNameNoExtension(fileName));
+        String path = getAbsPathForProxies(FileHelpers.getFileExtension(fileName));
 
         String proxyExt = FileHelpers.getFileExtension(mamFile.suggestProxyFileName());
         String proxyFileName = fileName + "." + proxyExt;

@@ -331,6 +331,7 @@ public class MaMGame implements IMaMGame
                                 }
                             }
 
+                            // environment objects
                             int environNum = tile.getIndexMiddle();
                             IRenderableGameObject envobject = world.getOutdoorEnvironmentSet(0).getEnviron(environNum, 1);
                             if(envobject != null)
@@ -347,25 +348,24 @@ public class MaMGame implements IMaMGame
 
 
                             // TODO: What is the overlay mask in the tile for?
-
-                            int thingNum = tile.getIndexMapOverlayIcon();
-                            MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
-                            if(thing != null)
-                            {
-                                IRenderableGameObject rThing = thing.getView(vsPos, partyDir).unifyDimensions();
-                                RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorPos(vsPos,
-                                        thing.getRenderedFrames()[0].getWidth(),
-                                        thing.getRenderedFrames()[0].getHeight());
-                                //int frame = RenderPosHelper.getGlobalHelper().getOutdoorEnvFrame(vsPos);
-                                if(spPos != null)
-                                {
-                                    Scene.addRenderable(spPos, thing);
-
-                                    //that whole left/right side of screen frame thing
-                                    //String name = (envobject instanceof MaMSprite) ? ((MaMSprite)envobject).getName() : "?";
-                                    //Scene.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
-                                }
-                            }
+//                            int thingNum = tile.getIndexMapOverlayIcon();
+//                            MaMThing thing = world.getOutdoorEnvironmentSet(0).getObject(thingNum);
+//                            if(thing != null)
+//                            {
+//                                IRenderableGameObject rThing = thing.getView(vsPos, partyDir).unifyDimensions();
+//                                RenderablePos spPos = RenderPosHelper.getGlobalHelper().getOutdoorPos(vsPos,
+//                                        thing.getRenderedFrames()[0].getWidth(),
+//                                        thing.getRenderedFrames()[0].getHeight());
+//                                //int frame = RenderPosHelper.getGlobalHelper().getOutdoorEnvFrame(vsPos);
+//                                if(spPos != null)
+//                                {
+//                                    Scene.addRenderable(spPos, thing);
+//
+//                                    //that whole left/right side of screen frame thing
+//                                    //String name = (envobject instanceof MaMSprite) ? ((MaMSprite)envobject).getName() : "?";
+//                                    //Scene.addRenderable(deFutzed, envobject.asSprite().subSetOfFrames("frame of " + name, frame, 1));
+//                                }
+//                            }
 
                             // entities (& monsters)
                             world.getEntities().stream()
@@ -407,7 +407,7 @@ public class MaMGame implements IMaMGame
     @Override
     public MaM2DMapComposition renderMap(int mapX, int mapY, int mapWidth, int mapHeight)
     {
-        MaMMazeView mazeView= this.world.getCurrentMazeView();
+        MaMMazeView mazeView = this.world.getCurrentMazeView();
         MaM2DMapComposition scene = new MaM2DMapComposition();
         if(mazeView != null)
         {
@@ -418,11 +418,11 @@ public class MaMGame implements IMaMGame
                 {
                     MaMMazeFile maze = mazeView.getMazeFileForPoint(x, y);
 
-                    //world space x and y
+                    // world space x and y
                     int wsX = x + mapX;
                     int wsY = y + mapY;
 
-                    //tile info
+                    // tile info
                     MaMTile tile = mazeView.get(wsX, wsY);
                     if(tile==null)
                     {
@@ -431,14 +431,14 @@ public class MaMGame implements IMaMGame
 
                     RenderablePos tilePos = new RenderablePos(x*8, y*8, 1.0, RenderablePos.ScalePosition.TopLeft, 0);
 
-                    //ground
+                    // ground
                     int groundTile = tile.getIndexBase();
                     IRenderableGameObject tileSprite = maze.getEnvironmentSet().getMapTile(groundTile);
                     scene.addRenderable(tilePos, tileSprite);
 
                     if(maze.isOutdoors())
                     {
-                        //environ
+                        // environ
                         tilePos = tilePos.above();
                         int environIndex = tile.getIndexMiddle();
                         IRenderableGameObject environSprite = ((IMaMOutdoorEnvironmentSet)maze.getEnvironmentSet())
@@ -450,7 +450,7 @@ public class MaMGame implements IMaMGame
                         }
                     }
 
-                    //objects
+                    // objects
                     tilePos = tilePos.above();
                     int objectIndex = tile.getIndexMapOverlayIcon();
                     IRenderableGameObject overlaySprite = maze.getEnvironmentSet().getMapObject(objectIndex);
@@ -459,7 +459,7 @@ public class MaMGame implements IMaMGame
                         scene.addRenderable(tilePos, overlaySprite);
                     }
 
-                    //draw arrow
+                    // draw arrow
                     if(equalsXY(partyPos, wsX, wsY))
                     {
                         tilePos = tilePos.above();
