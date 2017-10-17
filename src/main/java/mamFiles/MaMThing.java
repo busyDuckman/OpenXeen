@@ -101,13 +101,13 @@ public class MaMThing extends MAMFile implements Rendering.IRelativeToLocationSp
             }
         }
 
-        int debugAlpha = GlobalSettings.INSTANCE.getSceneryWash();
-        if(debugAlpha > 0) {
-            for(int i=0; i<directionalViews.length; i++) {
-                IRenderableGameObject vImg = directionalViews[i].applyAlphaTransform(debugAlpha, ImageHelpers.AlphaTransforms.SET_FOR_ALL);
-                directionalViews[i] = vImg;
-            }
-        }
+//        int debugAlpha = GlobalSettings.INSTANCE.getSceneryWash();
+//        if(debugAlpha > 0) {
+//            for(int i=0; i<directionalViews.length; i++) {
+//                IRenderableGameObject vImg = directionalViews[i].a(debugAlpha, ImageHelpers.AlphaTransforms.SET_FOR_ALL);
+//                directionalViews[i] = vImg;
+//            }
+//        }
 
 
     }

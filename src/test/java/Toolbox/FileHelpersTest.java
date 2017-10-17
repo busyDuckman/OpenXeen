@@ -50,6 +50,7 @@ public class FileHelpersTest {
         assertEquals("t", FileHelpers.getFileExtension("c:\\foo\\bar.t"));
         assertEquals("", FileHelpers.getFileExtension("c:\\foo\\bar."));
         assertEquals("", FileHelpers.getFileExtension("c:\\foo\\bar"));
+        assertEquals("txt", FileHelpers.getFileExtension("c:\\foo\\.txt"));
 
         assertEquals("", FileHelpers.getFileExtension(null));
         assertEquals("", FileHelpers.getFileExtension(""));
@@ -70,6 +71,7 @@ public class FileHelpersTest {
     @Test
     public void getFileNameNoExtension() throws Exception {
         assertEquals("bar", FileHelpers.getFileNameNoExtension("c:\\foo\\bar"));
+        assertEquals("", FileHelpers.getFileNameNoExtension("c:\\foo\\.bar"));
         assertEquals("bar", FileHelpers.getFileNameNoExtension("c:\\foo\\bar.txt"));
         assertEquals("bar", FileHelpers.getFileNameNoExtension("c:\\foo\\bar"));
         assertEquals("", FileHelpers.getFileNameNoExtension(null));
