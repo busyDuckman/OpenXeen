@@ -185,7 +185,22 @@ public class FileHelpers {
         {
             return ""; //eg c:\foo\  indicates no file...
         }
-        return new File(path).getName();
+
+        // Basic sub-string logic that seems OK... at 1am in the morning.
+        // Originally I used java libraries, but they were buggy.
+        int pos = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+        if (pos < 0) {
+            return path;
+        }
+        else {
+            if((pos+1) >= path.length()){
+                //should not be here, but...
+                return ""; //eg c:\foo\  indicates no file...
+            }
+            else {
+                return path.substring(pos+1);
+            }
+        }
     }
 
     public static String getFileExtension(String path)
@@ -202,7 +217,8 @@ public class FileHelpers {
             return "";
         }
 
-        return com.google.common.io.Files.getFileExtension(name);
+        int pos = name.lastIndexOf('.');
+        return (pos < 0) ? "" : ((pos < (name.length()-1)) ? name.substring(pos+1) : "");
     }
 
     public static boolean hasExtension(String path)
@@ -224,7 +240,8 @@ public class FileHelpers {
 
         //enforce our rules regarding what is a filename.
         String filename = getFileName(path);
-        return com.google.common.io.Files.getNameWithoutExtension(filename);
+        int pos = filename.lastIndexOf('.');
+        return (pos < 0) ? filename : filename.substring(0, pos);
     }
 
     public static String join(String pathA, String pathB)
