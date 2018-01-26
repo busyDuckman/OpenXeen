@@ -3,9 +3,11 @@ package Game;
 import Toolbox.FileHelpers;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 
 /**
  * Created by duckman on 18/06/2016.
@@ -24,6 +26,7 @@ public enum GlobalSettings
     private transient Font messageFont = null;
     private transient Font headingFont = null;
     private int spriteDebugAlpha = -1;
+    private Function<BufferedImage, BufferedImage> sceneryTransform = null;
 
     public boolean debugMode() {
         return debugMode;
@@ -117,5 +120,22 @@ public enum GlobalSettings
     public void setSpriteDebugAlpha(int spriteDebugAlpha) {
         // negative value indicates no alpha
         this.spriteDebugAlpha = Math.min(spriteDebugAlpha, 255);
+    }
+
+    public Function<BufferedImage, BufferedImage> getSceneryTransform() {
+        return sceneryTransform;
+    }
+
+    public void setSceneryTransform(Function<BufferedImage, BufferedImage> sceneryTransform) {
+        this.sceneryTransform = sceneryTransform;
+    }
+
+    public void addSceneryTransform(Function<BufferedImage, BufferedImage> sceneryTransform) {
+        if(this.sceneryTransform == null) {
+            this.sceneryTransform = sceneryTransform;
+        }
+        else {
+            this.sceneryTransform = this.sceneryTransform.andThen(sceneryTransform);
+        }
     }
 }

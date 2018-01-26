@@ -183,6 +183,21 @@ public interface IRenderableGameObject
     }
 
     /**
+     * Handy tool to manipulate image alpha values.
+     */
+    default IRenderableGameObject applyImageTransform(Function<BufferedImage, BufferedImage> transform)
+    {
+        BufferedImage[] sourceImages = getRenderedFrames();
+        BufferedImage[] destImages= new BufferedImage[sourceImages.length];
+        for (int i = 0; i < destImages.length; i++) {
+            destImages[i] = transform.apply(sourceImages[i]);
+        }
+        String name = (this instanceof MAMFile) ? ((MAMFile)this).getName() : "via transform-" + transform.toString();
+        String key = MAMFile.generateUniqueKey(name);
+        return new MaMSprite(name, key, destImages);
+    }
+
+    /**
      * Flip about vertical axis.
      */
     default IRenderableGameObject mirror()

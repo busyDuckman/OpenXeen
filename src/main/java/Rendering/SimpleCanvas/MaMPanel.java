@@ -11,16 +11,24 @@ import Rendering.GUI.PapyrusMessageBox;
 import Rendering.GUI.PlayerDialog;
 import Rendering.IRenderableGameObject;
 import Rendering.ISScalableGUI;
+import Toolbox.FileHelpers;
 import Toolbox.HackMe;
+import Toolbox.ImageHelpers;
+import Toolbox.Misc;
 import mamFiles.CCFileCache;
 import mamFiles.CCFileFormatException;
 import mamFiles.WOX.WOXSpriteFile;
 import net.miginfocom.swing.MigLayout;
 import org.joda.time.DateTime;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.stream.IntStream;
 
 import static Toolbox.SwingHelpers.makeClearPanel;
 
@@ -480,6 +488,7 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
                 CCFileCache.INSTANCE.flush();
                 break;
 
+            //used to debug certain sprite drawing commands
             case KeyEvent.VK_0:
                 WOXSpriteFile.opcodePurpleHack.toggleHack("CMD0 is purple");
                 break;
@@ -505,11 +514,44 @@ public class MaMPanel extends JPanel implements  KeyListener, ComponentListener,
                 WOXSpriteFile.opcodePurpleHack.toggleHack("CMD7 is purple");
                 break;
 
+            //screen shot
+            case KeyEvent.VK_F3:
+                saveScreenShot();
+                break;
+
 
 
         }
 
 
+    }
+
+    private void saveScreenShot() {
+        BufferedImage img = new BufferedImage((int)(mamNativeSize.getWidth()*scale),
+                                              (int)(mamNativeSize.getHeight()*scale),
+                                              BufferedImage.TYPE_INT_RGB);
+        Graphics g = img.getGraphics();
+        this.paint(g);
+        g.dispose();
+        String screenShotDir = FileHelpers.join(GlobalSettings.INSTANCE.getGameDir(), "screen_shots");
+        FileHelpers.ensurePathExists(screenShotDir);
+
+        //get an un-used sreen shot name
+        String file = IntStream.range(1, 9999)
+                .mapToObj(N-> Misc.pad(""+N, 4, '0', Misc.PadType.PAD_BEFORE))
+                .map(S -> "scrn_"+S+".png")
+                .map(S -> FileHelpers.join(screenShotDir, S))
+                .filter(F -> !FileHelpers.fileExists(F))
+                .findFirst()
+                .orElse(null);
+
+        if(file != null) {
+            try {
+                ImageIO.write(img, "png", new File(file));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 
     @Override
